@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript para Principiantes — Clase de 1 Hora</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent: #f7c948;
+    --accent2: #4af7a8;
+    --accent3: #f74a8a;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --code-bg: #0d0d14;
+    --highlight: rgba(247,201,72,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sidebar-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .sidebar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+  }
+
+  .nav-item:hover {
+    background: var(--card);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .nav-item.active {
+    background: var(--highlight);
+    color: var(--accent);
+    border-color: rgba(247,201,72,0.3);
+  }
+
+  .nav-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    min-width: 18px;
+  }
+
+  .nav-item.active .nav-num { color: var(--accent); }
+
+  .timer-widget {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .timer-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+
+  .timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 2rem;
+    color: var(--accent);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .timer-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .btn-sm {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.start { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn-sm.start:hover { opacity: 0.85; }
+
+  /* MAIN CONTENT */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 5rem 4rem 4rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: 'JS';
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 18rem;
+    color: rgba(247,201,72,0.04);
+    font-weight: 700;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--highlight);
+    border: 1px solid rgba(247,201,72,0.3);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-badge::before { content: '●'; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    max-width: 700px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .meta-item strong { color: var(--text); display: block; font-size: 0.9rem; margin-bottom: 0.1rem; }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* SECTIONS */
+  .content {
+    padding: 0 4rem 6rem;
+  }
+
+  .section {
+    padding: 4rem 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+
+  .section.visible { opacity: 1; transform: translateY(0); }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: var(--highlight);
+    border: 1px solid rgba(247,201,72,0.3);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    margin-top: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .section-info h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .section-body {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  p { color: #b8b8cc; font-size: 0.95rem; line-height: 1.8; max-width: 720px; }
+
+  strong { color: var(--text); }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .code-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .code-dot:nth-child(1) { background: #f74a8a; }
+  .code-dot:nth-child(2) { background: var(--accent); }
+  .code-dot:nth-child(3) { background: var(--accent2); }
+
+  .code-filename {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  pre {
+    padding: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    color: #c8c8e0;
+  }
+
+  /* Syntax highlighting */
+  .k { color: #f74a8a; }   /* keyword */
+  .s { color: var(--accent2); } /* string */
+  .n { color: var(--accent); }  /* number */
+  .c { color: var(--muted); font-style: italic; } /* comment */
+  .f { color: #a78bfa; }   /* function */
+  .b { color: #60a5fa; }   /* boolean */
+
+  /* CALLOUTS */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--highlight);
+    padding: 1rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    color: var(--text);
+    max-width: 720px;
+  }
+
+  .callout.tip { border-color: var(--accent2); background: rgba(74,247,168,0.08); }
+  .callout.warn { border-color: var(--accent3); background: rgba(247,74,138,0.08); }
+
+  .callout-icon {
+    font-size: 0.7rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+
+  .callout.tip .callout-icon { color: var(--accent2); }
+  .callout.warn .callout-icon { color: var(--accent3); }
+
+  /* CONCEPT CARDS */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 720px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent); }
+
+  .card-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    color: var(--text);
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-desc { font-size: 0.78rem; color: var(--muted); margin: 0; }
+
+  /* QUIZ */
+  .quiz {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+    max-width: 620px;
+  }
+
+  .quiz-q {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .quiz-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.88rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .quiz-opt:hover { border-color: var(--accent); color: var(--accent); }
+  .quiz-opt.correct { border-color: var(--accent2); background: rgba(74,247,168,0.1); color: var(--accent2); }
+  .quiz-opt.wrong { border-color: var(--accent3); background: rgba(247,74,138,0.1); color: var(--accent3); }
+
+  .quiz-feedback {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    display: none;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { color: var(--accent2); }
+  .quiz-feedback.fail { color: var(--accent3); }
+
+  /* OPERATOR TABLE */
+  .table-wrap { overflow-x: auto; max-width: 720px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th {
+    background: var(--card);
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: #b8b8cc;
+    vertical-align: top;
+  }
+  td:first-child { font-family: 'Space Mono', monospace; color: var(--accent); font-weight: 700; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* SUMMARY */
+  .summary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem;
+    display: grid;
+    gap: 1rem;
+    max-width: 720px;
+  }
+
+  .summary-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.88rem;
+  }
+
+  .summary-item::before {
+    content: '→';
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .hero { padding-top: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">// Curso JS</div>
+  <div class="sidebar-title">JavaScript para Principiantes</div>
+
+  <div class="sidebar-label">Contenido</div>
+  <a class="nav-item active" href="#intro"><span class="nav-num">01</span> Intro a JS</a>
+  <a class="nav-item" href="#variables"><span class="nav-num">02</span> Variables</a>
+  <a class="nav-item" href="#tipos"><span class="nav-num">03</span> Tipos de datos</a>
+  <a class="nav-item" href="#operadores"><span class="nav-num">04</span> Operadores</a>
+  <a class="nav-item" href="#condicionales"><span class="nav-num">05</span> Condicionales</a>
+  <a class="nav-item" href="#funciones"><span class="nav-num">06</span> Funciones</a>
+  <a class="nav-item" href="#arrays"><span class="nav-num">07</span> Arrays</a>
+  <a class="nav-item" href="#dom"><span class="nav-num">08</span> El DOM</a>
+  <a class="nav-item" href="#resumen"><span class="nav-num">✓</span> Resumen</a>
+
+  <div class="timer-widget">
+    <div class="timer-label">⏱ Cronómetro de clase</div>
+    <div class="timer-display" id="timerDisplay">60:00</div>
+    <div class="timer-controls">
+      <button class="btn-sm start" id="timerBtn" onclick="toggleTimer()">▶ Iniciar</button>
+      <button class="btn-sm" onclick="resetTimer()">↺ Reset</button>
+    </div>
+  </div>
+</nav>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">En vivo · Principiantes</div>
+    <h1>Aprende<br><span>JavaScript</span><br>en 1 hora</h1>
+    <div class="hero-meta">
+      <div class="meta-item"><strong>8 módulos</strong>Temario completo</div>
+      <div class="meta-item"><strong>60 minutos</strong>Duración total</div>
+      <div class="meta-item"><strong>Nivel</strong>Cero a funcional</div>
+      <div class="meta-item"><strong>Ejercicios</strong>Código real</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ─── MÓDULO 1: INTRO ─── -->
+    <section class="section" id="intro">
+      <div class="section-header">
+        <div class="section-num">01 — 5 min</div>
+        <div class="section-info">
+          <h2>¿Qué es JavaScript?</h2>
+          <div class="section-time">Minutos 0–5</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          <strong>JavaScript (JS)</strong> es el lenguaje de programación de la web. Mientras HTML estructura el contenido y CSS lo estiliza, JavaScript lo hace <strong>interactivo</strong>: botones que responden, animaciones, formularios que validan, y mucho más.
+        </p>
+        <p>
+          Hoy corre en el navegador de tu computador, en servidores (Node.js), en aplicaciones móviles y hasta en dispositivos inteligentes. Es uno de los lenguajes más usados del mundo.
+        </p>
+        <div class="callout">
+          <span class="callout-icon">💡 ¿Cómo ejecutarlo?</span>
+          Abre tu navegador → clic derecho → <strong>Inspeccionar</strong> → pestaña <strong>Consola</strong>. Escribe código JS ahí mismo y presiona Enter. ¡Tu primer entorno listo!
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">consola del navegador</div>
+          </div>
+          <pre><span class="c">// Tu primer programa en JavaScript</span>
+<span class="f">console</span>.<span class="f">log</span>(<span class="s">"¡Hola, mundo!"</span>);
+
+<span class="c">// console.log() muestra mensajes en la consola</span>
+<span class="c">// Es tu mejor aliado para depurar código</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 2: VARIABLES ─── -->
+    <section class="section" id="variables">
+      <div class="section-header">
+        <div class="section-num">02 — 8 min</div>
+        <div class="section-info">
+          <h2>Variables</h2>
+          <div class="section-time">Minutos 5–13</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          Una <strong>variable</strong> es un contenedor con nombre para guardar información. Piensa en ella como una caja etiquetada donde guardas un valor para usarlo después.
+        </p>
+        <p>
+          En JS moderno usamos <strong>const</strong> y <strong>let</strong>. Usa <code style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent);background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:3px;">const</code> cuando el valor no cambia, y <code style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent2);background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:3px;">let</code> cuando sí puede cambiar.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">variables.js</div>
+          </div>
+          <pre><span class="c">// const — el valor NO cambia</span>
+<span class="k">const</span> nombre = <span class="s">"María"</span>;
+<span class="k">const</span> edad   = <span class="n">25</span>;
+<span class="k">const</span> PI     = <span class="n">3.14159</span>;
+
+<span class="c">// let — el valor SÍ puede cambiar</span>
+<span class="k">let</span> puntaje  = <span class="n">0</span>;
+puntaje = <span class="n">100</span>;         <span class="c">// ✅ válido</span>
+
+<span class="c">// ❌ NO hacer esto — var es anticuado</span>
+<span class="c">// var x = 5;</span>
+
+<span class="f">console</span>.<span class="f">log</span>(nombre);    <span class="c">// → "María"</span>
+<span class="f">console</span>.<span class="f">log</span>(puntaje);   <span class="c">// → 100</span></pre>
+        </div>
+        <div class="callout warn">
+          <span class="callout-icon">⚠ Regla de nombres</span>
+          Los nombres de variables empiezan con letra, <code style="font-family:'Space Mono',monospace;">$</code> o <code style="font-family:'Space Mono',monospace;">_</code>. Sin espacios, sin tildes. Usa <strong>camelCase</strong>: <code style="font-family:'Space Mono',monospace;">miVariable</code>, no <code style="font-family:'Space Mono',monospace;">mi-variable</code>.
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 3: TIPOS ─── -->
+    <section class="section" id="tipos">
+      <div class="section-header">
+        <div class="section-num">03 — 8 min</div>
+        <div class="section-info">
+          <h2>Tipos de datos</h2>
+          <div class="section-time">Minutos 13–21</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          JavaScript maneja diferentes <strong>tipos de datos</strong>. No necesitas declararlos explícitamente — JS los infiere automáticamente (tipado dinámico).
+        </p>
+        <div class="cards">
+          <div class="card">
+            <div class="card-type">String</div>
+            <div class="card-val">"Texto"</div>
+            <p class="card-desc">Cadenas de caracteres. Van entre comillas simples, dobles o backticks.</p>
+          </div>
+          <div class="card">
+            <div class="card-type">Number</div>
+            <div class="card-val">42 / 3.14</div>
+            <p class="card-desc">Números enteros y decimales. Un solo tipo para ambos.</p>
+          </div>
+          <div class="card">
+            <div class="card-type">Boolean</div>
+            <div class="card-val">true / false</div>
+            <p class="card-desc">Solo dos valores. Para condiciones y lógica.</p>
+          </div>
+          <div class="card">
+            <div class="card-type">Null / Undefined</div>
+            <div class="card-val">null / undefined</div>
+            <p class="card-desc">Ausencia de valor. Null es intencional; undefined es involuntario.</p>
+          </div>
+          <div class="card">
+            <div class="card-type">Array</div>
+            <div class="card-val">[1, 2, 3]</div>
+            <p class="card-desc">Lista ordenada de valores. Se verá en el módulo 7.</p>
+          </div>
+          <div class="card">
+            <div class="card-type">Object</div>
+            <div class="card-val">{ key: val }</div>
+            <p class="card-desc">Colección de pares clave-valor para datos complejos.</p>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">tipos.js</div>
+          </div>
+          <pre><span class="k">const</span> texto   = <span class="s">"Hola"</span>;
+<span class="k">const</span> numero  = <span class="n">42</span>;
+<span class="k">const</span> decimal = <span class="n">3.14</span>;
+<span class="k">const</span> activo  = <span class="b">true</span>;
+<span class="k">const</span> vacio   = <span class="k">null</span>;
+
+<span class="c">// Template literals — strings con expresiones</span>
+<span class="k">const</span> nombre = <span class="s">"Ana"</span>;
+<span class="k">const</span> saludo = <span class="s">`Hola, <span style="color:var(--accent)">${nombre}</span>! Tienes <span style="color:var(--accent)">${numero}</span> mensajes.`</span>;
+<span class="f">console</span>.<span class="f">log</span>(saludo); <span class="c">// → "Hola, Ana! Tienes 42 mensajes."</span>
+
+<span class="c">// typeof — conocer el tipo de un valor</span>
+<span class="f">console</span>.<span class="f">log</span>(<span class="k">typeof</span> texto);  <span class="c">// → "string"</span>
+<span class="f">console</span>.<span class="f">log</span>(<span class="k">typeof</span> numero); <span class="c">// → "number"</span>
+<span class="f">console</span>.<span class="f">log</span>(<span class="k">typeof</span> activo); <span class="c">// → "boolean"</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 4: OPERADORES ─── -->
+    <section class="section" id="operadores">
+      <div class="section-header">
+        <div class="section-num">04 — 7 min</div>
+        <div class="section-info">
+          <h2>Operadores</h2>
+          <div class="section-time">Minutos 21–28</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          Los operadores realizan operaciones sobre valores. Los hay aritméticos, de comparación y lógicos.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Operador</th><th>Nombre</th><th>Ejemplo</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>+</td><td>Suma / Concatenar</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">3 + 2  /  "a" + "b"</code></td><td>5 / "ab"</td></tr>
+              <tr><td>-</td><td>Resta</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">10 - 4</code></td><td>6</td></tr>
+              <tr><td>*</td><td>Multiplicación</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">3 * 4</code></td><td>12</td></tr>
+              <tr><td>/</td><td>División</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">10 / 2</code></td><td>5</td></tr>
+              <tr><td>%</td><td>Módulo (resto)</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">10 % 3</code></td><td>1</td></tr>
+              <tr><td>**</td><td>Potencia</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">2 ** 8</code></td><td>256</td></tr>
+              <tr><td>===</td><td>Igual estricto</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">5 === "5"</code></td><td>false</td></tr>
+              <tr><td>!==</td><td>Diferente estricto</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">5 !== 6</code></td><td>true</td></tr>
+              <tr><td>&gt; / &lt;</td><td>Mayor / Menor</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">10 > 5</code></td><td>true</td></tr>
+              <tr><td>&amp;&amp;</td><td>Y lógico (AND)</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">true && false</code></td><td>false</td></tr>
+              <tr><td>||</td><td>O lógico (OR)</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">true || false</code></td><td>true</td></tr>
+              <tr><td>!</td><td>Negación (NOT)</td><td><code style="font-family:'Space Mono',monospace;font-size:0.75rem;">!true</code></td><td>false</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warn">
+          <span class="callout-icon">⚠ Siempre usa ===</span>
+          El operador <code style="font-family:'Space Mono',monospace;">==</code> hace conversiones de tipo peligrosas. Usa siempre <code style="font-family:'Space Mono',monospace;">===</code> (triple igual) para comparaciones seguras.
+        </div>
+
+        <!-- QUIZ 1 -->
+        <div class="quiz" id="quiz1">
+          <div class="quiz-q">🧠 ¿Cuál es el resultado de <code style="font-family:'Space Mono',monospace;color:var(--accent)">10 % 3</code>?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz1','wrong')">A. 3</div>
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz1','correct')">B. 1</div>
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz1','wrong')">C. 0.33</div>
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz1','wrong')">D. 30</div>
+          </div>
+          <div class="quiz-feedback" id="quiz1-feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 5: CONDICIONALES ─── -->
+    <section class="section" id="condicionales">
+      <div class="section-header">
+        <div class="section-num">05 — 8 min</div>
+        <div class="section-info">
+          <h2>Condicionales</h2>
+          <div class="section-time">Minutos 28–36</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          Los <strong>condicionales</strong> permiten que el programa tome decisiones: ejecutar diferente código según si una condición es verdadera o falsa.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">condicionales.js</div>
+          </div>
+          <pre><span class="k">const</span> hora = <span class="n">14</span>; <span class="c">// 2 PM</span>
+
+<span class="c">// if / else if / else</span>
+<span class="k">if</span> (hora < <span class="n">12</span>) {
+  <span class="f">console</span>.<span class="f">log</span>(<span class="s">"Buenos días"</span>);
+} <span class="k">else if</span> (hora < <span class="n">18</span>) {
+  <span class="f">console</span>.<span class="f">log</span>(<span class="s">"Buenas tardes"</span>); <span class="c">// ← esto se ejecuta</span>
+} <span class="k">else</span> {
+  <span class="f">console</span>.<span class="f">log</span>(<span class="s">"Buenas noches"</span>);
+}
+
+<span class="c">// Operador ternario — versión corta</span>
+<span class="k">const</span> edad = <span class="n">20</span>;
+<span class="k">const</span> acceso = (edad >= <span class="n">18</span>) ? <span class="s">"permitido"</span> : <span class="s">"denegado"</span>;
+<span class="f">console</span>.<span class="f">log</span>(acceso); <span class="c">// → "permitido"</span>
+
+<span class="c">// switch — varias opciones</span>
+<span class="k">const</span> dia = <span class="s">"lunes"</span>;
+<span class="k">switch</span> (dia) {
+  <span class="k">case</span> <span class="s">"lunes"</span>:
+    <span class="f">console</span>.<span class="f">log</span>(<span class="s">"Inicio de semana"</span>);
+    <span class="k">break</span>;
+  <span class="k">case</span> <span class="s">"viernes"</span>:
+    <span class="f">console</span>.<span class="f">log</span>(<span class="s">"¡Casi fin de semana!"</span>);
+    <span class="k">break</span>;
+  <span class="k">default</span>:
+    <span class="f">console</span>.<span class="f">log</span>(<span class="s">"Día entre semana"</span>);
+}</pre>
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">💡 Valores falsy</span>
+          En JS los siguientes valores se comportan como <code style="font-family:'Space Mono',monospace;">false</code> en una condición: <code style="font-family:'Space Mono',monospace;">0</code>, <code style="font-family:'Space Mono',monospace;">""</code>, <code style="font-family:'Space Mono',monospace;">null</code>, <code style="font-family:'Space Mono',monospace;">undefined</code>, <code style="font-family:'Space Mono',monospace;">NaN</code> y el propio <code style="font-family:'Space Mono',monospace;">false</code>. Todo lo demás es <em>truthy</em>.
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 6: FUNCIONES ─── -->
+    <section class="section" id="funciones">
+      <div class="section-header">
+        <div class="section-num">06 — 10 min</div>
+        <div class="section-info">
+          <h2>Funciones</h2>
+          <div class="section-time">Minutos 36–46</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          Una <strong>función</strong> es un bloque de código reutilizable al que le das un nombre. Evita repetir código y hace tu programa más organizado. En JS hay varias formas de crearlas.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">funciones.js</div>
+          </div>
+          <pre><span class="c">// 1. Declaración de función (tradicional)</span>
+<span class="k">function</span> <span class="f">saludar</span>(nombre) {
+  <span class="k">return</span> <span class="s">`¡Hola, <span style="color:var(--accent)">${nombre}</span>!`</span>;
+}
+<span class="f">console</span>.<span class="f">log</span>(<span class="f">saludar</span>(<span class="s">"Carlos"</span>)); <span class="c">// → "¡Hola, Carlos!"</span>
+
+<span class="c">// 2. Función flecha (arrow function) — moderna</span>
+<span class="k">const</span> <span class="f">sumar</span> = (a, b) => a + b;
+<span class="f">console</span>.<span class="f">log</span>(<span class="f">sumar</span>(<span class="n">3</span>, <span class="n">7</span>));   <span class="c">// → 10</span>
+
+<span class="c">// 3. Función con varias líneas</span>
+<span class="k">const</span> <span class="f">calcularDescuento</span> = (precio, porcentaje) => {
+  <span class="k">const</span> descuento = precio * (porcentaje / <span class="n">100</span>);
+  <span class="k">const</span> total     = precio - descuento;
+  <span class="k">return</span> total;
+};
+<span class="f">console</span>.<span class="f">log</span>(<span class="f">calcularDescuento</span>(<span class="n">50000</span>, <span class="n">20</span>)); <span class="c">// → 40000</span>
+
+<span class="c">// 4. Parámetros por defecto</span>
+<span class="k">const</span> <span class="f">potencia</span> = (base, exponente = <span class="n">2</span>) => base ** exponente;
+<span class="f">console</span>.<span class="f">log</span>(<span class="f">potencia</span>(<span class="n">4</span>));     <span class="c">// → 16  (usa exponente=2 por defecto)</span>
+<span class="f">console</span>.<span class="f">log</span>(<span class="f">potencia</span>(<span class="n">2</span>, <span class="n">10</span>)); <span class="c">// → 1024</span></pre>
+        </div>
+
+        <!-- QUIZ 2 -->
+        <div class="quiz" id="quiz2">
+          <div class="quiz-q">🧠 ¿Qué devuelve <code style="font-family:'Space Mono',monospace;color:var(--accent)">sumar(5, 3)</code> si <code style="font-family:'Space Mono',monospace;color:var(--accent)">const sumar = (a, b) => a + b</code>?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz2','wrong')">A. "53"</div>
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz2','correct')">B. 8</div>
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz2','wrong')">C. undefined</div>
+            <div class="quiz-opt" onclick="checkAnswer(this,'quiz2','wrong')">D. Error</div>
+          </div>
+          <div class="quiz-feedback" id="quiz2-feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 7: ARRAYS ─── -->
+    <section class="section" id="arrays">
+      <div class="section-header">
+        <div class="section-num">07 — 10 min</div>
+        <div class="section-info">
+          <h2>Arrays</h2>
+          <div class="section-time">Minutos 46–56</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          Un <strong>array</strong> es una lista ordenada de elementos. Pueden ser de cualquier tipo y se accede a ellos por su posición (índice), que empieza en <strong>0</strong>.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">arrays.js</div>
+          </div>
+          <pre><span class="c">// Crear un array</span>
+<span class="k">const</span> frutas = [<span class="s">"mango"</span>, <span class="s">"fresa"</span>, <span class="s">"guanábana"</span>, <span class="s">"lulo"</span>];
+
+<span class="c">// Acceder — índice empieza en 0</span>
+<span class="f">console</span>.<span class="f">log</span>(frutas[<span class="n">0</span>]); <span class="c">// → "mango"</span>
+<span class="f">console</span>.<span class="f">log</span>(frutas[<span class="n">2</span>]); <span class="c">// → "guanábana"</span>
+
+<span class="c">// Longitud</span>
+<span class="f">console</span>.<span class="f">log</span>(frutas.length); <span class="c">// → 4</span>
+
+<span class="c">// Métodos útiles</span>
+frutas.<span class="f">push</span>(<span class="s">"maracuyá"</span>);  <span class="c">// Agregar al final</span>
+frutas.<span class="f">pop</span>();              <span class="c">// Eliminar el último</span>
+frutas.<span class="f">unshift</span>(<span class="s">"mora"</span>);  <span class="c">// Agregar al inicio</span>
+
+<span class="c">// Iterar con forEach</span>
+frutas.<span class="f">forEach</span>((fruta) => {
+  <span class="f">console</span>.<span class="f">log</span>(<span class="s">`🍑 <span style="color:var(--accent)">${fruta}</span>`</span>);
+});
+
+<span class="c">// map — transformar cada elemento</span>
+<span class="k">const</span> mayusculas = frutas.<span class="f">map</span>((f) => f.<span class="f">toUpperCase</span>());
+<span class="f">console</span>.<span class="f">log</span>(mayusculas); <span class="c">// → ["MORA", "MANGO", ...]</span>
+
+<span class="c">// filter — filtrar elementos</span>
+<span class="k">const</span> numeros = [<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>, <span class="n">5</span>, <span class="n">6</span>];
+<span class="k">const</span> pares   = numeros.<span class="f">filter</span>((n) => n % <span class="n">2</span> === <span class="n">0</span>);
+<span class="f">console</span>.<span class="f">log</span>(pares); <span class="c">// → [2, 4, 6]</span>
+
+<span class="c">// find — encontrar el primero que cumple</span>
+<span class="k">const</span> mayor10  = numeros.<span class="f">find</span>((n) => n > <span class="n">3</span>);
+<span class="f">console</span>.<span class="f">log</span>(mayor10); <span class="c">// → 4</span></pre>
+        </div>
+        <div class="callout tip">
+          <span class="callout-icon">💡 Los 3 métodos más usados</span>
+          <strong>map</strong> transforma, <strong>filter</strong> filtra, <strong>forEach</strong> recorre. Estos tres los usarás en casi cualquier proyecto real.
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MÓDULO 8: DOM ─── -->
+    <section class="section" id="dom">
+      <div class="section-header">
+        <div class="section-num">08 — 4 min</div>
+        <div class="section-info">
+          <h2>El DOM — JavaScript en la página</h2>
+          <div class="section-time">Minutos 56–60</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <p>
+          El <strong>DOM</strong> (Document Object Model) es la representación de tu HTML como objetos de JavaScript. Con él puedes leer y modificar cualquier elemento de la página desde JS.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <div class="code-filename">dom.js</div>
+          </div>
+          <pre><span class="c">// Seleccionar elementos</span>
+<span class="k">const</span> titulo = document.<span class="f">querySelector</span>(<span class="s">"h1"</span>);
+<span class="k">const</span> boton  = document.<span class="f">querySelector</span>(<span class="s">"#miBoton"</span>);
+<span class="k">const</span> items  = document.<span class="f">querySelectorAll</span>(<span class="s">".item"</span>);
+
+<span class="c">// Leer y modificar contenido</span>
+<span class="f">console</span>.<span class="f">log</span>(titulo.textContent);      <span class="c">// leer texto</span>
+titulo.textContent = <span class="s">"Nuevo título"</span>;    <span class="c">// modificar texto</span>
+titulo.style.color  = <span class="s">"gold"</span>;          <span class="c">// cambiar estilo</span>
+
+<span class="c">// Responder a eventos</span>
+boton.<span class="f">addEventListener</span>(<span class="s">"click"</span>, () => {
+  <span class="f">alert</span>(<span class="s">"¡Botón presionado!"</span>);
+});
+
+<span class="c">// Crear y agregar elementos</span>
+<span class="k">const</span> parrafo   = document.<span class="f">createElement</span>(<span class="s">"p"</span>);
+parrafo.textContent = <span class="s">"Soy nuevo aquí 👋"</span>;
+document.body.<span class="f">appendChild</span>(parrafo);</pre>
+        </div>
+
+        <!-- MINI DEMO INTERACTIVA -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem;max-width:500px;">
+          <div style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;">🎮 Demo interactiva — DOM en acción</div>
+          <div id="demo-output" style="font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--accent);min-height:2rem;margin-bottom:1rem;">¡Hola, mundo!</div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button class="btn-sm" style="background:var(--surface)" onclick="demoChange()">Cambiar texto</button>
+            <button class="btn-sm" style="background:var(--surface)" onclick="demoColor()">Cambiar color</button>
+            <button class="btn-sm" style="background:var(--surface)" onclick="demoAdd()">Agregar elemento</button>
+            <button class="btn-sm" style="background:var(--surface)" onclick="demoReset()">↺ Reset</button>
+          </div>
+          <div id="demo-list" style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.3rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── RESUMEN ─── -->
+    <section class="section" id="resumen">
+      <div class="section-header">
+        <div class="section-num">✓</div>
+        <div class="section-info">
+          <h2>¡Lo lograste! Resumen de clase</h2>
+          <div class="section-time">60 minutos completados</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="summary">
+          <div class="summary-title">Lo que aprendiste hoy</div>
+          <div class="summary-item"><strong>JavaScript</strong> es el lenguaje de la web que hace las páginas interactivas.</div>
+          <div class="summary-item"><strong>Variables:</strong> <code style="font-family:'Space Mono',monospace;color:var(--accent);font-size:0.8rem;">const</code> para valores fijos, <code style="font-family:'Space Mono',monospace;color:var(--accent2);font-size:0.8rem;">let</code> para variables que cambian.</div>
+          <div class="summary-item"><strong>Tipos de datos:</strong> string, number, boolean, null, undefined, array, object.</div>
+          <div class="summary-item"><strong>Operadores:</strong> aritméticos (<code style="font-family:'Space Mono',monospace;font-size:0.8rem;">+ - * / % **</code>), comparación (<code style="font-family:'Space Mono',monospace;font-size:0.8rem;">=== !==</code>) y lógicos (<code style="font-family:'Space Mono',monospace;font-size:0.8rem;">&& || !</code>).</div>
+          <div class="summary-item"><strong>Condicionales:</strong> <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">if / else if / else</code>, operador ternario y <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">switch</code>.</div>
+          <div class="summary-item"><strong>Funciones:</strong> bloques reutilizables, declaradas o como arrow functions.</div>
+          <div class="summary-item"><strong>Arrays:</strong> listas con índices desde 0. Métodos clave: <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">map</code>, <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">filter</code>, <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">forEach</code>.</div>
+          <div class="summary-item"><strong>DOM:</strong> manipular HTML desde JS con <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">querySelector</code> y <code style="font-family:'Space Mono',monospace;font-size:0.8rem;">addEventListener</code>.</div>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <p style="margin-bottom:1rem;"><strong>Próximos pasos sugeridos:</strong></p>
+          <div class="cards" style="max-width:720px">
+            <div class="card">
+              <div class="card-type">Práctica</div>
+              <div class="card-val" style="font-size:0.85rem;">JavaScript30</div>
+              <p class="card-desc">30 proyectos en 30 días, gratis. javascript30.com</p>
+            </div>
+            <div class="card">
+              <div class="card-type">Referencia</div>
+              <div class="card-val" style="font-size:0.85rem;">MDN Web Docs</div>
+              <p class="card-desc">La documentación oficial más completa. developer.mozilla.org</p>
+            </div>
+            <div class="card">
+              <div class="card-type">Siguiente tema</div>
+              <div class="card-val" style="font-size:0.85rem;">Objetos & Loops</div>
+              <p class="card-desc">Profundiza en objetos, for…of, while y programación orientada a objetos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+// ── TIMER ──────────────────────────────────────────
+let totalSeconds = 60 * 60;
+let running = false;
+let interval = null;
+
+function toggleTimer() {
+  const btn = document.getElementById('timerBtn');
+  if (!running) {
+    running = true;
+    btn.textContent = '⏸ Pausar';
+    btn.classList.add('start');
+    interval = setInterval(() => {
+      if (totalSeconds <= 0) { clearInterval(interval); return; }
+      totalSeconds--;
+      updateDisplay();
+    }, 1000);
+  } else {
+    running = false;
+    btn.textContent = '▶ Reanudar';
+    clearInterval(interval);
+  }
+}
+
+function resetTimer() {
+  clearInterval(interval);
+  running = false;
+  totalSeconds = 60 * 60;
+  document.getElementById('timerBtn').textContent = '▶ Iniciar';
+  document.getElementById('timerBtn').classList.add('start');
+  updateDisplay();
+}
+
+function updateDisplay() {
+  const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+  const s = (totalSeconds % 60).toString().padStart(2, '0');
+  document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+}
+
+// ── SCROLL PROGRESS ────────────────────────────────
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const scrolled = doc.scrollTop;
+  const total = doc.scrollHeight - doc.clientHeight;
+  document.getElementById('progressFill').style.width = (scrolled / total * 100) + '%';
+});
+
+// ── SECTION OBSERVER ───────────────────────────────
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      const id = entry.target.id;
+      navItems.forEach(n => {
+        n.classList.toggle('active', n.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.15 });
+
+sections.forEach(s => observer.observe(s));
+
+// ── QUIZ ────────────────────────────────────────────
+function checkAnswer(el, quizId, result) {
+  const quiz = document.getElementById(quizId);
+  if (quiz.dataset.answered) return;
+  quiz.dataset.answered = '1';
+  el.classList.add(result);
+  const fb = document.getElementById(quizId + '-feedback');
+  fb.classList.add('show');
+  if (result === 'correct') {
+    fb.textContent = '✓ ¡Correcto! El módulo (%) devuelve el resto de la división entera.';
+    fb.classList.add('ok');
+  } else {
+    fb.textContent = '✗ No exactamente. La respuesta es B — el resto de 10 ÷ 3 es 1.';
+    fb.classList.add('fail');
+  }
+}
+
+// ── DOM DEMO ────────────────────────────────────────
+const texts = ['¡Hola, mundo!', '¡JavaScript es increíble!', '¡Tú puedes aprender esto!', '¡El DOM es poderoso!'];
+const colors = ['#f7c948', '#4af7a8', '#f74a8a', '#a78bfa', '#60a5fa'];
+let tIdx = 0, cIdx = 0, itemCount = 0;
+
+function demoChange() {
+  tIdx = (tIdx + 1) % texts.length;
+  document.getElementById('demo-output').textContent = texts[tIdx];
+}
+
+function demoColor() {
+  cIdx = (cIdx + 1) % colors.length;
+  document.getElementById('demo-output').style.color = colors[cIdx];
+}
+
+function demoAdd() {
+  if (itemCount >= 4) return;
+  itemCount++;
+  const list = document.getElementById('demo-list');
+  const el = document.createElement('div');
+  el.textContent = `→ Elemento creado desde JS #${itemCount}`;
+  el.style.cssText = 'font-family:Space Mono,monospace;font-size:0.7rem;color:#6b6b80;animation:fadeIn 0.3s ease';
+  list.appendChild(el);
+}
+
+function demoReset() {
+  document.getElementById('demo-output').textContent = '¡Hola, mundo!';
+  document.getElementById('demo-output').style.color = 'var(--accent)';
+  document.getElementById('demo-list').innerHTML = '';
+  tIdx = 0; cIdx = 0; itemCount = 0;
+}
+</script>
+
+<style>
+@keyframes fadeIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+</style>
+</body>
+</html>

@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forms & HTTP — Guía para Principiantes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #222230;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --code-bg: #0d0d1a;
+    --get: #43e97b;
+    --post: #6c63ff;
+    --put: #f7b731;
+    --delete: #ff6584;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 60px 40px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #e8e8f0 0%, #6c63ff 60%, #ff6584 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    overflow-x: auto;
+  }
+  .step-dot {
+    cursor: pointer;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all .25s;
+  }
+  .step-dot:hover, .step-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 40px;
+    border-bottom: 1px solid var(--border);
+    display: none;
+    animation: fadeUp .4s ease;
+  }
+  .section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .section p {
+    color: #b0b0cc;
+    margin-bottom: 16px;
+    max-width: 680px;
+  }
+  .section p strong { color: var(--text); }
+
+  /* CODE BLOCKS */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 20px 0;
+    position: relative;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #c8c8e8;
+  }
+  .kw  { color: #6c63ff; }
+  .at  { color: #43e97b; }
+  .val { color: #ff9f43; }
+  .cm  { color: #555577; font-style: italic; }
+  .tag { color: #ff6584; }
+  .str { color: #ff9f43; }
+  .num { color: #43e97b; }
+
+  /* DIAGRAM */
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    margin: 24px 0;
+    text-align: center;
+  }
+  .diagram-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .box {
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .box-client { background: #1a1a3a; border: 2px solid var(--accent); color: var(--accent); }
+  .box-server { background: #1a2a1a; border: 2px solid var(--accent3); color: var(--accent3); }
+  .box-db { background: #2a1a1a; border: 2px solid var(--accent2); color: var(--accent2); }
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0 8px;
+  }
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .arrow-line {
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  /* HTTP METHOD BADGES */
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+  }
+  .method-card {
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .method-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+  .method-card.get  { background: #0a1f12; border-color: var(--get); }
+  .method-card.post { background: #0f0e2a; border-color: var(--post); }
+  .method-card.put  { background: #1f1a08; border-color: var(--put); }
+  .method-card.del  { background: #1f0a10; border-color: var(--delete); }
+  .method-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .get  .method-badge { background: var(--get);    color: #0a1f12; }
+  .post .method-badge { background: var(--post);   color: #fff; }
+  .put  .method-badge { background: var(--put);    color: #1f1a08; }
+  .del  .method-badge { background: var(--delete); color: #fff; }
+  .method-card h4 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .method-card p  { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* LIVE DEMO */
+  .demo-box {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .demo-tabs {
+    display: flex;
+    background: var(--code-bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .demo-tab {
+    padding: 12px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+  }
+  .demo-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .demo-panel { display: none; padding: 24px; background: var(--surface); }
+  .demo-panel.active { display: block; }
+
+  /* INTERACTIVE FORM */
+  .form-demo {
+    background: #0f0f1a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .form-demo label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+  .form-demo label:first-child { margin-top: 0; }
+  .form-demo input, .form-demo select, .form-demo textarea {
+    width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .form-demo input:focus, .form-demo select:focus, .form-demo textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-demo select option { background: var(--code-bg); }
+  .form-demo textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all .2s;
+    margin-top: 18px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #5a52e8; transform: translateY(-1px); }
+  .btn-get    { background: var(--get); color: #0a1f12; }
+  .btn-post   { background: var(--post); color: #fff; }
+  .btn-delete { background: var(--delete); color: #fff; }
+
+  /* REQUEST/RESPONSE VIEWER */
+  .req-res {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  @media(max-width:600px){ .req-res { grid-template-columns: 1fr; } }
+  .req-box, .res-box {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .req-box .box-header { background: #1a1030; color: var(--accent); }
+  .res-box .box-header { background: #0a1f12; color: var(--accent3); }
+  .box-header {
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .box-body {
+    padding: 14px 16px;
+    background: var(--code-bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #b0b0cc;
+    min-height: 120px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* STATUS CODES */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .status-card {
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 3px solid;
+  }
+  .s2xx { background: #0a1f12; border-color: var(--get); }
+  .s3xx { background: #0f1520; border-color: #5bc4f5; }
+  .s4xx { background: #1f1a08; border-color: var(--put); }
+  .s5xx { background: #1f0a10; border-color: var(--delete); }
+  .status-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .s2xx .status-code { color: var(--get); }
+  .s3xx .status-code { color: #5bc4f5; }
+  .s4xx .status-code { color: var(--put); }
+  .s5xx .status-code { color: var(--delete); }
+  .status-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-info { background: #0f0e2a; border: 1px solid var(--accent); }
+  .callout-warn { background: #1f1a08; border: 1px solid var(--put); }
+  .callout-tip  { background: #0a1f12; border: 1px solid var(--get); }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .callout-text { font-size: 14px; color: #b0b0cc; }
+  .callout-text strong { color: var(--text); }
+
+  /* FLOW ANIMATION */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .flow-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-left: 2px solid var(--border);
+    padding-left: 20px;
+    position: relative;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity .4s, transform .4s;
+  }
+  .flow-item.visible { opacity: 1; transform: translateX(0); }
+  .flow-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 22px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .flow-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 24px;
+  }
+  .flow-content { flex: 1; }
+  .flow-content strong { color: var(--text); display: block; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+  .flow-content span { font-size: 13px; color: var(--muted); }
+
+  /* NAV BUTTONS */
+  .nav-row {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    transition: all .2s;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn.next-btn { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nav-btn.next-btn:hover { background: #5a52e8; }
+
+  /* HIGHLIGHT */
+  .highlight { color: var(--accent); font-weight: 600; }
+
+  /* URL bar sim */
+  .url-bar {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .url-method { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .url-path { color: var(--text); }
+  .url-query { color: var(--accent2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Result output */
+  #demo-output {
+    margin-top: 16px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    min-height: 80px;
+    white-space: pre-wrap;
+    display: none;
+  }
+  #demo-output.visible { display: block; }
+  .loading-dots::after {
+    content: '...';
+    animation: dots 1s steps(3, end) infinite;
+  }
+  @keyframes dots {
+    0%,20% { content: '.'; }
+    40%,60% { content: '..'; }
+    80%,100% { content: '...'; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">// guía interactiva · principiantes</div>
+  <h1>Forms, HTTP<br>& la Web</h1>
+  <p>Cómo el navegador habla con el servidor. Desde el primer <code>&lt;form&gt;</code> hasta entender qué viaja por el cable.</p>
+</div>
+
+<!-- PROGRESS NAV -->
+<div class="progress-bar">
+  <div class="step-dot active" onclick="goTo(0)">01 · Cliente & Servidor</div>
+  <div class="step-dot" onclick="goTo(1)">02 · El form en HTML</div>
+  <div class="step-dot" onclick="goTo(2)">03 · Métodos HTTP</div>
+  <div class="step-dot" onclick="goTo(3)">04 · Request & Response</div>
+  <div class="step-dot" onclick="goTo(4)">05 · Demo en vivo</div>
+  <div class="step-dot" onclick="goTo(5)">06 · Status Codes</div>
+</div>
+
+<!-- ===================== SECTION 0 ===================== -->
+<div class="section active" id="sec-0">
+  <div class="section-label">01</div>
+  <h2>Cliente & Servidor</h2>
+  <p>Antes de tocar código, necesitas entender el modelo que mueve toda la web. Son dos actores distintos que se comunican por red.</p>
+
+  <div class="diagram">
+    <div class="diagram-row">
+      <div class="box box-client">🖥️ Cliente<br><small style="font-size:10px;color:var(--muted)">tu navegador</small></div>
+      <div class="arrow">
+        <div class="arrow-label">request →</div>
+        <div class="arrow-line">━━━━━━━━</div>
+        <div class="arrow-label">← response</div>
+      </div>
+      <div class="box box-server">⚡ Servidor<br><small style="font-size:10px;color:var(--muted)">Node, Python, etc.</small></div>
+      <div class="arrow">
+        <div class="arrow-label">query →</div>
+        <div class="arrow-line">━━━━━━</div>
+        <div class="arrow-label">← data</div>
+      </div>
+      <div class="box box-db">🗄️ Base de datos</div>
+    </div>
+  </div>
+
+  <div class="flow" id="flow-cs">
+    <div class="flow-item">
+      <div class="flow-num">01</div>
+      <div class="flow-content">
+        <strong>El cliente inicia todo</strong>
+        <span>Tu navegador (Chrome, Firefox) es el cliente. Solo habla cuando tú haces algo: escribes una URL, haces click, envías un form.</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">02</div>
+      <div class="flow-content">
+        <strong>Viaja una Request por internet</strong>
+        <span>Un paquete de texto estructurado sale de tu máquina hacia la IP del servidor. Lleva: método, ruta, headers y opcionalmente un body.</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">03</div>
+      <div class="flow-content">
+        <strong>El servidor procesa y responde</strong>
+        <span>El servidor recibe la request, ejecuta lógica (busca en DB, genera HTML, valida datos) y devuelve una Response con un status code.</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">04</div>
+      <div class="flow-content">
+        <strong>El cliente renderiza</strong>
+        <span>El navegador recibe la response y la muestra: puede ser HTML, JSON, una imagen, un error... lo que el servidor decidió devolver.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text">
+      <strong>HTTP es sin estado (stateless).</strong> El servidor no recuerda quién eres entre requests. Por eso existen las cookies, sessions y tokens JWT — para simular memoria.
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION 1 ===================== -->
+<div class="section" id="sec-1">
+  <div class="section-label">02</div>
+  <h2>El &lt;form&gt; en HTML</h2>
+  <p>Un <code>&lt;form&gt;</code> es el mecanismo nativo del navegador para recolectar datos del usuario y <strong>enviarlos al servidor</strong>. Tiene dos atributos clave:</p>
+
+  <pre><code><span class="cm">&lt;!-- action = ¿a dónde van los datos? --&gt;
+&lt;!-- method = ¿cómo los enviamos? --&gt;</span>
+
+<span class="tag">&lt;form</span> <span class="at">action</span>=<span class="str">"/registro"</span> <span class="at">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"text"</span>  <span class="at">name</span>=<span class="str">"usuario"</span>  <span class="at">placeholder</span>=<span class="str">"Tu nombre"</span>  <span class="tag">/&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"email"</span> <span class="at">name</span>=<span class="str">"correo"</span>   <span class="at">placeholder</span>=<span class="str">"email@ejemplo.com"</span> <span class="tag">/&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"password"</span> <span class="at">name</span>=<span class="str">"clave"</span> <span class="at">placeholder</span>=<span class="str">"Contraseña"</span> <span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;button</span> <span class="at">type</span>=<span class="str">"submit"</span><span class="tag">&gt;</span>Registrar<span class="tag">&lt;/button&gt;</span>
+
+<span class="tag">&lt;/form&gt;</span></code></pre>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text">
+      El atributo <strong>name</strong> es el que importa: es la clave con la que el servidor va a recibir el dato. Sin <code>name</code>, el campo no se envía.
+    </div>
+  </div>
+
+  <p style="margin-top:24px;"><strong>¿Qué pasa cuando haces submit?</strong></p>
+
+  <div class="flow" id="flow-form">
+    <div class="flow-item">
+      <div class="flow-num">01</div>
+      <div class="flow-content">
+        <strong>El navegador serializa los campos</strong>
+        <span>Toma cada input con su <code>name</code> y construye pares clave=valor: <code>usuario=Ana&amp;correo=ana@mail.com&amp;clave=1234</code></span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">02</div>
+      <div class="flow-content">
+        <strong>GET → va en la URL · POST → va en el body</strong>
+        <span>Con GET verás los datos en la barra del navegador. Con POST viajan ocultos en el cuerpo de la request.</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">03</div>
+      <div class="flow-content">
+        <strong>El servidor los recibe y procesa</strong>
+        <span>En Node/Express: <code>req.body.usuario</code>. En Python/Flask: <code>request.form['usuario']</code></span>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Tipos de input más comunes:</strong></p>
+  <pre><code><span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"text"</span>     <span class="at">name</span>=<span class="str">"nombre"</span>   <span class="tag">/&gt;</span>  <span class="cm">&lt;!-- texto libre --&gt;</span>
+<span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"email"</span>    <span class="at">name</span>=<span class="str">"correo"</span>   <span class="tag">/&gt;</span>  <span class="cm">&lt;!-- valida @ --&gt;</span>
+<span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"password"</span> <span class="at">name</span>=<span class="str">"clave"</span>    <span class="tag">/&gt;</span>  <span class="cm">&lt;!-- oculta caracteres --&gt;</span>
+<span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"number"</span>   <span class="at">name</span>=<span class="str">"edad"</span>     <span class="tag">/&gt;</span>  <span class="cm">&lt;!-- solo números --&gt;</span>
+<span class="tag">&lt;input</span> <span class="at">type</span>=<span class="str">"checkbox"</span> <span class="at">name</span>=<span class="str">"acepto"</span>  <span class="tag">/&gt;</span>  <span class="cm">&lt;!-- booleano --&gt;</span>
+<span class="tag">&lt;select</span> <span class="at">name</span>=<span class="str">"pais"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;option</span> <span class="at">value</span>=<span class="str">"co"</span><span class="tag">&gt;</span>Colombia<span class="tag">&lt;/option&gt;</span>
+<span class="tag">&lt;/select&gt;</span>
+<span class="tag">&lt;textarea</span> <span class="at">name</span>=<span class="str">"mensaje"</span><span class="tag">&gt;&lt;/textarea&gt;</span>    <span class="cm">&lt;!-- texto largo --&gt;</span></code></pre>
+</div>
+
+<!-- ===================== SECTION 2 ===================== -->
+<div class="section" id="sec-2">
+  <div class="section-label">03</div>
+  <h2>Métodos HTTP</h2>
+  <p>HTTP define <strong>verbos</strong> que indican la intención de la request. Cada uno tiene un significado semántico claro:</p>
+
+  <div class="methods-grid">
+    <div class="method-card get">
+      <div class="method-badge">GET</div>
+      <h4>Obtener datos</h4>
+      <p>Lee información del servidor. No modifica nada. Los datos van en la URL.</p>
+    </div>
+    <div class="method-card post">
+      <div class="method-badge">POST</div>
+      <h4>Crear / Enviar</h4>
+      <p>Crea un nuevo recurso. Los datos van en el body, no en la URL.</p>
+    </div>
+    <div class="method-card put">
+      <div class="method-badge">PUT</div>
+      <h4>Actualizar</h4>
+      <p>Reemplaza un recurso completo. Necesitas enviar todos los campos.</p>
+    </div>
+    <div class="method-card del">
+      <div class="method-badge">DELETE</div>
+      <h4>Eliminar</h4>
+      <p>Borra un recurso del servidor. Generalmente va el ID en la URL.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-text">
+      <strong>Un form HTML solo soporta GET y POST nativamente.</strong> Para usar PUT o DELETE necesitas JavaScript (fetch/axios) o un campo oculto <code>&lt;input type="hidden" name="_method" value="PUT"&gt;</code> si tu framework lo soporta.
+    </div>
+  </div>
+
+  <p style="margin-top:24px;"><strong>¿Cómo se ve una request GET vs POST?</strong></p>
+
+  <div class="url-bar">
+    <span class="url-method" style="background:var(--get);color:#0a1f12">GET</span>
+    <span class="url-path">https://api.ejemplo.com/usuarios</span>
+    <span class="url-query">?nombre=Ana&amp;pagina=2</span>
+  </div>
+  <p style="font-size:13px;color:var(--muted);">Con GET los parámetros van en la URL después del <code>?</code>. Son visibles, guardados en historial, sin body.</p>
+
+  <div class="url-bar" style="margin-top:8px;">
+    <span class="url-method" style="background:var(--post);color:#fff">POST</span>
+    <span class="url-path">https://api.ejemplo.com/usuarios</span>
+  </div>
+  <pre style="margin-top:6px;"><code><span class="cm">// Body de la request POST (no visible en la URL):</span>
+{
+  <span class="str">"nombre"</span>: <span class="str">"Ana"</span>,
+  <span class="str">"correo"</span>: <span class="str">"ana@mail.com"</span>,
+  <span class="str">"clave"</span>:  <span class="str">"supersecreta"</span>
+}</code></pre>
+
+  <p>Con POST los datos viajan en el cuerpo de la request — no aparecen en la URL, pero <strong>tampoco son secretos sin HTTPS</strong>. Siempre usa <code>https://</code>.</p>
+
+  <p style="margin-top:24px;"><strong>Ejemplo con fetch() en JavaScript:</strong></p>
+  <pre><code><span class="cm">// GET — leer usuarios</span>
+<span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'/api/usuarios'</span>);
+<span class="kw">const</span> data = <span class="kw">await</span> res.json();
+
+<span class="cm">// POST — crear usuario</span>
+<span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'/api/usuarios'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+  body: JSON.stringify({ nombre: <span class="str">'Ana'</span>, correo: <span class="str">'ana@mail.com'</span> })
+});
+
+<span class="cm">// DELETE — eliminar usuario con id 42</span>
+<span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'/api/usuarios/42'</span>, { method: <span class="str">'DELETE'</span> });</code></pre>
+</div>
+
+<!-- ===================== SECTION 3 ===================== -->
+<div class="section" id="sec-3">
+  <div class="section-label">04</div>
+  <h2>Request & Response</h2>
+  <p>Toda la comunicación web son mensajes de texto estructurados. Veamos exactamente qué viaja en cada dirección:</p>
+
+  <div class="req-res">
+    <div class="req-box">
+      <div class="box-header">📤 REQUEST (cliente → servidor)</div>
+      <div class="box-body">POST /registro HTTP/1.1
+Host: miapp.com
+Content-Type: application/json
+Authorization: Bearer eyJ...
+Accept: application/json
+
+{
+  "usuario": "ana",
+  "correo": "ana@mail.com"
+}</div>
+    </div>
+    <div class="res-box">
+      <div class="box-header">📥 RESPONSE (servidor → cliente)</div>
+      <div class="box-body">HTTP/1.1 201 Created
+Content-Type: application/json
+Set-Cookie: session=abc123
+Cache-Control: no-store
+
+{
+  "id": 99,
+  "usuario": "ana",
+  "ok": true
+}</div>
+    </div>
+  </div>
+
+  <p><strong>Anatomía de una Request:</strong></p>
+
+  <div class="flow" id="flow-req">
+    <div class="flow-item">
+      <div class="flow-num">★</div>
+      <div class="flow-content">
+        <strong>Request Line</strong>
+        <span><code>POST /registro HTTP/1.1</code> — el método, la ruta, y la versión del protocolo.</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">★</div>
+      <div class="flow-content">
+        <strong>Headers</strong>
+        <span>Metadatos: <code>Content-Type</code> (qué formato envías), <code>Authorization</code> (tu token), <code>Accept</code> (qué formato quieres recibir).</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">★</div>
+      <div class="flow-content">
+        <strong>Body (opcional)</strong>
+        <span>Solo en POST, PUT, PATCH. Contiene los datos en JSON, form-data, texto, etc. GET no tiene body.</span>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:16px;"><strong>Anatomía de una Response:</strong></p>
+
+  <div class="flow" id="flow-res">
+    <div class="flow-item">
+      <div class="flow-num">★</div>
+      <div class="flow-content">
+        <strong>Status Line</strong>
+        <span><code>HTTP/1.1 201 Created</code> — versión + código numérico + mensaje. El código lo dice todo.</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">★</div>
+      <div class="flow-content">
+        <strong>Headers</strong>
+        <span><code>Content-Type</code> (qué te mando), <code>Set-Cookie</code> (guardar sesión), <code>Cache-Control</code> (cómo cachearlo).</span>
+      </div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-num">★</div>
+      <div class="flow-content">
+        <strong>Body</strong>
+        <span>La respuesta en sí: JSON con datos, HTML de una página, texto de error, o nada (en un 204 No Content).</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🔍</div>
+    <div class="callout-text">
+      <strong>Tip práctico:</strong> Abre DevTools (F12) → pestaña <strong>Network</strong>. Cada vez que cargues una página o envíes un form, verás exactamente qué requests salieron, qué headers llevaban, y qué respondió el servidor.
+    </div>
+  </div>
+
+  <pre><code><span class="cm">// En el servidor (Node + Express) así ves el request:</span>
+app.post(<span class="str">'/registro'</span>, (req, res) => {
+  <span class="kw">const</span> { usuario, correo } = req.body;    <span class="cm">// body</span>
+  <span class="kw">const</span> token = req.headers.authorization;  <span class="cm">// header</span>
+  <span class="kw">const</span> pagina = req.query.pagina;           <span class="cm">// ?pagina=2 en la URL</span>
+  <span class="kw">const</span> id = req.params.id;                 <span class="cm">// /usuarios/:id</span>
+
+  <span class="cm">// ... lógica ...</span>
+
+  res.status(<span class="num">201</span>).json({ ok: <span class="kw">true</span>, id: <span class="num">99</span> });  <span class="cm">// response</span>
+});</code></pre>
+</div>
+
+<!-- ===================== SECTION 4 ===================== -->
+<div class="section" id="sec-4">
+  <div class="section-label">05</div>
+  <h2>Demo en vivo</h2>
+  <p>Prueba un form real que hace requests a la API pública <strong>JSONPlaceholder</strong>. Observa cómo cambia la request según el método.</p>
+
+  <div class="demo-box">
+    <div class="demo-tabs">
+      <div class="demo-tab active" onclick="switchTab(0)">GET · Leer</div>
+      <div class="demo-tab" onclick="switchTab(1)">POST · Crear</div>
+      <div class="demo-tab" onclick="switchTab(2)">DELETE · Borrar</div>
+    </div>
+
+    <!-- GET -->
+    <div class="demo-panel active" id="tab-0">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Obtiene un post por su ID. Los datos van en la URL.</p>
+      <div class="form-demo">
+        <label>ID del post (1–100)</label>
+        <input type="number" id="get-id" value="1" min="1" max="100" />
+        <button class="btn btn-get" onclick="doGet()">→ GET /posts/{id}</button>
+      </div>
+      <div id="demo-output-get" class="demo-output-box"></div>
+    </div>
+
+    <!-- POST -->
+    <div class="demo-panel" id="tab-1">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Crea un nuevo post. Los datos van en el body como JSON.</p>
+      <div class="form-demo">
+        <label>Título</label>
+        <input type="text" id="post-title" placeholder="Mi primer post" />
+        <label>Contenido</label>
+        <textarea id="post-body" placeholder="Escribe algo..."></textarea>
+        <label>User ID</label>
+        <input type="number" id="post-userid" value="1" min="1" max="10" />
+        <button class="btn btn-post" onclick="doPost()">→ POST /posts</button>
+      </div>
+      <div id="demo-output-post" class="demo-output-box"></div>
+    </div>
+
+    <!-- DELETE -->
+    <div class="demo-panel" id="tab-2">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Elimina un post. Solo necesitas el ID en la URL.</p>
+      <div class="form-demo">
+        <label>ID del post a eliminar</label>
+        <input type="number" id="del-id" value="1" min="1" max="100" />
+        <button class="btn btn-delete" onclick="doDelete()">→ DELETE /posts/{id}</button>
+      </div>
+      <div id="demo-output-delete" class="demo-output-box"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION 5 ===================== -->
+<div class="section" id="sec-5">
+  <div class="section-label">06</div>
+  <h2>Status Codes</h2>
+  <p>El servidor siempre responde con un código de 3 dígitos. El primer dígito define la categoría.</p>
+
+  <div class="status-grid">
+    <div class="status-card s2xx">
+      <div class="status-code">2xx</div>
+      <p><strong style="color:var(--get)">Éxito</strong><br>200 OK · 201 Created · 204 No Content</p>
+    </div>
+    <div class="status-card s3xx">
+      <div class="status-code">3xx</div>
+      <p><strong style="color:#5bc4f5">Redirección</strong><br>301 Moved · 302 Found · 304 Not Modified</p>
+    </div>
+    <div class="status-card s4xx">
+      <div class="status-code">4xx</div>
+      <p><strong style="color:var(--put)">Error del cliente</strong><br>400 Bad Request · 401 Unauth · 404 Not Found</p>
+    </div>
+    <div class="status-card s5xx">
+      <div class="status-code">5xx</div>
+      <p><strong style="color:var(--delete)">Error del servidor</strong><br>500 Internal Error · 502 Bad Gateway · 503 Service Unavailable</p>
+    </div>
+  </div>
+
+  <p style="margin-top:8px;"><strong>Los más importantes que verás a diario:</strong></p>
+
+  <pre><code><span class="num">200</span> OK            → Todo bien. La respuesta tiene el contenido pedido.
+<span class="num">201</span> Created        → Se creó el recurso (respuesta típica de POST).
+<span class="num">204</span> No Content      → Ok pero sin body (respuesta típica de DELETE).
+<span class="num">301</span> Moved Perm.     → El recurso cambió de URL para siempre.
+<span class="num">400</span> Bad Request     → Tu request tiene errores (datos inválidos, JSON roto).
+<span class="num">401</span> Unauthorized    → No enviaste credenciales o son inválidas.
+<span class="num">403</span> Forbidden       → Autenticado pero sin permiso.
+<span class="num">404</span> Not Found       → El recurso no existe en esa ruta.
+<span class="num">422</span> Unproc. Entity  → Datos con formato correcto pero lógicamente inválidos.
+<span class="num">500</span> Internal Error  → El servidor explotó. Bug en tu backend.</code></pre>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">✅</div>
+    <div class="callout-text">
+      <strong>Ya sabes lo esencial.</strong> Con esto puedes entender cualquier API, debuggear problemas de red, y construir forms que realmente se comuniquen con un servidor. El siguiente paso es explorar fetch(), async/await, y cómo leer errores en DevTools Network.
+    </div>
+  </div>
+
+  <pre><code><span class="cm">// Patrón completo: form → fetch → manejo de respuesta</span>
+<span class="kw">async function</span> enviarForm(e) {
+  e.preventDefault();  <span class="cm">// evita que el form recargue la página</span>
+
+  <span class="kw">const</span> datos = {
+    nombre: document.getElementById(<span class="str">'nombre'</span>).value,
+    correo: document.getElementById(<span class="str">'correo'</span>).value,
+  };
+
+  <span class="kw">try</span> {
+    <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'/api/usuarios'</span>, {
+      method: <span class="str">'POST'</span>,
+      headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+      body: JSON.stringify(datos),
+    });
+
+    <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> Error(<span class="str">`Error ${res.status}`</span>);
+
+    <span class="kw">const</span> json = <span class="kw">await</span> res.json();
+    console.log(<span class="str">'Creado:'</span>, json);
+
+  } <span class="kw">catch</span> (err) {
+    console.error(<span class="str">'Falló:'</span>, err.message);
+  }
+}
+
+document.getElementById(<span class="str">'mi-form'</span>).addEventListener(<span class="str">'submit'</span>, enviarForm);</code></pre>
+</div>
+
+<!-- NAV BUTTONS -->
+<div class="nav-row">
+  <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Anterior</button>
+  <button class="nav-btn next-btn" id="btn-next" onclick="navigate(1)">Siguiente →</button>
+</div>
+
+<style>
+  .demo-output-box {
+    margin-top: 16px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    min-height: 60px;
+    display: none;
+    white-space: pre-wrap;
+  }
+  .demo-output-box.visible { display: block; }
+  .out-req { color: var(--muted); margin-bottom: 8px; }
+  .out-status-ok { color: var(--get); }
+  .out-status-err { color: var(--delete); }
+  .out-body { color: #c8c8e8; margin-top: 8px; }
+</style>
+
+<script>
+  let current = 0;
+  const total = 6;
+
+  function goTo(index) {
+    document.querySelectorAll('.section').forEach((s, i) => {
+      s.classList.toggle('active', i === index);
+    });
+    document.querySelectorAll('.step-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === index);
+    });
+    current = index;
+    document.getElementById('btn-prev').disabled = current === 0;
+    document.getElementById('btn-next').disabled = current === total - 1;
+    document.getElementById('btn-next').textContent = current === total - 1 ? '✓ Completado' : 'Siguiente →';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    animateFlows();
+  }
+
+  function navigate(dir) {
+    const next = current + dir;
+    if (next >= 0 && next < total) goTo(next);
+  }
+
+  function animateFlows() {
+    setTimeout(() => {
+      document.querySelectorAll('.section.active .flow-item').forEach((item, i) => {
+        item.style.transitionDelay = `${i * 120}ms`;
+        item.classList.add('visible');
+      });
+    }, 100);
+  }
+
+  function switchTab(idx) {
+    document.querySelectorAll('.demo-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    document.querySelectorAll('.demo-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+  }
+
+  function showOutput(id, reqLine, statusCode, statusText, bodyText) {
+    const box = document.getElementById(id);
+    box.classList.add('visible');
+    const statusClass = statusCode < 300 ? 'out-status-ok' : 'out-status-err';
+    box.innerHTML = `<div class="out-req">→ ${reqLine}</div><div class="${statusClass}">← ${statusCode} ${statusText}</div><div class="out-body">${bodyText}</div>`;
+  }
+
+  async function doGet() {
+    const id = document.getElementById('get-id').value || 1;
+    const box = document.getElementById('demo-output-get');
+    box.classList.add('visible');
+    box.innerHTML = '<div class="out-req">→ GET /posts/' + id + '</div><div style="color:var(--muted)">Enviando request<span class="loading-dots"></span></div>';
+    try {
+      const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      const data = await res.json();
+      showOutput('demo-output-get', `GET https://jsonplaceholder.typicode.com/posts/${id}`, res.status, res.statusText || 'OK', JSON.stringify(data, null, 2));
+    } catch(e) {
+      box.innerHTML = `<div class="out-status-err">Error de red: ${e.message}</div>`;
+    }
+  }
+
+  async function doPost() {
+    const title = document.getElementById('post-title').value || 'Sin título';
+    const body = document.getElementById('post-body').value || 'Sin contenido';
+    const userId = document.getElementById('post-userid').value || 1;
+    const payload = { title, body, userId: Number(userId) };
+    const box = document.getElementById('demo-output-post');
+    box.classList.add('visible');
+    box.innerHTML = `<div class="out-req">→ POST /posts\nBody: ${JSON.stringify(payload)}</div><div style="color:var(--muted)">Enviando request<span class="loading-dots"></span></div>`;
+    try {
+      const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      showOutput('demo-output-post', `POST https://jsonplaceholder.typicode.com/posts`, res.status, 'Created', JSON.stringify(data, null, 2));
+    } catch(e) {
+      box.innerHTML = `<div class="out-status-err">Error: ${e.message}</div>`;
+    }
+  }
+
+  async function doDelete() {
+    const id = document.getElementById('del-id').value || 1;
+    const box = document.getElementById('demo-output-delete');
+    box.classList.add('visible');
+    box.innerHTML = `<div class="out-req">→ DELETE /posts/${id}</div><div style="color:var(--muted)">Enviando request<span class="loading-dots"></span></div>`;
+    try {
+      const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, { method: 'DELETE' });
+      showOutput('demo-output-delete', `DELETE https://jsonplaceholder.typicode.com/posts/${id}`, res.status, '200 OK', res.status === 200 ? '{}  // Servidor confirmó el borrado (body vacío)' : 'Sin contenido');
+    } catch(e) {
+      box.innerHTML = `<div class="out-status-err">Error: ${e.message}</div>`;
+    }
+  }
+
+  // Init
+  animateFlows();
+</script>
+</body>
+</html>

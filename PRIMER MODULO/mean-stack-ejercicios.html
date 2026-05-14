@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIT · Fundamentos + Ejercicios</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080d12; --surface:#0d1520; --s2:#111c2e;
+  --cyan:#00e5cc; --purple:#7c3aed; --pink:#f472b6;
+  --yellow:#fbbf24; --green:#10b981; --orange:#fb923c;
+  --red:#f87171; --blue:#60a5fa;
+  --text:#e2eaf4; --muted:#5a7191; --border:#1a2d45;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+
+/* BG */
+.bg-grid{position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(0,229,204,.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,229,204,.025) 1px,transparent 1px);
+  background-size:48px 48px;}
+.bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,229,204,.06) 0%,transparent 70%);}
+
+/* PROGRESS */
+#prog{position:fixed;top:0;left:0;height:3px;z-index:200;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+/* SLIDE ENGINE */
+#deck{position:relative;width:100vw;height:100vh;overflow:hidden;z-index:1;}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:2.5rem 3.5rem 5rem;
+  opacity:0;pointer-events:none;transform:translateY(28px);
+  transition:opacity .45s ease,transform .45s cubic-bezier(.4,0,.2,1);
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateY(0);}
+.slide.out{opacity:0;transform:translateY(-28px);}
+
+/* TYPOGRAPHY */
+.label{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.18em;
+  color:var(--cyan);text-transform:uppercase;margin-bottom:.6rem;}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.4rem,5.5vw,4.5rem);
+  line-height:1.05;text-align:center;}
+h2{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.1;}
+h3{font-family:'Syne',sans-serif;font-weight:600;font-size:clamp(.95rem,1.8vw,1.25rem);}
+p,li{font-size:clamp(.85rem,1.3vw,1rem);line-height:1.7;color:#a0b8cc;}
+.sm{font-size:.82rem !important;}
+
+.cy{color:var(--cyan);} .pu{color:var(--purple);} .ye{color:var(--yellow);}
+.gr{color:var(--green);} .pk{color:var(--pink);} .or{color:var(--orange);}
+.bl{color:var(--blue);} .re{color:var(--red);}
+
+/* LAYOUT */
+.w{width:100%;max-width:940px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;max-width:920px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;width:100%;max-width:940px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;width:100%;max-width:940px;}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:1.1rem 1.3rem;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+.card:hover{transform:translateY(-3px);border-color:rgba(0,229,204,.3);}
+
+/* TAG */
+.tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.65rem;
+  padding:.18rem .55rem;border-radius:9999px;border:1px solid;margin-bottom:.4rem;}
+.tc{color:var(--cyan);border-color:var(--cyan);}
+.tp{color:var(--purple);border-color:var(--purple);}
+.ty{color:var(--yellow);border-color:var(--yellow);}
+.tg{color:var(--green);border-color:var(--green);}
+.tk{color:var(--pink);border-color:var(--pink);}
+.to{color:var(--orange);border-color:var(--orange);}
+.tb{color:var(--blue);border-color:var(--blue);}
+
+/* CODE */
+.code{background:#050a0f;border:1px solid var(--border);border-radius:10px;
+  padding:.9rem 1.1rem;font-family:'Space Mono',monospace;font-size:.78rem;
+  color:#7dd3fc;line-height:1.85;position:relative;overflow:hidden;}
+.code::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));}
+.kw{color:var(--purple);} .st{color:var(--yellow);} .fn{color:var(--cyan);}
+.cm{color:var(--muted);font-style:italic;} .nu{color:var(--green);}
+.op{color:var(--orange);} .va{color:#93c5fd;}
+
+/* ANALOGY */
+.ana{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(0,229,204,.05));
+  border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:.9rem 1.1rem;
+  display:flex;gap:.7rem;align-items:flex-start;}
+.ai{font-size:1.4rem;flex-shrink:0;margin-top:.1rem;}
+
+/* ══════════════════════════════
+   EXERCISE TYPES
+══════════════════════════════ */
+
+/* ALGO EXERCISE */
+.ex-algo{background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(251,146,60,.04));
+  border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:1.1rem 1.3rem;}
+.ex-header{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;}
+.ex-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:1rem;flex-shrink:0;}
+.ex-icon-algo{background:rgba(251,191,36,.15);}
+.ex-icon-html{background:rgba(251,146,60,.15);}
+.ex-icon-inv{background:rgba(96,165,250,.15);}
+.ex-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+
+/* STEPS */
+.steps{list-style:none;display:flex;flex-direction:column;gap:.4rem;}
+.steps li{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;color:#a0b8cc;}
+.step-n{width:20px;height:20px;border-radius:50%;background:rgba(0,229,204,.12);
+  border:1px solid rgba(0,229,204,.3);color:var(--cyan);
+  font-family:'Space Mono',monospace;font-size:.6rem;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;}
+
+/* CHECKBOX */
+.checks{list-style:none;display:flex;flex-direction:column;gap:.45rem;}
+.checks li{display:flex;gap:.6rem;align-items:flex-start;font-size:.84rem;color:#a0b8cc;cursor:pointer;
+  padding:.3rem .5rem;border-radius:7px;transition:background .2s;}
+.checks li:hover{background:rgba(255,255,255,.03);}
+.cb{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;
+  flex-shrink:0;margin-top:.15rem;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.checks li.done .cb{background:var(--green);border-color:var(--green);}
+.checks li.done .cb::after{content:'✓';font-size:.6rem;color:#fff;}
+.checks li.done span{text-decoration:line-through;color:var(--muted);}
+
+/* FLIP CARD */
+.flip-wrap{perspective:800px;cursor:pointer;}
+.flip-inner{position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);}
+.flip-wrap.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-face{backface-visibility:hidden;border-radius:12px;padding:1rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:110px;text-align:center;}
+.flip-front{background:var(--surface);border:1px solid var(--border);}
+.flip-back{background:linear-gradient(135deg,rgba(0,229,204,.1),rgba(124,58,237,.1));
+  border:1px solid rgba(0,229,204,.3);
+  position:absolute;inset:0;transform:rotateY(180deg);}
+.flip-hint{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:.4rem;}
+
+/* DRAG & DROP */
+.dnd-area{display:flex;flex-wrap:wrap;gap:.5rem;min-height:48px;
+  border:2px dashed var(--border);border-radius:10px;padding:.5rem;
+  transition:border-color .2s;}
+.dnd-area.drag-over{border-color:var(--cyan);}
+.dnd-chip{background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:.3rem .75rem;font-family:'Space Mono',monospace;font-size:.75rem;
+  cursor:grab;user-select:none;transition:all .2s;color:var(--text);}
+.dnd-chip:hover{border-color:var(--cyan);color:var(--cyan);}
+.dnd-chip.dragging{opacity:.4;}
+
+/* TIMER */
+.timer-badge{display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);
+  padding:.2rem .7rem;border-radius:9999px;font-family:'Space Mono',monospace;font-size:.7rem;
+  color:var(--yellow);}
+#timer-val{min-width:35px;display:inline-block;text-align:center;}
+
+/* INPUT EXERCISE */
+.ex-input{background:#050a0f;border:1px solid var(--border);border-radius:8px;
+  padding:.5rem .9rem;font-family:'Space Mono',monospace;font-size:.85rem;
+  color:var(--text);width:100%;outline:none;transition:border-color .2s;}
+.ex-input:focus{border-color:var(--cyan);}
+.ex-btn{background:rgba(0,229,204,.12);border:1px solid rgba(0,229,204,.3);
+  color:var(--cyan);font-family:'Space Mono',monospace;font-size:.75rem;
+  padding:.45rem 1rem;border-radius:8px;cursor:pointer;transition:all .2s;margin-top:.5rem;}
+.ex-btn:hover{background:rgba(0,229,204,.2);}
+.ex-result{margin-top:.5rem;font-family:'Space Mono',monospace;font-size:.8rem;
+  min-height:24px;padding:.3rem .6rem;border-radius:6px;}
+.ok{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.er{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+
+/* TIMELINE */
+.tl{display:flex;flex-direction:column;gap:0;width:100%;max-width:700px;}
+.tl-item{display:flex;gap:1rem;align-items:flex-start;padding:.55rem 0;position:relative;}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:68px;top:2rem;
+  bottom:-.5rem;width:1px;background:var(--border);}
+.tl-y{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--cyan);
+  min-width:56px;text-align:right;padding-top:.15rem;}
+.tl-d{width:10px;height:10px;border-radius:50%;background:var(--cyan);
+  flex-shrink:0;margin-top:.25rem;border:2px solid var(--bg);box-shadow:0 0 8px var(--cyan);}
+.tl-t{font-size:.88rem;color:#a0b8cc;}
+.tl-t strong{color:var(--text);}
+
+/* NAV */
+#nav{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%);
+  display:flex;gap:.6rem;align-items:center;
+  background:rgba(13,21,32,.9);border:1px solid var(--border);
+  padding:.55rem 1.1rem;border-radius:9999px;z-index:100;backdrop-filter:blur(14px);}
+#nav button{background:none;border:none;cursor:pointer;color:var(--muted);
+  font-size:1.05rem;padding:.2rem .45rem;transition:color .2s;}
+#nav button:hover{color:var(--cyan);}
+#sc{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);
+  padding:0 .4rem;min-width:58px;text-align:center;}
+.dots{display:flex;gap:.3rem;padding:0 .4rem;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s;}
+.dot.a{background:var(--cyan);transform:scale(1.5);}
+
+/* SECTION BADGE */
+.sec-badge{display:inline-flex;align-items:center;gap:.5rem;
+  padding:.35rem .9rem;border-radius:9999px;font-family:'Space Mono',monospace;
+  font-size:.7rem;margin-bottom:.8rem;}
+.sb-algo{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--yellow);}
+.sb-html{background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.25);color:var(--orange);}
+.sb-inv{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);color:var(--blue);}
+.sb-lec{background:rgba(0,229,204,.1);border:1px solid rgba(0,229,204,.2);color:var(--cyan);}
+
+/* MEAN */
+.ml{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,3rem);line-height:1;}
+
+/* HERO */
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.5);}}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(0,229,204,.07);border:1px solid rgba(0,229,204,.18);
+  padding:.4rem 1rem;border-radius:9999px;font-family:'Space Mono',monospace;
+  font-size:.72rem;color:var(--cyan);margin-bottom:1.3rem;}
+
+/* KEYBOARD HINT */
+#hint{position:fixed;bottom:4.8rem;right:1.8rem;z-index:50;
+  font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);
+  display:flex;gap:.4rem;align-items:center;opacity:.5;}
+kbd{background:var(--surface);border:1px solid var(--border);
+  padding:.12rem .38rem;border-radius:3px;font-family:inherit;font-size:.6rem;}
+
+/* PILL */
+.pill{background:var(--surface);border:1px solid var(--border);
+  padding:.3rem .8rem;border-radius:9999px;font-size:.78rem;color:var(--muted);
+  transition:all .2s;display:inline-block;}
+.pill:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* SCROLLABLE for tall slides */
+.scr{overflow-y:auto;max-height:72vh;padding-right:.4rem;}
+.scr::-webkit-scrollbar{width:3px;}
+.scr::-webkit-scrollbar-track{background:transparent;}
+.scr::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div id="prog"></div>
+<div id="hint"><kbd>←</kbd><kbd>→</kbd></div>
+
+<div id="deck">
+
+<!-- ══ 0 · HERO ══════════════════════════════════════════ -->
+<div class="slide active">
+  <div class="hero-badge"><span class="badge-dot"></span>BIT · Módulo 1 · Semana 1</div>
+  <h1>Fundamentos de<br><span class="cy">Programación</span> +<br>Ejercicios Prácticos</h1>
+  <br>
+  <p style="color:var(--muted);max-width:560px;text-align:center;font-size:.95rem">
+    Teoría, analogías, ejercicios de algoritmos, retos HTML y tareas de investigación
+  </p>
+  <br>
+  <div style="display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;max-width:700px">
+    <span class="pill">📜 Historia</span>
+    <span class="pill">🧮 Algoritmos</span>
+    <span class="pill">📦 Variables</span>
+    <span class="pill">🌐 Lenguajes</span>
+    <span class="pill">🚀 MEAN Stack</span>
+    <span class="pill" style="border-color:rgba(251,191,36,.3);color:var(--yellow)">⚡ Ejercicios</span>
+    <span class="pill" style="border-color:rgba(251,146,60,.3);color:var(--orange)">🏷️ Retos HTML</span>
+    <span class="pill" style="border-color:rgba(96,165,250,.3);color:var(--blue)">🔎 Investigación</span>
+  </div>
+</div>
+
+<!-- ══ 1 · HISTORIA ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="label">01 · Historia</div>
+    <h2>De los telares a la IA:<br><span class="cy">Historia de la Programación</span></h2>
+    <br>
+    <div class="tl">
+      <div class="tl-item">
+        <div class="tl-y">1843</div><div class="tl-d"></div>
+        <div class="tl-t"><strong>Ada Lovelace</strong> — Primera programadora. Escribe el algoritmo para la Máquina de Babbage.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-y">1936</div>
+        <div class="tl-d" style="background:var(--purple);box-shadow:0 0 8px var(--purple)"></div>
+        <div class="tl-t"><strong>Alan Turing</strong> — Máquina universal. Todo problema computable = instrucciones secuenciales.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-y">1957</div>
+        <div class="tl-d" style="background:var(--yellow);box-shadow:0 0 8px var(--yellow)"></div>
+        <div class="tl-t"><strong>FORTRAN</strong> — Primer lenguaje de alto nivel. Fin del lenguaje máquina puro.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-y">1991</div>
+        <div class="tl-d" style="background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+        <div class="tl-t"><strong>La Web nace</strong> — Tim Berners-Lee lanza HTML. JavaScript aparece en 1995.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-y">2009</div>
+        <div class="tl-d" style="background:var(--pink);box-shadow:0 0 8px var(--pink)"></div>
+        <div class="tl-t"><strong>Node.js</strong> — JavaScript conquista el servidor. Nace el MEAN Stack.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-y">Hoy</div>
+        <div class="tl-d"></div>
+        <div class="tl-t"><strong>Tú</strong> — Aprendes a programar. El futuro lo construyen quienes saben crear.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2 · ALGORITMOS (Teoría) ═══════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="label">02 · Algoritmos</div>
+    <h2>¿Qué es un <span class="cy">Algoritmo</span>?</h2>
+    <br>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="ana">
+          <div class="ai">☕</div>
+          <div><h3 style="color:var(--text);font-size:.95rem;margin-bottom:.25rem">Receta de café</h3>
+          <p class="sm">Pasos claros y ordenados que resuelven un problema. Siempre el mismo resultado si sigues los pasos exactos.</p></div>
+        </div>
+        <div class="ana">
+          <div class="ai">🗺️</div>
+          <div><h3 style="color:var(--text);font-size:.95rem;margin-bottom:.25rem">GPS</h3>
+          <p class="sm">Entrada (ubicación) → Proceso (cálculo de rutas) → Salida (camino más corto).</p></div>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <div class="tag tc">📥 Entrada</div>
+          <span style="color:var(--muted);padding-top:.2rem">→</span>
+          <div class="tag tp">⚙️ Proceso</div>
+          <span style="color:var(--muted);padding-top:.2rem">→</span>
+          <div class="tag tg">📤 Salida</div>
+        </div>
+      </div>
+      <div class="code">
+<span class="cm">// Algoritmo: decidir si salir con paraguas</span>
+
+<span class="kw">function</span> <span class="fn">salirDeCasa</span>(<span class="va">clima</span>) {
+  <span class="kw">if</span> (<span class="va">clima</span> <span class="op">===</span> <span class="st">"lluvia"</span>) {
+    <span class="kw">return</span> <span class="st">"🌂 Llevar paraguas"</span>
+  } <span class="kw">else</span> {
+    <span class="kw">return</span> <span class="st">"😎 Solo lentes"</span>
+  }
+}
+
+<span class="fn">salirDeCasa</span>(<span class="st">"lluvia"</span>)
+<span class="cm">// → "🌂 Llevar paraguas"</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3 · EJERCICIO ALGORITMO 1 ═════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-algo">⚡ Ejercicio de Algoritmo · #1</div>
+    <h2>Diseña el algoritmo:<br><span class="ye">Adivina el número</span></h2>
+    <br>
+    <div class="grid2">
+      <div class="ex-algo">
+        <div class="ex-header">
+          <div class="ex-icon ex-icon-algo">🧩</div>
+          <div>
+            <div class="ex-title">Enunciado</div>
+            <p class="sm" style="color:var(--muted)">Escribe en papel los pasos</p>
+          </div>
+          <div class="timer-badge" style="margin-left:auto" id="t1">⏱ <span id="timer-val">08:00</span></div>
+        </div>
+        <p class="sm" style="margin-bottom:.8rem">La computadora "piensa" un número del 1 al 10. El usuario intenta adivinarlo. Si falla, recibe pista de si es mayor o menor. Máximo 3 intentos.</p>
+        <ol class="steps" style="list-style:decimal;padding-left:1.2rem;display:block">
+          <li class="sm" style="color:#a0b8cc;margin-bottom:.3rem">¿Cuál es la <strong>entrada</strong>? (¿qué datos necesita?)</li>
+          <li class="sm" style="color:#a0b8cc;margin-bottom:.3rem">¿Cuál es la <strong>salida</strong>? (¿qué devuelve?)</li>
+          <li class="sm" style="color:#a0b8cc;margin-bottom:.3rem">¿Qué <strong>condiciones</strong> hay? (if/else)</li>
+          <li class="sm" style="color:#a0b8cc">¿Cuándo <strong>termina</strong> el bucle?</li>
+        </ol>
+        <br>
+        <button class="ex-btn" onclick="startTimer('timer-val', 480)">▶ Iniciar temporizador</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="card">
+          <div class="tag ty" style="margin-bottom:.5rem">💡 Pistas visuales</div>
+          <div class="code" style="font-size:.72rem">
+<span class="cm">INICIO</span>
+  numero_secreto ← <span class="fn">aleatorio</span>(<span class="nu">1</span>,<span class="nu">10</span>)
+  intentos ← <span class="nu">0</span>
+  <span class="kw">MIENTRAS</span> intentos &lt; <span class="nu">3</span>:
+    intento ← <span class="fn">leer</span>()
+    <span class="kw">SI</span> intento <span class="op">==</span> secreto → <span class="st">"¡Ganaste!"</span>
+    <span class="kw">SI</span> intento &lt; secreto → <span class="st">"Mayor"</span>
+    <span class="kw">SINO</span> → <span class="st">"Menor"</span>
+    intentos++
+<span class="cm">FIN</span>
+          </div>
+        </div>
+        <div class="ana">
+          <div class="ai">🎯</div>
+          <p class="sm"><strong>Pruébalo:</strong> ¿Puedes convertir este pseudocódigo a JavaScript real? Guárdalo para el Desafío 1.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4 · EJERCICIO ALGORITMO 2 — DRAG ══════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-algo">⚡ Ejercicio de Algoritmo · #2</div>
+    <h2>Ordena los pasos:<br><span class="ye">Iniciar sesión</span></h2>
+    <p style="color:var(--muted);margin-bottom:1.2rem;font-size:.88rem">Arrastra los bloques al área correcta en orden lógico</p>
+    <div class="grid2">
+      <div>
+        <p class="sm" style="color:var(--muted);margin-bottom:.5rem">🗂 Pasos disponibles (mezcla)</p>
+        <div class="dnd-area" id="pool" style="flex-direction:column;min-height:200px">
+          <div class="dnd-chip" draggable="true" data-step="5">5. Mostrar dashboard</div>
+          <div class="dnd-chip" draggable="true" data-step="2">2. Recibir contraseña</div>
+          <div class="dnd-chip" draggable="true" data-step="4">4. Si coincide → generar token</div>
+          <div class="dnd-chip" draggable="true" data-step="1">1. Recibir email del usuario</div>
+          <div class="dnd-chip" draggable="true" data-step="6">6. Si falla → mostrar error</div>
+          <div class="dnd-chip" draggable="true" data-step="3">3. Buscar usuario en BD</div>
+        </div>
+      </div>
+      <div>
+        <p class="sm" style="color:var(--muted);margin-bottom:.5rem">✅ Mi algoritmo (ordena aquí)</p>
+        <div class="dnd-area" id="zone" style="flex-direction:column;min-height:200px"></div>
+        <button class="ex-btn" style="margin-top:.6rem" onclick="checkDND()">Verificar orden</button>
+        <div class="ex-result" id="dnd-res" style="margin-top:.5rem"></div>
+      </div>
+    </div>
+    <br>
+    <div class="ana">
+      <div class="ai">💡</div>
+      <p class="sm">Este es exactamente el flujo de autenticación que implementarás en Node.js + Express en el Módulo 2. ¡Ya estás pensando como backend developer!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5 · VARIABLES ══════════════════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="label">05 · Variables</div>
+    <h2>Variables: las <span class="ye">cajas</span> del código</h2>
+    <br>
+    <div class="ana" style="margin-bottom:1rem;max-width:860px">
+      <div class="ai">📦</div>
+      <p class="sm">Una <strong>caja con etiqueta</strong> donde guardas información. Puedes cambiar el contenido, pero la etiqueta (nombre) siempre es la misma. JavaScript tiene 3 formas de declararlas.</p>
+    </div>
+    <div class="grid4" style="margin-bottom:1rem">
+      <div class="card" style="text-align:center">
+        <div class="tag tc" style="font-size:.6rem">String · texto</div>
+        <div style="font-family:'Space Mono',monospace;font-size:1rem;color:var(--yellow)">"Hola"</div>
+        <p class="sm" style="margin-top:.3rem">Siempre entre comillas</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="tag tp" style="font-size:.6rem">Number</div>
+        <div style="font-family:'Space Mono',monospace;font-size:1rem;color:var(--green)">42</div>
+        <p class="sm" style="margin-top:.3rem">Enteros y decimales</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="tag ty" style="font-size:.6rem">Boolean</div>
+        <div style="font-family:'Space Mono',monospace;font-size:1rem;color:var(--cyan)">true</div>
+        <p class="sm" style="margin-top:.3rem">Solo sí o no</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="tag tg" style="font-size:.6rem">Array · lista</div>
+        <div style="font-family:'Space Mono',monospace;font-size:.9rem;color:var(--pink)">[1,2,3]</div>
+        <p class="sm" style="margin-top:.3rem">Colección ordenada</p>
+      </div>
+    </div>
+    <div class="code" style="max-width:860px">
+<span class="kw">let</span>   <span class="va">nombre</span>     = <span class="st">"Ana"</span>       <span class="cm">// puede cambiar después</span>
+<span class="kw">const</span> <span class="va">PI</span>         = <span class="nu">3.14159</span>    <span class="cm">// constante — nunca cambia</span>
+<span class="kw">var</span>   <span class="va">ciudad</span>     = <span class="st">"Bogotá"</span>   <span class="cm">// ⚠️ forma antigua, evitar</span>
+
+<span class="va">nombre</span> = <span class="st">"Ana Sofía"</span>  <span class="cm">// ✅ actualizar variable let</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6 · EJERCICIO VARIABLES (interactivo) ═════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-algo">⚡ Ejercicio · Variables</div>
+    <h2>¿Qué tipo de dato es?<br><span class="ye">Identifica y predice</span></h2>
+    <br>
+    <div class="grid2">
+      <!-- FLIP CARDS -->
+      <div>
+        <p class="sm" style="color:var(--muted);margin-bottom:.8rem">Haz clic para revelar el tipo de dato</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+          <div class="flip-wrap" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <div style="font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--yellow)">"Colombia"</div>
+                <div class="flip-hint">clic para ver</div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="tag tc">String</div>
+                <p class="sm" style="margin-top:.3rem">Texto entre comillas. Siempre string.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-wrap" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <div style="font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--green)">2026</div>
+                <div class="flip-hint">clic para ver</div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="tag tp">Number</div>
+                <p class="sm" style="margin-top:.3rem">Sin comillas = número.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-wrap" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <div style="font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--cyan)">false</div>
+                <div class="flip-hint">clic para ver</div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="tag tg">Boolean</div>
+                <p class="sm" style="margin-top:.3rem">Solo true o false.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-wrap" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <div style="font-family:'Space Mono',monospace;font-size:.95rem;color:var(--pink)">["a","b","c"]</div>
+                <div class="flip-hint">clic para ver</div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="tag tk">Array</div>
+                <p class="sm" style="margin-top:.3rem">Corchetes [ ] = lista.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MINI REPL -->
+      <div class="card" style="display:flex;flex-direction:column;gap:.6rem">
+        <div class="tag ty">🖥️ Mini ejercicio interactivo</div>
+        <p class="sm">Escribe un valor y adivina su tipo:</p>
+        <input class="ex-input" id="typeInput" placeholder='Ej: "hola" o 42 o true' />
+        <button class="ex-btn" onclick="checkType()">¿Qué tipo es?</button>
+        <div class="ex-result" id="typeRes"></div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:.2rem 0">
+        <p class="sm">¿Cuánto vale <code style="color:var(--cyan)">"5" + 5</code> en JS?</p>
+        <button class="ex-btn" onclick="checkConcat()">Ejecutar</button>
+        <div class="ex-result" id="concatRes"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 7 · TIPOS DE LENGUAJES ════════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="label">07 · Lenguajes</div>
+    <h2>Tipos de <span class="cy">Lenguajes</span></h2>
+    <br>
+    <div class="grid3" style="margin-bottom:1rem">
+      <div class="card">
+        <div class="tag tc">Alto Nivel</div>
+        <h3 style="margin-bottom:.4rem">Python · JS · Ruby</h3>
+        <p class="sm">Parecido al inglés. Fácil de leer. Como un asistente que entiende frases normales.</p>
+        <br>
+        <div class="code" style="font-size:.7rem;padding:.7rem"><span class="kw">print</span>(<span class="st">"Hola"</span>)</div>
+      </div>
+      <div class="card">
+        <div class="tag ty">Bajo Nivel</div>
+        <h3 style="margin-bottom:.4rem">C · Assembler</h3>
+        <p class="sm">Habla directo con la máquina. Muy potente. Como dar instrucciones paso a paso en binario.</p>
+        <br>
+        <div class="code" style="font-size:.7rem;padding:.7rem"><span class="cm">; MOV AX, 01h</span><br><span class="fn">INT</span> <span class="nu">21h</span></div>
+      </div>
+      <div class="card">
+        <div class="tag tp">Compilado vs Interpretado</div>
+        <h3 style="margin-bottom:.4rem">C++ vs Python</h3>
+        <p class="sm"><strong>Compilado:</strong> traduce todo antes de ejecutar.<br><strong>Interpretado:</strong> traduce línea a línea en tiempo real.</p>
+        <br>
+        <div class="ana" style="padding:.5rem .7rem"><span>📖</span><p class="sm">Libro ya traducido vs. intérprete en vivo</p></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+      <span class="tag tc">Funcional</span>
+      <span class="tag tp">OOP</span>
+      <span class="tag ty">Scripting</span>
+      <span class="tag tg">Markup (HTML)</span>
+      <span class="tag tk">Query (SQL)</span>
+      <p class="sm" style="padding-top:.3rem;color:var(--muted)">→ Cada uno diseñado para resolver problemas distintos</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8 · TAREA INVESTIGACIÓN 1 ═════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-inv">🔎 Tarea de Investigación · #1</div>
+    <h2>Investiga y compara<br><span class="bl">3 lenguajes de programación</span></h2>
+    <br>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <div class="card">
+          <div class="ex-header">
+            <div class="ex-icon ex-icon-inv">📋</div>
+            <div class="ex-title">Lo que debes encontrar</div>
+          </div>
+          <ul class="checks" id="inv1">
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿En qué año fue creado?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Quién lo creó y por qué?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Para qué se usa hoy?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Es compilado o interpretado?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué empresa famosa lo usa?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Un ejemplo de "Hola Mundo"</span></li>
+          </ul>
+        </div>
+        <div class="ana">
+          <div class="ai">📌</div>
+          <p class="sm"><strong>Elige 3 de estos:</strong> JavaScript, Python, Java, C#, Go, Rust, Swift, Kotlin</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <div class="card">
+          <div class="tag tb">📊 Formato de entrega</div>
+          <p class="sm" style="margin-bottom:.6rem">Crea una tabla comparativa en un archivo <code style="color:var(--cyan)">.html</code>:</p>
+          <div class="code" style="font-size:.7rem">
+&lt;<span class="kw">table</span>&gt;
+  &lt;<span class="kw">tr</span>&gt;
+    &lt;<span class="kw">th</span>&gt;Lenguaje&lt;/<span class="kw">th</span>&gt;
+    &lt;<span class="kw">th</span>&gt;Año&lt;/<span class="kw">th</span>&gt;
+    &lt;<span class="kw">th</span>&gt;Tipo&lt;/<span class="kw">th</span>&gt;
+    &lt;<span class="kw">th</span>&gt;Uso hoy&lt;/<span class="kw">th</span>&gt;
+  &lt;/<span class="kw">tr</span>&gt;
+  <span class="cm">&lt;!-- llenar con tu investigación --&gt;</span>
+&lt;/<span class="kw">table</span>&gt;
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(96,165,250,.25)">
+          <div class="tag tb">🌐 Fuentes sugeridas</div>
+          <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.3rem;margin-top:.3rem">
+            <li class="sm">→ <span style="color:var(--blue)">developer.mozilla.org</span></li>
+            <li class="sm">→ <span style="color:var(--blue)">w3schools.com</span></li>
+            <li class="sm">→ <span style="color:var(--blue)">stackoverflow.com/developer-survey</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 9 · MEAN STACK ════════════════════════════════════ -->
+<div class="slide">
+  <div class="w" style="text-align:center">
+    <div class="label">09 · El Stack</div>
+    <h2>El <span class="cy">MEAN Stack</span></h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:1.3rem">4 tecnologías · 1 lenguaje (JavaScript) · ∞ posibilidades</p>
+    <div class="grid4">
+      <div class="card" style="text-align:center;border-color:rgba(16,185,129,.25)">
+        <div class="ml cy" style="color:#10b981">M</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;margin:.3rem 0">MongoDB</div>
+        <div class="tag tg" style="font-size:.6rem">Base de Datos</div>
+        <p class="sm" style="margin-top:.4rem;color:var(--muted)">Como un archivador flexible. Guarda objetos JSON.</p>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(248,113,113,.25)">
+        <div class="ml" style="color:#f87171">E</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;margin:.3rem 0">Express.js</div>
+        <div class="tag tk" style="font-size:.6rem">Backend</div>
+        <p class="sm" style="margin-top:.4rem;color:var(--muted)">El mesero: recibe pedidos y los lleva a la cocina.</p>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(251,146,60,.25)">
+        <div class="ml" style="color:#fb923c">A</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;margin:.3rem 0">Angular</div>
+        <div class="tag to" style="font-size:.6rem">Frontend</div>
+        <p class="sm" style="margin-top:.4rem;color:var(--muted)">Lo que el usuario ve. La sala del restaurante.</p>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(0,229,204,.25)">
+        <div class="ml cy">N</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;margin:.3rem 0">Node.js</div>
+        <div class="tag tc" style="font-size:.6rem">Runtime</div>
+        <p class="sm" style="margin-top:.4rem;color:var(--muted)">JavaScript fuera del navegador. La cocina.</p>
+      </div>
+    </div>
+    <br>
+    <div class="ana" style="max-width:780px;margin:0 auto">
+      <div class="ai">🍽️</div>
+      <p class="sm"><strong>Analogía:</strong> Angular (sala) → Express (mesero) → Node (cocina) → MongoDB (bodega). Un solo idioma para todo el equipo.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10 · TAREA INVESTIGACIÓN 2 ════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-inv">🔎 Tarea de Investigación · #2</div>
+    <h2>Explora el<br><span class="bl">Ecosistema MEAN</span></h2>
+    <br>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="card">
+          <div class="tag tb" style="margin-bottom:.6rem">📋 Preguntas a responder</div>
+          <ul class="checks" id="inv2">
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué es npm y para qué sirve?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué diferencia hay entre SQL y MongoDB?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué es una API REST? Ejemplo real.</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué empresa usa Angular en producción?</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>¿Por qué Node.js es tan rápido?</span></li>
+          </ul>
+        </div>
+        <div class="ana">
+          <div class="ai">🎯</div>
+          <p class="sm">Entrega un documento <strong>.md o .html</strong> con tus respuestas + una imagen del diagrama de flujo del MEAN Stack.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="card">
+          <div class="tag tc">🗺️ Diagrama que debes buscar</div>
+          <div class="code" style="font-size:.72rem;margin-top:.5rem">
+Cliente (Angular)
+    ↕ HTTP
+Express.js (rutas)
+    ↕
+Node.js (lógica)
+    ↕
+MongoDB (datos)
+
+<span class="cm">// Tu tarea: explicar qué
+// sucede en cada flecha ↕</span>
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(96,165,250,.25)">
+          <div class="tag tb">⭐ Bonus</div>
+          <p class="sm" style="margin-top:.3rem">Busca en LinkedIn una oferta de trabajo que pida "MEAN Stack" o "Node.js". Anota: ¿cuánto paga?, ¿qué más piden?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 11 · RETO HTML 1 ══════════════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-html">🏷️ Reto HTML · #1 — Básico</div>
+    <h2>Tu primera<br><span class="or">página web</span></h2>
+    <br>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="ex-algo" style="background:linear-gradient(135deg,rgba(251,146,60,.06),rgba(251,191,36,.04));border-color:rgba(251,146,60,.25)">
+          <div class="ex-header">
+            <div class="ex-icon ex-icon-html">🏷️</div>
+            <div class="ex-title">Instrucciones</div>
+          </div>
+          <ul class="checks" id="html1">
+            <li onclick="toggle(this)"><div class="cb"></div><span>Crear archivo <code>index.html</code></span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Usar estructura DOCTYPE, html, head, body</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Agregar un <code>&lt;h1&gt;</code> con tu nombre</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Un párrafo <code>&lt;p&gt;</code> con tu descripción</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Una imagen con <code>&lt;img src="..."&gt;</code></span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Un enlace a tu red social favorita</span></li>
+          </ul>
+        </div>
+        <div class="ana">
+          <div class="ai">⏱️</div>
+          <p class="sm"><strong>Tiempo estimado:</strong> 30–45 minutos. Ábrelo en el navegador para ver el resultado.</p>
+        </div>
+      </div>
+      <div class="code" style="font-size:.72rem">
+<span class="cm">&lt;!-- Estructura base --&gt;</span>
+&lt;!<span class="kw">DOCTYPE</span> html&gt;
+&lt;<span class="kw">html</span> lang=<span class="st">"es"</span>&gt;
+&lt;<span class="kw">head</span>&gt;
+  &lt;<span class="kw">meta</span> charset=<span class="st">"UTF-8"</span>&gt;
+  &lt;<span class="kw">title</span>&gt;Mi primera página&lt;/<span class="kw">title</span>&gt;
+&lt;/<span class="kw">head</span>&gt;
+&lt;<span class="kw">body</span>&gt;
+
+  &lt;<span class="kw">h1</span>&gt;Hola, soy ___________&lt;/<span class="kw">h1</span>&gt;
+
+  &lt;<span class="kw">p</span>&gt;Soy estudiante de BIT y
+  estoy aprendiendo a programar.&lt;/<span class="kw">p</span>&gt;
+
+  &lt;<span class="kw">img</span> src=<span class="st">"mi-foto.jpg"</span>
+       alt=<span class="st">"Mi foto"</span>
+       width=<span class="st">"200"</span>&gt;
+
+  &lt;<span class="kw">a</span> href=<span class="st">"https://..."</span>&gt;
+    Sígueme aquí
+  &lt;/<span class="kw">a</span>&gt;
+
+&lt;/<span class="kw">body</span>&gt;
+&lt;/<span class="kw">html</span>&gt;
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 12 · RETO HTML 2 ══════════════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-html">🏷️ Reto HTML · #2 — Intermedio</div>
+    <h2>Perfil de<br><span class="or">Desarrollador</span></h2>
+    <br>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="card" style="border-color:rgba(251,146,60,.2)">
+          <div class="tag to">📋 Tu misión</div>
+          <p class="sm" style="margin:.5rem 0">Crea una página de perfil tipo LinkedIn con:</p>
+          <ul class="checks" id="html2">
+            <li onclick="toggle(this)"><div class="cb"></div><span>Tabla con tu horario semanal (<code>&lt;table&gt;</code>)</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Lista de habilidades (<code>&lt;ul&gt;</code> + <code>&lt;li&gt;</code>)</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Formulario de contacto con nombre + email</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>Sección "Mis proyectos" con 2 cards</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>CSS básico: colores, tipografía, márgenes</span></li>
+            <li onclick="toggle(this)"><div class="cb"></div><span>⭐ Bonus: modo oscuro con variables CSS</span></li>
+          </ul>
+        </div>
+        <div class="ana">
+          <div class="ai">🏆</div>
+          <p class="sm">Este reto es la base del <strong>Desafío 1</strong>. Guárdalo en GitHub — será parte de tu portafolio.</p>
+        </div>
+      </div>
+      <div class="code" style="font-size:.7rem">
+<span class="cm">&lt;!-- Bonus: Variables CSS --&gt;</span>
+&lt;<span class="kw">style</span>&gt;
+  :root {
+    --<span class="va">color-fondo</span>: <span class="st">#1a1a2e</span>;
+    --<span class="va">color-texto</span>: <span class="st">#e0e0ff</span>;
+    --<span class="va">color-acento</span>: <span class="st">#00e5cc</span>;
+  }
+  <span class="fn">body</span> {
+    background: <span class="fn">var</span>(--<span class="va">color-fondo</span>);
+    color: <span class="fn">var</span>(--<span class="va">color-texto</span>);
+  }
+  <span class="fn">h1</span> {
+    color: <span class="fn">var</span>(--<span class="va">color-acento</span>);
+    font-family: sans-serif;
+  }
+&lt;/<span class="kw">style</span>&gt;
+
+<span class="cm">&lt;!-- Tabla --&gt;</span>
+&lt;<span class="kw">table</span> border=<span class="st">"1"</span>&gt;
+  &lt;<span class="kw">tr</span>&gt;&lt;<span class="kw">th</span>&gt;Día&lt;/<span class="kw">th</span>&gt;&lt;<span class="kw">th</span>&gt;Clase&lt;/<span class="kw">th</span>&gt;&lt;/<span class="kw">tr</span>&gt;
+  &lt;<span class="kw">tr</span>&gt;&lt;<span class="kw">td</span>&gt;Lunes&lt;/<span class="kw">td</span>&gt;&lt;<span class="kw">td</span>&gt;HTML&lt;/<span class="kw">td</span>&gt;&lt;/<span class="kw">tr</span>&gt;
+&lt;/<span class="kw">table</span>&gt;
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 13 · RETO HTML 3 — AVANZADO ══════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-html">🏷️ Reto HTML · #3 — Desafío</div>
+    <h2>Landing page:<br><span class="or">Proyecto ficticio</span></h2>
+    <br>
+    <div class="grid3">
+      <div class="card" style="border-color:rgba(251,146,60,.2)">
+        <div class="tag to" style="margin-bottom:.5rem">🎯 Objetivo</div>
+        <p class="sm">Crea la landing page de una app imaginaria (ej: "AppQuiz", "TutorBot", "CodeTrack"). Debe parecer real.</p>
+      </div>
+      <div class="card">
+        <div class="tag ty" style="margin-bottom:.5rem">📐 Secciones requeridas</div>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.25rem">
+          <li class="sm">🔝 Hero con nombre + slogan</li>
+          <li class="sm">✅ 3 características (cards)</li>
+          <li class="sm">💬 1 testimonio falso</li>
+          <li class="sm">📞 Formulario de registro</li>
+          <li class="sm">🦶 Footer con links</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag tg" style="margin-bottom:.5rem">⭐ Bonus points</div>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:.25rem">
+          <li class="sm">🎨 Paleta de colores coherente</li>
+          <li class="sm">📱 Responsive con meta viewport</li>
+          <li class="sm">🖱️ Hover effects en botones</li>
+          <li class="sm">🔗 Subida a GitHub Pages</li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div class="grid2">
+      <div class="ana">
+        <div class="ai">💡</div>
+        <p class="sm"><strong>Criterio de evaluación:</strong> ¿Le mostrarías esta página a alguien sin explicar que es tarea? Si la respuesta es sí, tienes 10/10.</p>
+      </div>
+      <div class="ana" style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(0,229,204,.05));border-color:rgba(16,185,129,.25)">
+        <div class="ai">🚀</div>
+        <p class="sm"><strong>Publicar en GitHub Pages es gratis.</strong> Crea tu cuenta en github.com ahora y sube tu reto.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 14 · EJERCICIO ALGORITMO 3 ════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-algo">⚡ Ejercicio de Algoritmo · #3</div>
+    <h2>Traza el flujo:<br><span class="ye">¿Qué imprime este código?</span></h2>
+    <br>
+    <div class="grid2">
+      <div class="code" style="font-size:.8rem">
+<span class="kw">let</span> <span class="va">nota</span> = <span class="nu">75</span>
+
+<span class="kw">function</span> <span class="fn">calificar</span>(<span class="va">n</span>) {
+  <span class="kw">if</span> (<span class="va">n</span> <span class="op">>=</span> <span class="nu">90</span>) {
+    <span class="kw">return</span> <span class="st">"🏆 Excelente"</span>
+  } <span class="kw">else if</span> (<span class="va">n</span> <span class="op">>=</span> <span class="nu">70</span>) {
+    <span class="kw">return</span> <span class="st">"✅ Aprobado"</span>
+  } <span class="kw">else</span> {
+    <span class="kw">return</span> <span class="st">"❌ Reprobado"</span>
+  }
+}
+
+console.<span class="fn">log</span>(<span class="fn">calificar</span>(<span class="nu">75</span>))
+console.<span class="fn">log</span>(<span class="fn">calificar</span>(<span class="nu">91</span>))
+console.<span class="fn">log</span>(<span class="fn">calificar</span>(<span class="nu">50</span>))
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="card">
+          <div class="tag ty">🤔 ¿Qué imprime?</div>
+          <p class="sm" style="margin:.4rem 0">Predice el resultado antes de ejecutar:</p>
+          <div style="display:flex;flex-direction:column;gap:.4rem">
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <span class="sm" style="color:var(--muted);min-width:100px">calificar(75):</span>
+              <input class="ex-input" id="q1" placeholder="tu respuesta" style="flex:1">
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <span class="sm" style="color:var(--muted);min-width:100px">calificar(91):</span>
+              <input class="ex-input" id="q2" placeholder="tu respuesta" style="flex:1">
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <span class="sm" style="color:var(--muted);min-width:100px">calificar(50):</span>
+              <input class="ex-input" id="q3" placeholder="tu respuesta" style="flex:1">
+            </div>
+          </div>
+          <button class="ex-btn" style="margin-top:.6rem" onclick="checkCalif()">Verificar</button>
+          <div class="ex-result" id="califRes"></div>
+        </div>
+        <div class="ana">
+          <div class="ai">📝</div>
+          <p class="sm"><strong>Siguiente paso:</strong> Modifica la función para que también maneje notas negativas o mayores a 100 con un mensaje de error.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 15 · TAREA INVESTIGACIÓN 3 ════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="sec-badge sb-inv">🔎 Tarea de Investigación · #3</div>
+    <h2>Casos de éxito:<br><span class="bl">Código que cambió el mundo</span></h2>
+    <br>
+    <div class="grid3" style="margin-bottom:1rem">
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.8rem;margin-bottom:.4rem">🎵</div>
+        <h3 style="font-size:.95rem">Spotify</h3>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--cyan)">600M+</div>
+        <p class="sm" style="color:var(--muted)">usuarios. Node.js + Python.</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.8rem;margin-bottom:.4rem">🛒</div>
+        <h3 style="font-size:.95rem">Rappi 🇨🇴</h3>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--cyan)">Unicornio</div>
+        <p class="sm" style="color:var(--muted)">LATAM. Stack MEAN.</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:1.8rem;margin-bottom:.4rem">🚗</div>
+        <h3 style="font-size:.95rem">Uber</h3>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--cyan)">$75B</div>
+        <p class="sm" style="color:var(--muted)">Node.js en su core.</p>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(96,165,250,.2)">
+      <div class="ex-header">
+        <div class="ex-icon ex-icon-inv">📋</div>
+        <div class="ex-title">Tu tarea: elige 1 empresa y responde</div>
+      </div>
+      <div class="grid2">
+        <ul class="checks" id="inv3">
+          <li onclick="toggle(this)"><div class="cb"></div><span>¿Con cuántos devs empezaron?</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué problema real resuelve?</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>¿Qué tecnologías usan hoy?</span></li>
+        </ul>
+        <ul class="checks" id="inv3b">
+          <li onclick="toggle(this)"><div class="cb"></div><span>¿Cuándo lanzaron su MVP?</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Un consejo del fundador</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>¿Hay oficinas en Colombia?</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 16 · RESUMEN DE TAREAS ════════════════════════════ -->
+<div class="slide">
+  <div class="w">
+    <div class="label">16 · Resumen</div>
+    <h2>Checklist de la<br><span class="cy">Semana 1</span></h2>
+    <br>
+    <div class="grid3">
+      <div class="ex-algo" style="display:flex;flex-direction:column;gap:.5rem">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+          <div class="ex-icon ex-icon-algo">⚡</div>
+          <strong style="font-size:.9rem">Ejercicios Algoritmos</strong>
+        </div>
+        <ul class="checks" id="final-algo">
+          <li onclick="toggle(this)"><div class="cb"></div><span>Diseñé el algoritmo "Adivina el número" en papel</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Ordené los pasos de login (drag & drop)</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Predije el output del código calificar()</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Convertí pseudocódigo a JS</span></li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(251,146,60,.2)">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+          <div class="ex-icon ex-icon-html">🏷️</div>
+          <strong style="font-size:.9rem">Retos HTML</strong>
+        </div>
+        <ul class="checks" id="final-html">
+          <li onclick="toggle(this)"><div class="cb"></div><span>Reto #1: Mi primera página (nombre + foto)</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Reto #2: Perfil con tabla + formulario</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Reto #3: Landing page ficticia</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>⭐ Subí al menos uno a GitHub</span></li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(96,165,250,.2)">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+          <div class="ex-icon ex-icon-inv">🔎</div>
+          <strong style="font-size:.9rem">Investigación</strong>
+        </div>
+        <ul class="checks" id="final-inv">
+          <li onclick="toggle(this)"><div class="cb"></div><span>Inv. #1: Tabla comparativa de lenguajes</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Inv. #2: Diagrama explicado del MEAN Stack</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>Inv. #3: Historia de empresa tech real</span></li>
+          <li onclick="toggle(this)"><div class="cb"></div><span>⭐ Oferta laboral Node.js encontrada</span></li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div class="ana" style="max-width:900px">
+      <div class="ai">🚀</div>
+      <p class="sm">La próxima semana: <strong>CSS Flexbox + Grid + Variables CSS.</strong> Si terminaste los retos HTML, ya vas un paso adelante. Sigue practicando todos los días aunque sean 20 minutos.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 17 · CIERRE ═══════════════════════════════════════ -->
+<div class="slide">
+  <div style="text-align:center;max-width:700px">
+    <div class="label">Fin de la Clase</div>
+    <h1 style="font-size:clamp(2rem,5vw,4rem)">Escribe código<br>aunque sea<br><span class="cy">malo</span></h1>
+    <br>
+    <p style="color:var(--muted);max-width:500px;margin:0 auto 2rem;font-size:.95rem">
+      Todo gran developer empezó con un HTML sin estilos y un algoritmo que no funcionaba. El truco es no parar.
+    </p>
+    <div class="code" style="font-size:.95rem;padding:1rem 1.5rem;display:inline-block;max-width:500px">
+<span class="kw">const</span> tú = {<br>
+&nbsp; nombre: <span class="st">"___________"</span>,<br>
+&nbsp; semana: <span class="nu">1</span>,<br>
+&nbsp; tareas_hechas: <span class="nu">0</span>, <span class="cm">// ← cambia esto</span><br>
+&nbsp; potencial: <span class="st">"ilimitado"</span><br>
+}
+    </div>
+    <br><br>
+    <div style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted)">
+      BIT · Build · Innovate · Transform &nbsp;·&nbsp; Módulo 1 — S1
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- ══ NAV ═══════════════════════════════════════════════ -->
+<div id="nav">
+  <button id="bp">&#8592;</button>
+  <div class="dots" id="dotsC"></div>
+  <span id="sc">1 / 18</span>
+  <button id="bn">&#8594;</button>
+</div>
+
+<script>
+// ── SLIDE ENGINE ──────────────────────────────────────────
+const slides = [...document.querySelectorAll('.slide')];
+const dotsC  = document.getElementById('dotsC');
+const sc     = document.getElementById('sc');
+const prog   = document.getElementById('prog');
+let cur = 0;
+
+slides.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' a':'');
+  d.onclick = () => go(i);
+  dotsC.appendChild(d);
+});
+
+function go(idx) {
+  if (idx < 0 || idx >= slides.length) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('out');
+  const prev = cur;
+  setTimeout(() => slides[prev].classList.remove('out'), 450);
+  cur = idx;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('a', i===cur));
+  sc.textContent = `${cur+1} / ${slides.length}`;
+  prog.style.width = `${((cur+1)/slides.length)*100}%`;
+}
+
+document.getElementById('bn').onclick = () => go(cur+1);
+document.getElementById('bp').onclick = () => go(cur-1);
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') go(cur+1);
+  if (e.key==='ArrowLeft'||e.key==='ArrowUp')  go(cur-1);
+});
+let ts=0;
+document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; });
+document.addEventListener('touchend',   e => {
+  const d = ts - e.changedTouches[0].clientX;
+  if (Math.abs(d)>50) d>0 ? go(cur+1) : go(cur-1);
+});
+prog.style.width = `${(1/slides.length)*100}%`;
+
+// ── CHECKBOX TOGGLE ───────────────────────────────────────
+function toggle(li) { li.classList.toggle('done'); }
+
+// ── TIMER ─────────────────────────────────────────────────
+const timers = {};
+function startTimer(id, secs) {
+  if (timers[id]) { clearInterval(timers[id]); }
+  let remaining = secs;
+  const el = document.getElementById(id);
+  timers[id] = setInterval(() => {
+    remaining--;
+    const m = String(Math.floor(remaining/60)).padStart(2,'0');
+    const s = String(remaining%60).padStart(2,'0');
+    el.textContent = `${m}:${s}`;
+    if (remaining <= 0) {
+      clearInterval(timers[id]);
+      el.textContent = '⏰ ¡Tiempo!';
+      el.style.color = '#f87171';
+    }
+  }, 1000);
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────
+let dragged = null;
+document.addEventListener('dragstart', e => {
+  if (!e.target.classList.contains('dnd-chip')) return;
+  dragged = e.target;
+  e.target.classList.add('dragging');
+});
+document.addEventListener('dragend', e => {
+  if (e.target.classList.contains('dnd-chip')) e.target.classList.remove('dragging');
+});
+['pool','zone'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    el.classList.remove('drag-over');
+    if (dragged) { el.appendChild(dragged); dragged = null; }
+  });
+});
+
+function checkDND() {
+  const zone = document.getElementById('zone');
+  const chips = [...zone.querySelectorAll('.dnd-chip')];
+  const order = chips.map(c => parseInt(c.dataset.step));
+  const correct = [1,2,3,4,5,6];
+  const isCorrect = order.length===6 && order.every((v,i) => v===correct[i]);
+  const res = document.getElementById('dnd-res');
+  if (isCorrect) {
+    res.className = 'ex-result ok';
+    res.textContent = '✅ ¡Perfecto! Ese es el flujo correcto de autenticación.';
+  } else if (order.length < 6) {
+    res.className = 'ex-result er';
+    res.textContent = `⚠️ Faltan pasos. Tienes ${order.length}/6.`;
+  } else {
+    res.className = 'ex-result er';
+    res.textContent = '❌ El orden no es correcto. Pista: primero se reciben los datos, luego se validan.';
+  }
+}
+
+// ── TYPE CHECKER ──────────────────────────────────────────
+function checkType() {
+  const raw = document.getElementById('typeInput').value.trim();
+  const res = document.getElementById('typeRes');
+  if (!raw) { res.className='ex-result er'; res.textContent='Escribe algo primero.'; return; }
+  let tipo, color;
+  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
+    tipo = 'String 📝'; color = 'ok';
+  } else if (raw === 'true' || raw === 'false') {
+    tipo = 'Boolean ✅'; color = 'ok';
+  } else if (!isNaN(raw) && raw !== '') {
+    tipo = 'Number 🔢'; color = 'ok';
+  } else if (raw.startsWith('[') && raw.endsWith(']')) {
+    tipo = 'Array 📋'; color = 'ok';
+  } else if (raw === 'null') {
+    tipo = 'Null (ausencia intencional)'; color = 'ok';
+  } else if (raw === 'undefined') {
+    tipo = 'Undefined (sin valor asignado)'; color = 'ok';
+  } else {
+    tipo = '❓ Puede ser un nombre de variable o error de sintaxis'; color = 'er';
+  }
+  res.className = `ex-result ${color}`;
+  res.textContent = `Tipo: ${tipo}`;
+}
+
+function checkConcat() {
+  const res = document.getElementById('concatRes');
+  res.className = 'ex-result ok';
+  res.textContent = '"5" + 5 = "55" — JS convierte el 5 en texto y concatena. ¡Ojo con los tipos!';
+}
+
+// ── CALIFICAR CHECKER ─────────────────────────────────────
+function checkCalif() {
+  const answers = [
+    {id:'q1', correct:'✅ Aprobado'},
+    {id:'q2', correct:'🏆 Excelente'},
+    {id:'q3', correct:'❌ Reprobado'},
+  ];
+  const res = document.getElementById('califRes');
+  let ok = 0;
+  answers.forEach(a => {
+    const v = document.getElementById(a.id).value.trim();
+    if (v.includes('Aprobado') && a.correct.includes('Aprobado')) ok++;
+    else if (v.includes('Excelente') && a.correct.includes('Excelente')) ok++;
+    else if (v.includes('Reprobado') && a.correct.includes('Reprobado')) ok++;
+  });
+  const msgs = {
+    3: '🏆 ¡Perfecto! Entiendes cómo fluye el if/else.',
+    2: '✅ Casi. Revisa la condición >= 90.',
+    1: '⚠️ Traza paso a paso cada condición.',
+    0: '❌ Lee el código despacio. ¿Qué evalúa primero el if?',
+  };
+  res.className = `ex-result ${ok===3?'ok':'er'}`;
+  res.textContent = `${ok}/3 correctas — ${msgs[ok]}`;
+}
+</script>
+</body>
+</html>

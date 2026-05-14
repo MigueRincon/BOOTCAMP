@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mi Primera Vez con JavaScript — Guía para Estudiantes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #fafaf8;
+  --surface:  #ffffff;
+  --surface2: #f4f3ef;
+  --border:   #e8e6e0;
+  --border2:  #d4d1c8;
+  --ink:      #1a1916;
+  --ink2:     #5c5a54;
+  --ink3:     #9c9a92;
+  --green:    #16a34a;
+  --green-bg: #f0fdf4;
+  --green-bd: #bbf7d0;
+  --blue:     #1d4ed8;
+  --blue-bg:  #eff6ff;
+  --blue-bd:  #bfdbfe;
+  --amber:    #b45309;
+  --amber-bg: #fffbeb;
+  --amber-bd: #fde68a;
+  --red:      #dc2626;
+  --red-bg:   #fef2f2;
+  --red-bd:   #fecaca;
+  --purple:   #7c3aed;
+  --purple-bg:#f5f3ff;
+  --purple-bd:#ddd6fe;
+  --accent:   #e8410a;
+  --radius:   12px;
+  --radius-lg:18px;
+  --radius-xl:24px;
+  --mono:     'JetBrains Mono', monospace;
+  --sans:     'Plus Jakarta Sans', sans-serif;
+  --display:  'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  color: #fff;
+  padding: 52px 48px 44px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 20px,
+    rgba(255,255,255,.025) 20px,
+    rgba(255,255,255,.025) 21px
+  );
+}
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.hero h1 {
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.5px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero h1 em { color: #fbbf24; font-style: normal; }
+.hero-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,.65);
+  max-width: 560px;
+  line-height: 1.7;
+  position: relative;
+  margin-bottom: 28px;
+}
+.hero-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+}
+.hero-pill {
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.06);
+}
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 240px);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  padding: 28px 0 28px;
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--surface);
+}
+.sidebar-section { margin-bottom: 6px; }
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  padding: 0 20px 8px;
+  display: block;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  color: var(--ink2);
+  font-family: var(--sans);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: all .12s;
+}
+.nav-btn:hover { background: var(--surface2); color: var(--ink); }
+.nav-btn.on { background: #fff7f5; color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.nav-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-family: var(--mono);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--ink3);
+}
+.nav-btn.on .nav-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+.nav-sep { height: 1px; background: var(--border); margin: 10px 20px; }
+
+/* ── CONTENT ── */
+.content { padding: 44px 52px 60px; max-width: 820px; }
+.panel { display: none; }
+.panel.on { display: block; }
+
+/* ── STEP HEADER ── */
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.badge-intro   { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+.badge-task    { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+.badge-live    { background: #fff7f5; color: var(--accent); border: 1px solid #fecaca; }
+.badge-adv     { background: var(--ink); color: #fbbf24; }
+.step-title {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -.3px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.step-desc {
+  font-size: 14.5px;
+  color: var(--ink2);
+  line-height: 1.75;
+  margin-bottom: 28px;
+  max-width: 620px;
+}
+
+/* ── CONCEPT BLOCK ── */
+.concept {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+.concept-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.concept-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.concept-title {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.concept-sub { font-size: 12px; color: var(--ink3); }
+.concept-body { font-size: 14px; color: var(--ink2); line-height: 1.75; }
+.concept-body strong { font-weight: 600; color: var(--ink); }
+
+/* ── ANALOGY BOX ── */
+.analogy {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-bd);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13.5px;
+  color: var(--amber);
+  line-height: 1.7;
+}
+.analogy strong { font-weight: 600; }
+
+/* ── SECTION TITLE ── */
+.sec {
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin: 28px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── STEP LIST ── */
+.step-list { list-style: none; margin-bottom: 20px; }
+.step-list li {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.65;
+  align-items: flex-start;
+}
+.step-list li:last-child { border-bottom: none; }
+.step-num {
+  width: 26px; height: 26px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-list li strong { font-weight: 600; }
+.step-list li code { font-family: var(--mono); font-size: 12px; background: var(--surface2); padding: 1px 7px; border-radius: 5px; color: var(--blue); border: 1px solid var(--border); }
+
+/* ── CODE BLOCK ── */
+.code-wrap { position: relative; margin: 14px 0; }
+.code-label {
+  position: absolute;
+  top: -1px; right: -1px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  background: var(--border);
+  color: var(--ink3);
+  padding: 3px 10px;
+  border-radius: 0 var(--radius) 0 6px;
+}
+.code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 2;
+  background: #16181f;
+  color: #cdd6f4;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  overflow-x: auto;
+  white-space: pre;
+  border: 1px solid #2a2d3a;
+}
+.cm  { color: #585b70; font-style: italic; }
+.kw  { color: #cba6f7; }
+.fn  { color: #a6e3a1; }
+.st  { color: #a6e3a1; }
+.str { color: #fab387; }
+.num { color: #fab387; }
+.tg  { color: #89b4fa; }
+.at  { color: #f38ba8; }
+.line-hl { background: rgba(166,227,161,.08); display: block; margin: 0 -20px; padding: 0 20px; border-left: 3px solid #a6e3a1; }
+
+/* ── CALLOUTS ── */
+.callout {
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13.5px;
+  line-height: 1.75;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout-body { flex: 1; }
+.callout.info  { background: var(--blue-bg);   color: var(--blue);  border: 1px solid var(--blue-bd); }
+.callout.ok    { background: var(--green-bg);  color: var(--green); border: 1px solid var(--green-bd); }
+.callout.warn  { background: var(--amber-bg);  color: var(--amber); border: 1px solid var(--amber-bd); }
+.callout.tip   { background: var(--surface2);  color: var(--ink2);  border: 1px solid var(--border); }
+.callout code  { font-family: var(--mono); font-size: 12px; background: rgba(0,0,0,.07); padding: 1px 6px; border-radius: 4px; }
+.callout strong { font-weight: 600; }
+
+/* ── COMPARE TABLE ── */
+.compare { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 14px 0; }
+.compare th {
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  padding: 10px 16px;
+  text-align: left;
+}
+.compare th:first-child { border-radius: var(--radius) 0 0 0; }
+.compare th:last-child  { border-radius: 0 var(--radius) 0 0; }
+.compare td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--ink2); line-height: 1.6; }
+.compare tr:last-child td { border-bottom: none; }
+.compare td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); background: var(--blue-bg); font-weight: 500; }
+.compare tr:nth-child(even) td { background: var(--surface2); }
+.compare tr:nth-child(even) td:first-child { background: #e8f0fe; }
+
+/* ── INLINE CODE ── */
+code { font-family: var(--mono); font-size: 12.5px; background: var(--surface2); color: var(--blue); padding: 2px 7px; border-radius: 5px; border: 1px solid var(--border); }
+
+/* ── GLOSSARY ── */
+.gloss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.gloss-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.gloss-term { font-family: var(--mono); font-size: 13px; color: var(--purple); font-weight: 500; margin-bottom: 5px; }
+.gloss-def  { font-size: 12.5px; color: var(--ink2); line-height: 1.6; }
+
+/* ── TWO COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+.mini { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.mini h5 { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.mini p  { font-size: 12.5px; color: var(--ink2); line-height: 1.65; }
+
+/* ── CHALLENGE SECTION ── */
+.challenge-hero {
+  background: var(--ink);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.challenge-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(251,191,36,.12) 0%, transparent 65%);
+}
+.challenge-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(251,191,36,.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,.3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.challenge-hero h2 {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+  position: relative;
+}
+.challenge-hero p {
+  font-size: 14px;
+  color: rgba(255,255,255,.6);
+  line-height: 1.7;
+  max-width: 500px;
+  position: relative;
+}
+
+.challenge-level {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin-bottom: 14px;
+}
+.level-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.level-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 12px;
+  border-radius: 999px;
+}
+.lv1 { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+.lv2 { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-bd); }
+.lv3 { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-bd); }
+.lv4 { background: var(--ink);      color: #fbbf24;      border: 1px solid #374151; }
+.level-title { font-family: var(--display); font-size: 17px; font-weight: 700; color: var(--ink); }
+.level-list { list-style: none; }
+.level-list li {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+  color: var(--ink2);
+  line-height: 1.6;
+  align-items: flex-start;
+}
+.level-list li:last-child { border-bottom: none; }
+.level-list li::before {
+  content: '→';
+  color: var(--border2);
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.level-list li code { font-family: var(--mono); font-size: 12px; background: var(--surface2); padding: 1px 6px; border-radius: 4px; color: var(--blue); border: 1px solid var(--border); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.btn {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all .12s;
+  letter-spacing: .3px;
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--ink2);
+}
+.btn-ghost:hover { background: var(--surface2); }
+.btn-ghost:disabled { opacity: .3; cursor: not-allowed; }
+.btn-solid { background: var(--ink); border: none; color: #fff; }
+.btn-solid:hover { background: #2d2b27; }
+.btn-solid:disabled { opacity: .3; cursor: not-allowed; }
+.nav-info { font-size: 12px; color: var(--ink3); font-family: var(--mono); }
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { height: 3px; background: var(--border); }
+.prog-fill { height: 100%; background: var(--accent); transition: width .3s; }
+
+/* ── FINAL CARD ── */
+.final-card {
+  background: linear-gradient(135deg, var(--green-bg), var(--blue-bg));
+  border: 1px solid var(--green-bd);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.final-card h3 { font-family: var(--display); font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.final-card p  { font-size: 14px; color: var(--ink2); line-height: 1.7; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .content { padding: 28px 20px 40px; }
+  .two-col, .gloss-grid { grid-template-columns: 1fr; }
+  .hero { padding: 36px 24px 30px; }
+}
+</style>
+</head>
+<body>
+
+<div class="prog-wrap"><div class="prog-fill" id="prog" style="width:8.33%"></div></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">🚀 Guía para estudiantes</div>
+  <h1>Tu primera vez con<br><em>JavaScript y el DOM</em></h1>
+  <p class="hero-sub">No necesitás saber nada de programación para empezar. Esta guía te lleva de cero a hacer que tu página web reaccione a clics — paso a paso, sin saltear nada.</p>
+  <div class="hero-pills">
+    <span class="hero-pill">⏱ ~60 min</span>
+    <span class="hero-pill">📄 3 archivos</span>
+    <span class="hero-pill">🧠 Nivel cero</span>
+    <span class="hero-pill">🔥 Reto avanzado incluido</span>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-section">
+    <span class="sidebar-label">La guía</span>
+    <button class="nav-btn on" onclick="go(0)"><span class="nav-num">·</span> ¿Qué es todo esto?</button>
+    <button class="nav-btn"    onclick="go(1)"><span class="nav-num">1</span> Tus 3 archivos</button>
+    <button class="nav-btn"    onclick="go(2)"><span class="nav-num">2</span> El HTML — vos lo escribís</button>
+    <button class="nav-btn"    onclick="go(3)"><span class="nav-num">3</span> El CSS — vos lo escribís</button>
+    <button class="nav-btn"    onclick="go(4)"><span class="nav-num">4</span> Conectar el JS</button>
+    <button class="nav-btn"    onclick="go(5)"><span class="nav-num">5</span> Tus primeras variables</button>
+    <button class="nav-btn"    onclick="go(6)"><span class="nav-num">6</span> Buscar en el DOM</button>
+    <button class="nav-btn"    onclick="go(7)"><span class="nav-num">7</span> Tus funciones</button>
+    <button class="nav-btn"    onclick="go(8)"><span class="nav-num">8</span> Lógica con if / else</button>
+    <button class="nav-btn"    onclick="go(9)"><span class="nav-num">9</span> Clases desde JS</button>
+    <button class="nav-btn"    onclick="go(10)"><span class="nav-num">10</span> El código completo</button>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="sidebar-section">
+    <span class="sidebar-label">Bonus</span>
+    <button class="nav-btn" onclick="go(11)"><span class="nav-num" style="background:#fbbf24;border-color:#fbbf24;color:#1a1916">★</span> Reto avanzado</button>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<main class="content">
+
+<!-- ═══════════════════════════════════════
+     PANEL 0 — QUÉ ES TODO ESTO
+════════════════════════════════════════ -->
+<div class="panel on" id="p0">
+  <span class="step-badge badge-intro">Introducción</span>
+  <div class="step-title">¿Qué vas a aprender hoy?</div>
+  <div class="step-desc">Vamos a construir un <strong>contador de puntos</strong> que funciona en vivo en el navegador. Parece simple, pero en el camino vas a aprender los conceptos más importantes del desarrollo web.</div>
+
+  <div class="sec">qué vas a construir</div>
+  <div class="concept">
+    <div class="concept-head">
+      <div class="concept-icon" style="background:#fef3c7;font-size:22px">🎮</div>
+      <div>
+        <div class="concept-title">Contador de puntos interactivo</div>
+        <div class="concept-sub">HTML + CSS + JavaScript trabajando juntos</div>
+      </div>
+    </div>
+    <div class="concept-body">Dos botones que suman y restan puntos. Un número que cambia en tiempo real. Un mensaje que aparece cuando llegás a 10 puntos. Tarjetas de jugadores que se resaltan. Todo sin recargar la página.</div>
+  </div>
+
+  <div class="sec">los 3 roles — qué hace cada tecnología</div>
+  <div class="step-list">
+    <li>
+      <span class="step-num" style="background:#e8410a">H</span>
+      <div><strong>HTML</strong> — es la <em>estructura</em>. Define qué elementos existen en la página: el título, los botones, los párrafos. Es como el esqueleto de un edificio.</div>
+    </li>
+    <li>
+      <span class="step-num" style="background:#2563eb">C</span>
+      <div><strong>CSS</strong> — es el <em>diseño</em>. Decide cómo se ve todo: colores, tamaños, fuentes, espaciado. Es la pintura y decoración del edificio.</div>
+    </li>
+    <li>
+      <span class="step-num" style="background:#16a34a">J</span>
+      <div><strong>JavaScript</strong> — es el <em>comportamiento</em>. Hace que las cosas pasen: botones que responden, números que cambian, elementos que aparecen y desaparecen. Es la electricidad del edificio.</div>
+    </li>
+  </div>
+
+  <div class="sec">el DOM — el concepto más importante</div>
+  <div class="concept">
+    <div class="concept-head">
+      <div class="concept-icon" style="background:#ede9fe">🗺️</div>
+      <div>
+        <div class="concept-title">¿Qué es el DOM?</div>
+        <div class="concept-sub">Document Object Model</div>
+      </div>
+    </div>
+    <div class="concept-body">Cuando el navegador carga tu HTML, lo convierte en un <strong>mapa interno</strong> de todos los elementos. Ese mapa se llama DOM (Document Object Model). JavaScript puede entrar a ese mapa y <strong>cambiar cualquier cosa</strong>: texto, colores, visibilidad — todo en tiempo real, sin recargar.</div>
+  </div>
+
+  <div class="analogy">
+    <strong>Analogía:</strong> Imaginá que el HTML es un árbol con ramas y hojas. El DOM es ese mismo árbol pero dibujado como un mapa que JavaScript puede leer y modificar. Si JS cambia una hoja en el mapa, la página se actualiza al instante.
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body"><strong>Para verlo en vivo:</strong> abrí cualquier página web, hacé clic derecho → "Inspeccionar" → pestaña "Elements". Ese árbol que ves es el DOM. ¡Podés hacer clic en cualquier elemento y editarlo en tiempo real!</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 1 — TUS 3 ARCHIVOS
+════════════════════════════════════════ -->
+<div class="panel" id="p1">
+  <span class="step-badge badge-intro">Antes de empezar</span>
+  <div class="step-title">Preparar tu espacio de trabajo</div>
+  <div class="step-desc">Antes de escribir código, necesitás tener todo en orden. Siguiendo estos pasos no vas a tener problemas de "¿por qué no funciona?".</div>
+
+  <div class="sec">paso a paso — hacelo ahora</div>
+  <ol class="step-list">
+    <li>
+      <span class="step-num">1</span>
+      <div><strong>Instalá VS Code</strong> si no lo tenés. Buscalo en Google como "Visual Studio Code" o andá a <code>code.visualstudio.com</code>. Es gratis y es el editor más usado en el mundo.</div>
+    </li>
+    <li>
+      <span class="step-num">2</span>
+      <div><strong>Instalá la extensión Live Server.</strong> Abrí VS Code → presioná <code>Ctrl + Shift + X</code> → buscá "Live Server" de Ritwick Dey → instalá. Esta extensión recarga el navegador automáticamente cada vez que guardás.</div>
+    </li>
+    <li>
+      <span class="step-num">3</span>
+      <div><strong>Creá una carpeta</strong> en tu escritorio o documentos. Llamala <code>mi-contador</code>. Nada de espacios ni tildes en el nombre.</div>
+    </li>
+    <li>
+      <span class="step-num">4</span>
+      <div><strong>Abrí esa carpeta con VS Code.</strong> Menú Archivo → "Abrir carpeta" → elegís <code>mi-contador</code>.</div>
+    </li>
+    <li>
+      <span class="step-num">5</span>
+      <div><strong>Creá 3 archivos vacíos</strong> dentro de la carpeta. En el explorador de VS Code (panel izquierdo), hacé clic derecho → "Nuevo archivo" y creá:<br>→ <code>index.html</code><br>→ <code>style.css</code><br>→ <code>script.js</code></div>
+    </li>
+  </ol>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>Los 3 archivos tienen que estar en la misma carpeta.</strong> Si están en distintos lugares, no van a poder "verse" entre sí y nada va a funcionar.</div>
+  </div>
+
+  <div class="sec">cómo usar live server</div>
+  <div class="callout ok">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body">Para lanzar tu página: en el explorador de VS Code, hacé <strong>clic derecho sobre index.html</strong> → "Open with Live Server". Se va a abrir el navegador en <code>localhost:5500</code>. Cada vez que guardés con <code>Ctrl+S</code>, la página se recarga sola.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 2 — HTML
+════════════════════════════════════════ -->
+<div class="panel" id="p2">
+  <span class="step-badge badge-task">Tarea tuya</span>
+  <div class="step-title">El HTML — vos lo escribís</div>
+  <div class="step-desc">Abrí <code>index.html</code> y construí la estructura. Vos decidís cómo organizarlo, pero hay elementos específicos que necesitamos — con ids y clases exactos — para que el JavaScript los encuentre después.</div>
+
+  <div class="callout info">
+    <span class="callout-icon">🔑</span>
+    <div class="callout-body"><strong>Concepto clave — id vs class:</strong><br>
+    — Un <strong>id</strong> es como el DNI: es único, solo un elemento puede tenerlo. Se usa cuando el elemento es especial.<br>
+    — Una <strong>class</strong> es como una etiqueta de grupo: muchos elementos pueden tenerla. Se usa cuando querés aplicar algo a varios a la vez.</div>
+  </div>
+
+  <div class="sec">elementos que debes incluir</div>
+  <ol class="step-list">
+    <li>
+      <span class="step-num">A</span>
+      <div>Un <strong>título</strong> cualquiera para tu página. No necesita id.</div>
+    </li>
+    <li>
+      <span class="step-num">B</span>
+      <div>Un elemento (puede ser un <code>&lt;span&gt;</code> dentro de un <code>&lt;div&gt;</code>) con <code>id="numero-puntos"</code> que muestre el número <strong>0</strong>.</div>
+    </li>
+    <li>
+      <span class="step-num">C</span>
+      <div>Un párrafo <code>&lt;p&gt;</code> con <code>id="mensaje"</code> que diga algo como "¡Pulsá los botones!".</div>
+    </li>
+    <li>
+      <span class="step-num">D</span>
+      <div>Un botón con el texto "Sumar" y el atributo <code>onclick="sumarPunto()"</code>. Atención: los paréntesis son obligatorios.</div>
+    </li>
+    <li>
+      <span class="step-num">E</span>
+      <div>Un botón con el texto "Restar" y el atributo <code>onclick="restarPunto()"</code>.</div>
+    </li>
+    <li>
+      <span class="step-num">F</span>
+      <div>Exactamente <strong>3 divs</strong>, cada uno con <code>class="jugador"</code>, con nombres de personas adentro.</div>
+    </li>
+    <li>
+      <span class="step-num">G</span>
+      <div>Un div con <code>id="ganador"</code> y <code>class="oculto"</code> que diga "¡GANASTE!"</div>
+    </li>
+  </ol>
+
+  <div class="sec">referencia — así se ve una estructura posible</div>
+  <div class="code-wrap">
+    <span class="code-label">HTML</span>
+    <div class="code"><span class="cm">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html</span> <span class="at">lang=</span><span class="str">"es"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset=</span><span class="str">"UTF-8"</span><span class="tg">/&gt;</span>
+  <span class="tg">&lt;title&gt;</span>Mi Contador<span class="tg">&lt;/title&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel=</span><span class="str">"stylesheet"</span> <span class="at">href=</span><span class="str">"style.css"</span><span class="tg">/&gt;</span>
+<span class="tg">&lt;/head&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+
+  <span class="tg">&lt;h1&gt;</span>Contador de Puntos<span class="tg">&lt;/h1&gt;</span>
+
+  <span class="cm">&lt;!-- El número: tiene id para que JS lo encuentre --&gt;</span>
+  <span class="tg">&lt;div&gt;</span>
+    <span class="tg">&lt;span</span> <span class="at">id=</span><span class="str">"numero-puntos"</span><span class="tg">&gt;</span>0<span class="tg">&lt;/span&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- Mensaje de estado --&gt;</span>
+  <span class="tg">&lt;p</span> <span class="at">id=</span><span class="str">"mensaje"</span><span class="tg">&gt;</span>¡Pulsá los botones!<span class="tg">&lt;/p&gt;</span>
+
+  <span class="cm">&lt;!-- Botones — el onclick llama a funciones de JS --&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">onclick=</span><span class="str">"sumarPunto()"</span><span class="tg">&gt;</span>➕ Sumar<span class="tg">&lt;/button&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">onclick=</span><span class="str">"restarPunto()"</span><span class="tg">&gt;</span>➖ Restar<span class="tg">&lt;/button&gt;</span>
+
+  <span class="cm">&lt;!-- Tarjetas de jugadores: misma clase los 3 --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="str">"jugador"</span><span class="tg">&gt;</span>Ana<span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="str">"jugador"</span><span class="tg">&gt;</span>Luis<span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class=</span><span class="str">"jugador"</span><span class="tg">&gt;</span>María<span class="tg">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- Mensaje ganador: oculto por defecto --&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">id=</span><span class="str">"ganador"</span> <span class="at">class=</span><span class="str">"oculto"</span><span class="tg">&gt;</span>🏆 ¡GANASTE!<span class="tg">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- El JS va AQUÍ, al final del body --&gt;</span>
+  <span class="tg">&lt;script</span> <span class="at">src=</span><span class="str">"script.js"</span><span class="tg">&gt;&lt;/script&gt;</span>
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></div>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>Error clásico:</strong> los ids son sensibles a mayúsculas y espacios. <code>id="numero-puntos"</code> es distinto a <code>id="Numero Puntos"</code> o <code>id="numeroPuntos"</code>. Anotátelo bien porque JS va a buscar el id exacto.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 3 — CSS
+════════════════════════════════════════ -->
+<div class="panel" id="p3">
+  <span class="step-badge badge-task">Tarea tuya</span>
+  <div class="step-title">El CSS — vos lo diseñás</div>
+  <div class="step-desc">Abrí <code>style.css</code>. Acá tenés total libertad de diseño — colores, fuentes, espaciado, lo que quieras. Pero hay <strong>dos clases que son obligatorias</strong> porque JavaScript las va a activar y desactivar.</div>
+
+  <div class="sec">las dos clases que JS necesita (obligatorias)</div>
+  <div class="code-wrap">
+    <span class="code-label">CSS</span>
+    <div class="code"><span class="cm">/* ─── CLASE 1: ocultar/mostrar elementos ───────── */</span>
+<span class="cm">/* JS quita esta clase para mostrar el mensaje ganador */</span>
+<span class="fn">.oculto</span> {
+  display: none;
+}
+
+<span class="cm">/* ─── CLASE 2: resaltar tarjetas de jugadores ──── */</span>
+<span class="cm">/* JS agrega esta clase cuando se gana */</span>
+<span class="fn">.resaltado</span> {
+  border: 3px solid <span class="str">#22c55e</span>;
+  background-color: <span class="str">#f0fdf4</span>;
+}</div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body"><strong>El concepto importante:</strong> JavaScript no escribe CSS directamente. En cambio, <strong>agrega o quita clases</strong>. Vos definís el diseño en CSS; JS solo decide <em>cuándo aplicarlo</em>. Esta separación de responsabilidades es fundamental en el desarrollo web.</div>
+  </div>
+
+  <div class="sec">ejemplo de diseño completo (opcional — podés hacerlo diferente)</div>
+  <div class="code-wrap">
+    <span class="code-label">CSS</span>
+    <div class="code"><span class="cm">/* Estilos generales */</span>
+<span class="fn">body</span> {
+  font-family: sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+<span class="cm">/* El número grande */</span>
+<span class="fn">#numero-puntos</span> {
+  font-size: 5rem;
+  font-weight: bold;
+  color: #e94560;
+  display: block;
+}
+
+<span class="cm">/* Tarjetas de jugadores */</span>
+<span class="fn">.jugador</span> {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin: 8px auto;
+  max-width: 300px;
+  transition: all 0.3s;
+}
+
+<span class="cm">/* ── Las dos clases obligatorias ── */</span>
+<span class="fn">.oculto</span> {
+  display: none;
+}
+
+<span class="fn">.resaltado</span> {
+  border: 2px solid #2ecc71;
+  background: #1a3a2e;
+}</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 4 — CONECTAR JS
+════════════════════════════════════════ -->
+<div class="panel" id="p4">
+  <span class="step-badge badge-live">Guiado por el profe</span>
+  <div class="step-title">Conectar el JavaScript al HTML</div>
+  <div class="step-desc">El HTML y el JS son archivos separados. Para que "se conozcan", el HTML necesita una instrucción que diga "cargá este archivo JS". Esa instrucción es la etiqueta <code>&lt;script&gt;</code>.</div>
+
+  <div class="sec">dónde va la etiqueta script</div>
+  <div class="code-wrap">
+    <span class="code-label">HTML — al final del body</span>
+    <div class="code"><span class="tg">&lt;body&gt;</span>
+
+  <span class="cm">&lt;!-- ... todo tu HTML aquí arriba ... --&gt;</span>
+
+  <span class="cm">&lt;!-- ESTO va AL FINAL, justo antes de &lt;/body&gt; --&gt;</span>
+  <span class="line-hl"><span class="tg">&lt;script</span> <span class="at">src=</span><span class="str">"script.js"</span><span class="tg">&gt;&lt;/script&gt;</span></span>
+<span class="tg">&lt;/body&gt;</span></div>
+  </div>
+
+  <div class="sec">por qué va al final y no en el head</div>
+  <div class="concept">
+    <div class="concept-body">
+      Cuando el navegador carga una página, la lee de <strong>arriba hacia abajo</strong>. Si el <code>&lt;script&gt;</code> está en el <code>&lt;head&gt;</code>, JavaScript empieza a ejecutarse <em>antes</em> de que existan los elementos del HTML.<br><br>
+      Al ponerlo al <strong>final del body</strong>, todo el HTML ya existe cuando el script se ejecuta, y JS puede encontrar todos los elementos sin problemas.
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>Analogía:</strong> Es como llegar a una fiesta e intentar presentarte con la gente. Si llegás antes que todos (script en el head), no hay nadie con quien hablar. Si llegás al final (script al final del body), todos ya están ahí y podés encontrarlos fácilmente.
+  </div>
+
+  <div class="sec">verificá que funciona</div>
+  <div class="callout ok">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body">
+      Abrí <code>script.js</code> y escribí esta única línea:<br><br>
+      <code>console.log("¡JS conectado correctamente!")</code><br><br>
+      Guardá (Ctrl+S), abrí tu página con Live Server, presioná <strong>F12</strong> → pestaña <strong>Consola</strong>. Si ves el mensaje, ¡todo está conectado!
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">🔧</span>
+    <div class="callout-body"><strong>La Consola (F12) es tu mejor amiga.</strong> Es donde aparecen los errores, los mensajes de <code>console.log()</code> y toda la información de depuración. Mantela siempre visible mientras programás.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 5 — VARIABLES
+════════════════════════════════════════ -->
+<div class="panel" id="p5">
+  <span class="step-badge badge-live">Guiado por el profe</span>
+  <div class="step-title">Las variables — la memoria de tu programa</div>
+  <div class="step-desc">Antes de buscar nada en el DOM, necesitamos una variable que guarde el puntaje. Las variables son "cajitas" donde JavaScript guarda información que puede cambiar.</div>
+
+  <div class="sec">cómo declarar variables</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="cm">// "let" → el valor puede cambiar (los puntos suben y bajan)</span>
+<span class="kw">let</span> puntos = <span class="num">0</span>;
+
+<span class="cm">// "const" → el valor nunca cambia (la meta siempre es 10)</span>
+<span class="kw">const</span> META = <span class="num">10</span>;
+
+<span class="cm">// Comprobamos que JS funciona</span>
+console.<span class="fn">log</span>(<span class="str">"Puntos al inicio:"</span>, puntos);  <span class="cm">// → 0</span></div>
+  </div>
+
+  <div class="sec">let vs const — cuándo usar cada uno</div>
+  <table class="compare">
+    <tr>
+      <th>Palabra clave</th>
+      <th>¿Puede cambiar?</th>
+      <th>Cuándo usarla</th>
+    </tr>
+    <tr>
+      <td>let</td>
+      <td>Sí, puede cambiar</td>
+      <td>Contadores, estados, valores que se actualizan</td>
+    </tr>
+    <tr>
+      <td>const</td>
+      <td>No, es fija</td>
+      <td>Metas, configuraciones, valores que nunca cambian</td>
+    </tr>
+  </table>
+
+  <div class="analogy">
+    <strong>Analogía de la pizarra:</strong> la variable <code>puntos</code> es como tener el número en la cabeza (memoria interna). El DOM (lo que se ve en pantalla) es como la pizarra. Cuando cambiás la variable, tenés que actualizar la pizarra a mano — no se actualizan solas.
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>Error conceptual común:</strong> si solo cambiás el texto en el DOM pero no actualizás la variable, la lógica se pierde. Siempre: primero la variable, luego el DOM.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 6 — getElementById
+════════════════════════════════════════ -->
+<div class="panel" id="p6">
+  <span class="step-badge badge-live">Guiado por el profe</span>
+  <div class="step-title">Buscar elementos en el DOM</div>
+  <div class="step-desc">Para que JS pueda cambiar un elemento HTML, primero tiene que <strong>encontrarlo</strong>. Hay dos métodos principales dependiendo de si buscás por id o por clase.</div>
+
+  <div class="sec">método 1 — buscar por id</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="cm">// document.getElementById("el-id")
+// → Devuelve UN elemento (porque los ids son únicos)</span>
+
+<span class="kw">const</span> elNumero  = document.<span class="fn">getElementById</span>(<span class="str">"numero-puntos"</span>);
+<span class="kw">const</span> elMensaje  = document.<span class="fn">getElementById</span>(<span class="str">"mensaje"</span>);
+<span class="kw">const</span> elGanador  = document.<span class="fn">getElementById</span>(<span class="str">"ganador"</span>);
+
+<span class="cm">// Verificamos qué obtuvimos:</span>
+console.<span class="fn">log</span>(elNumero);   <span class="cm">// → &lt;span id="numero-puntos"&gt;0&lt;/span&gt;</span>
+
+<span class="cm">// Si aparece null → el id en el HTML no coincide exactamente</span></div>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>Si la Consola muestra <code>null</code>:</strong> el id que escribiste en JS no existe exactamente igual en el HTML. Revisá mayúsculas, guiones y espacios. <code>"numero-puntos"</code> ≠ <code>"NumeroPuntos"</code>.</div>
+  </div>
+
+  <div class="sec">método 2 — buscar por clase (varios elementos)</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="cm">// document.getElementsByClassName("la-clase")
+// → Devuelve una LISTA de elementos (HTMLCollection)
+// porque muchos elementos pueden tener la misma clase</span>
+
+<span class="kw">const</span> jugadores = document.<span class="fn">getElementsByClassName</span>(<span class="str">"jugador"</span>);
+
+console.<span class="fn">log</span>(jugadores);          <span class="cm">// → HTMLCollection(3) [div, div, div]</span>
+console.<span class="fn">log</span>(jugadores.length);    <span class="cm">// → 3 (cuántos encontró)</span>
+console.<span class="fn">log</span>(jugadores[<span class="num">0</span>]);       <span class="cm">// → primer div (índice empieza en 0)</span>
+console.<span class="fn">log</span>(jugadores[<span class="num">1</span>]);       <span class="cm">// → segundo div</span>
+console.<span class="fn">log</span>(jugadores[<span class="num">2</span>]);       <span class="cm">// → tercer div</span></div>
+  </div>
+
+  <div class="sec">resumen de las diferencias</div>
+  <table class="compare">
+    <tr>
+      <th>Método</th>
+      <th>Devuelve</th>
+      <th>Cuándo usarlo</th>
+    </tr>
+    <tr>
+      <td>getElementById</td>
+      <td>Un solo elemento</td>
+      <td>Cuando el elemento es único (contadores, mensajes, titulos)</td>
+    </tr>
+    <tr>
+      <td>getElementsByClassName</td>
+      <td>Una lista (HTMLCollection)</td>
+      <td>Cuando querés agarrar un grupo del mismo tipo</td>
+    </tr>
+  </table>
+
+  <div class="analogy">
+    <strong>Analogía:</strong> <code>getElementById</code> es como buscar a alguien por su número de DNI — solo puede haber uno. <code>getElementsByClassName</code> es como llamar "¡estudiantes!" en el pasillo — todos los que tienen esa etiqueta levantan la mano.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 7 — FUNCIONES
+════════════════════════════════════════ -->
+<div class="panel" id="p7">
+  <span class="step-badge badge-live">Guiado por el profe</span>
+  <div class="step-title">Las funciones — acciones que se ejecutan</div>
+  <div class="step-desc">Una función es un bloque de código con nombre que se ejecuta cuando alguien lo llama. Los botones con <code>onclick</code> llaman funciones. Vamos a crear las dos funciones vacías primero, para verificar la conexión.</div>
+
+  <div class="sec">estructura de una función</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="cm">// Así se declara una función:</span>
+<span class="kw">function</span> <span class="fn">nombreDeLaFuncion</span>() {
+  <span class="cm">// el código que se ejecuta va aquí adentro</span>
+}
+
+<span class="cm">// Así se llama (ejecuta) una función:</span>
+<span class="fn">nombreDeLaFuncion</span>();   <span class="cm">// ← los paréntesis son OBLIGATORIOS</span></div>
+  </div>
+
+  <div class="sec">creá las funciones vacías primero</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="cm">// Empezamos vacías para verificar que el botón conecta:</span>
+<span class="kw">function</span> <span class="fn">sumarPunto</span>() {
+  console.<span class="fn">log</span>(<span class="str">"¡Botón SUMAR pulsado!"</span>);
+}
+
+<span class="kw">function</span> <span class="fn">restarPunto</span>() {
+  console.<span class="fn">log</span>(<span class="str">"¡Botón RESTAR pulsado!"</span>);
+}</div>
+  </div>
+
+  <div class="callout ok">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body">Guardá (Ctrl+S) y hacé clic en el botón "Sumar". Abrí F12 → Consola. ¿Aparece el mensaje? Perfecto. Si no aparece, revisá que el nombre en <code>onclick="sumarPunto()"</code> sea idéntico al nombre de la función en el JS.</div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body"><strong>Técnica profesional:</strong> siempre empezá con funciones vacías que solo hacen <code>console.log()</code>. Así confirmás que la conexión funciona antes de escribir lógica. Si el log no aparece, sabés exactamente dónde está el problema.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 8 — IF/ELSE
+════════════════════════════════════════ -->
+<div class="panel" id="p8">
+  <span class="step-badge badge-live">Guiado por el profe</span>
+  <div class="step-title">Lógica con if / else</div>
+  <div class="step-desc">Ahora llenás las funciones con código real. El <code>if / else</code> permite que el programa tome decisiones: <em>"si pasa X, hacé A; si no, hacé B"</em>.</div>
+
+  <div class="sec">cómo funciona if / else</div>
+  <div class="code-wrap">
+    <span class="code-label">Estructura</span>
+    <div class="code"><span class="kw">if</span> (condición que puede ser verdadera o falsa) {
+  <span class="cm">// esto se ejecuta si la condición es VERDADERA</span>
+} <span class="kw">else</span> {
+  <span class="cm">// esto se ejecuta si la condición es FALSA</span>
+}</div>
+  </div>
+
+  <div class="sec">función sumarPunto — completa</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="kw">function</span> <span class="fn">sumarPunto</span>() {
+
+  <span class="cm">// 1. Actualizamos la variable interna</span>
+  puntos = puntos + <span class="num">1</span>;         <span class="cm">// también se puede escribir: puntos++</span>
+
+  <span class="cm">// 2. Reflejamos el nuevo valor en el DOM</span>
+  elNumero.textContent = puntos;  <span class="cm">// .textContent cambia el texto del elemento</span>
+
+  <span class="cm">// 3. Lógica: ¿llegamos a la meta?</span>
+  <span class="kw">if</span> (puntos >= META) {
+    elMensaje.textContent = <span class="str">"🎉 ¡Ganaste!"</span>;
+  } <span class="kw">else</span> {
+    elMensaje.textContent = <span class="str">"Vas por "</span> + puntos + <span class="str">" puntos"</span>;
+  }
+
+}</div>
+  </div>
+
+  <div class="callout ok">
+    <span class="callout-icon">🔥</span>
+    <div class="callout-body">Guardá y probá pulsar "Sumar" varias veces. El número en pantalla debe cambiar en tiempo real. ¡Eso es el DOM en acción!</div>
+  </div>
+
+  <div class="sec">función restarPunto — con validación</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js</span>
+    <div class="code"><span class="kw">function</span> <span class="fn">restarPunto</span>() {
+
+  <span class="cm">// Validación: no dejamos bajar de 0</span>
+  <span class="kw">if</span> (puntos > <span class="num">0</span>) {
+    puntos = puntos - <span class="num">1</span>;         <span class="cm">// también se puede: puntos--</span>
+    elNumero.textContent = puntos;
+    elMensaje.textContent = <span class="str">"Bajaste a "</span> + puntos + <span class="str">" puntos"</span>;
+  } <span class="kw">else</span> {
+    elMensaje.textContent = <span class="str">"⚠️ ¡No podés bajar de 0!"</span>;
+  }
+
+}</div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">🤔</span>
+    <div class="callout-body"><strong>¿Por qué el if de validación?</strong> Sin él, los puntos podrían llegar a -1, -2, etc. La validación es un "guardián" que protege la lógica. En programación, anticipar casos problemáticos se llama <strong>manejo de casos borde</strong>.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 9 — classList
+════════════════════════════════════════ -->
+<div class="panel" id="p9">
+  <span class="step-badge badge-live">Guiado por el profe</span>
+  <div class="step-title">Manipular clases desde JavaScript</div>
+  <div class="step-desc">Ahora conectás todo: JS va a agregar y quitar las clases CSS que creaste antes. Así mostrás el banner ganador y resaltás los jugadores.</div>
+
+  <div class="sec">los 3 métodos de classList</div>
+  <div class="gloss-grid">
+    <div class="gloss-card">
+      <div class="gloss-term">.classList.add("clase")</div>
+      <div class="gloss-def">Agrega una clase al elemento. Si ya la tiene, no hace nada.</div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-term">.classList.remove("clase")</div>
+      <div class="gloss-def">Quita una clase del elemento. Si no la tiene, no hace nada.</div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-term">.classList.toggle("clase")</div>
+      <div class="gloss-def">Si la tiene la quita, si no la tiene la agrega. Como un interruptor.</div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-term">.classList.contains("clase")</div>
+      <div class="gloss-def">Devuelve true o false según si el elemento tiene esa clase.</div>
+    </div>
+  </div>
+
+  <div class="sec">mostrar el banner ganador</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js — dentro del if (puntos >= META)</span>
+    <div class="code"><span class="kw">if</span> (puntos >= META) {
+  elMensaje.textContent = <span class="str">"🎉 ¡Ganaste!"</span>;
+
+  <span class="cm">// Quitamos la clase "oculto" → el elemento aparece</span>
+  <span class="line-hl">  elGanador.classList.<span class="fn">remove</span>(<span class="str">"oculto"</span>);</span>
+}</div>
+  </div>
+
+  <div class="sec">resaltar los jugadores con un bucle for</div>
+  <div class="code-wrap">
+    <span class="code-label">script.js — también dentro del if</span>
+    <div class="code"><span class="cm">// "jugadores" es una lista de 3 elementos
+// Para hacer algo con CADA UNO, usamos un bucle for:</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; jugadores.length; i++) {
+  jugadores[i].classList.<span class="fn">add</span>(<span class="str">"resaltado"</span>);
+}
+
+<span class="cm">// El for funciona así:
+// i empieza en 0
+// mientras i sea menor que la cantidad de jugadores...
+// ejecuta el código del bloque y luego suma 1 a i</span></div>
+  </div>
+
+  <div class="analogy">
+    <strong>Analogía del bucle:</strong> es como si tuvieras una lista de tarea en papel y fueras marcando cada ítem de a uno. El bucle hace lo mismo con los elementos de la lista, automáticamente.
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">🎯</span>
+    <div class="callout-body"><strong>Mini desafío:</strong> ¿Podés agregar una función <code>reiniciar()</code> conectada a un tercer botón que ponga <code>puntos = 0</code>, actualice el DOM, y vuelva a agregar <code>"oculto"</code> al ganador? ¡Intentalo vos solo antes de ver la solución!</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 10 — CÓDIGO COMPLETO
+════════════════════════════════════════ -->
+<div class="panel" id="p10">
+  <span class="step-badge badge-intro">Referencia final</span>
+  <div class="step-title">El script.js completo</div>
+  <div class="step-desc">Acá tenés todo el JavaScript junto, con comentarios explicando cada parte. Usalo como referencia si algo no te funciona.</div>
+
+  <div class="code-wrap">
+    <span class="code-label">script.js — completo</span>
+    <div class="code"><span class="cm">// ═══════════════════════════════════════════════════
+// PASO 1: Variables de estado
+// ═══════════════════════════════════════════════════</span>
+<span class="kw">let</span> puntos = <span class="num">0</span>;     <span class="cm">// guarda el puntaje real (puede cambiar)</span>
+<span class="kw">const</span> META = <span class="num">10</span>;   <span class="cm">// la meta para ganar (nunca cambia)</span>
+
+
+<span class="cm">// ═══════════════════════════════════════════════════
+// PASO 2: Obtener elementos del DOM
+// ═══════════════════════════════════════════════════</span>
+
+<span class="cm">// getElementById → busca 1 elemento por su id único</span>
+<span class="kw">const</span> elNumero  = document.<span class="fn">getElementById</span>(<span class="str">"numero-puntos"</span>);
+<span class="kw">const</span> elMensaje  = document.<span class="fn">getElementById</span>(<span class="str">"mensaje"</span>);
+<span class="kw">const</span> elGanador  = document.<span class="fn">getElementById</span>(<span class="str">"ganador"</span>);
+
+<span class="cm">// getElementsByClassName → devuelve una LISTA de elementos</span>
+<span class="kw">const</span> jugadores = document.<span class="fn">getElementsByClassName</span>(<span class="str">"jugador"</span>);
+
+
+<span class="cm">// ═══════════════════════════════════════════════════
+// PASO 3: Funciones con lógica
+// ═══════════════════════════════════════════════════</span>
+
+<span class="kw">function</span> <span class="fn">sumarPunto</span>() {
+  puntos = puntos + <span class="num">1</span>;              <span class="cm">// 1. actualizar variable</span>
+  elNumero.textContent = puntos;    <span class="cm">// 2. reflejar en el DOM</span>
+
+  <span class="kw">if</span> (puntos >= META) {             <span class="cm">// 3. lógica de victoria</span>
+    elMensaje.textContent = <span class="str">"🎉 ¡Ganaste!"</span>;
+    elGanador.classList.<span class="fn">remove</span>(<span class="str">"oculto"</span>);
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; jugadores.length; i++) {
+      jugadores[i].classList.<span class="fn">add</span>(<span class="str">"resaltado"</span>);
+    }
+  } <span class="kw">else</span> {
+    elMensaje.textContent = <span class="str">"Vas por "</span> + puntos + <span class="str">" puntos"</span>;
+  }
+}
+
+<span class="kw">function</span> <span class="fn">restarPunto</span>() {
+  <span class="kw">if</span> (puntos > <span class="num">0</span>) {
+    puntos = puntos - <span class="num">1</span>;
+    elNumero.textContent = puntos;
+    elMensaje.textContent = <span class="str">"Bajaste a "</span> + puntos + <span class="str">" puntos"</span>;
+    <span class="kw">if</span> (puntos &lt; META) {
+      elGanador.classList.<span class="fn">add</span>(<span class="str">"oculto"</span>);
+    }
+  } <span class="kw">else</span> {
+    elMensaje.textContent = <span class="str">"⚠️ ¡No podés bajar de 0!"</span>;
+  }
+}
+
+<span class="kw">function</span> <span class="fn">reiniciar</span>() {
+  puntos = <span class="num">0</span>;
+  elNumero.textContent = puntos;
+  elMensaje.textContent = <span class="str">"¡Reiniciado! Empezá de nuevo 💪"</span>;
+  elGanador.classList.<span class="fn">add</span>(<span class="str">"oculto"</span>);
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; jugadores.length; i++) {
+    jugadores[i].classList.<span class="fn">remove</span>(<span class="str">"resaltado"</span>);
+  }
+}</div>
+  </div>
+
+  <div class="final-card">
+    <h3>¡Lo construiste de cero! 🎉</h3>
+    <p>Aprendiste a conectar HTML, CSS y JavaScript. Obtuviste elementos del DOM por id y por clase, usaste variables de estado, lógica con if/else, y manipulaste clases CSS desde JS. Eso es el corazón del desarrollo web frontend.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL 11 — RETO AVANZADO
+════════════════════════════════════════ -->
+<div class="panel" id="p11">
+  <span class="step-badge badge-adv">★ Reto avanzado</span>
+  <div class="step-title">¿Ya terminaste? Esto es para vos.</div>
+  <div class="step-desc">Cuatro niveles de dificultad creciente. Cada uno te enseña algo nuevo que no cubrimos en clase. Podés hacerlos en orden o elegir el que más te llame.</div>
+
+  <div class="challenge-hero">
+    <div class="challenge-hero-tag">★ Modo avanzado desbloqueado</div>
+    <h2>El contador no era el límite.</h2>
+    <p>Estos retos no tienen solución en la guía. Vas a necesitar buscar en MDN, Stack Overflow o preguntar al profe. Eso es exactamente lo que hace un programador real.</p>
+  </div>
+
+  <!-- Nivel 1 -->
+  <div class="challenge-level">
+    <div class="level-header">
+      <span class="level-badge lv1">Nivel 1 — Cómodo</span>
+      <div class="level-title">Mejorar la UX del contador</div>
+    </div>
+    <ul class="level-list">
+      <li>Agregá un contador de "intentos" que cuenta cuántas veces pulsaron Sumar o Restar en total y lo muestre en pantalla.</li>
+      <li>Cambiá el color del número según el valor: rojo si es 0, amarillo si está entre 1 y 5, verde si es 6 o más. Usá <code>style.color</code> o agrega/quitá clases.</li>
+      <li>Deshabilitá el botón Restar cuando <code>puntos === 0</code> usando <code>elemento.disabled = true</code>. Volvé a habilitarlo cuando suba.</li>
+      <li>Hacé que el título de la página cambie con <code>document.title</code> para mostrar los puntos actuales.</li>
+    </ul>
+  </div>
+
+  <!-- Nivel 2 -->
+  <div class="challenge-level">
+    <div class="level-header">
+      <span class="level-badge lv2">Nivel 2 — Desafiante</span>
+      <div class="level-title">Múltiples jugadores con puntajes individuales</div>
+    </div>
+    <ul class="level-list">
+      <li>Modificá el proyecto para que cada jugador tenga su propio botón de sumar y su propio puntaje. Usá un <strong>array</strong> o un <strong>objeto</strong> para guardar los puntajes: <code>let puntajes = [0, 0, 0]</code>.</li>
+      <li>Mostrá el nombre del jugador que va ganando (el que tiene más puntos) en tiempo real. Si hay empate, mostrá "Empate".</li>
+      <li>Buscá en MDN cómo funciona <code>Math.max()</code> y <code>indexOf()</code> para encontrar al jugador con más puntos.</li>
+      <li>Agregá una animación CSS de pulso al jugador que acaba de sumar un punto usando <code>classList.add()</code> y luego <code>classList.remove()</code> con <code>setTimeout()</code>.</li>
+    </ul>
+  </div>
+
+  <!-- Nivel 3 -->
+  <div class="challenge-level">
+    <div class="level-header">
+      <span class="level-badge lv3">Nivel 3 — Difícil</span>
+      <div class="level-title">Historial y localStorage</div>
+    </div>
+    <ul class="level-list">
+      <li>Creá un historial de movimientos: cada vez que se suma o resta, agregá una entrada a una lista visible en pantalla con el texto "Sumó 1 → ahora tiene X puntos".</li>
+      <li>Investigá cómo funciona <code>document.createElement()</code> y <code>element.appendChild()</code> para agregar elementos al DOM dinámicamente (sin tocar el HTML).</li>
+      <li>Guardá el puntaje en <code>localStorage</code> para que se mantenga aunque el usuario recargue la página. Investigá <code>localStorage.setItem()</code> y <code>localStorage.getItem()</code>.</li>
+      <li>Agregá un botón "Deshacer" que revierta el último movimiento. Usá un <strong>stack</strong> (un array donde solo usás <code>push()</code> y <code>pop()</code>) para guardar el historial.</li>
+    </ul>
+  </div>
+
+  <!-- Nivel 4 -->
+  <div class="challenge-level">
+    <div class="level-header">
+      <span class="level-badge lv4">Nivel 4 — Experto</span>
+      <div class="level-title">Refactorizar con addEventListener y querySelector</div>
+    </div>
+    <ul class="level-list">
+      <li>Eliminá todos los <code>onclick=""</code> del HTML. En su lugar, usá <code>document.querySelector()</code> para seleccionar los botones por clase o atributo, y conectalos con <code>addEventListener("click", función)</code>. Esa es la forma profesional de hacerlo.</li>
+      <li>Reescribí el código usando <code>querySelectorAll()</code> en lugar de <code>getElementsByClassName()</code> y recorrelo con <code>.forEach()</code> en lugar de un bucle <code>for</code>.</li>
+      <li>Convertí toda la lógica del contador en un <strong>objeto</strong> con propiedades y métodos: <code>const contador = { puntos: 0, sumar() {...}, restar() {...} }</code>.</li>
+      <li>Investigá cómo funciona el evento <code>keydown</code> y hacé que las teclas <code>ArrowUp</code> y <code>ArrowDown</code> del teclado también sumen y resten puntos.</li>
+    </ul>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">🧭</span>
+    <div class="callout-body"><strong>Recursos para investigar:</strong><br>
+    — <code>developer.mozilla.org/es</code> (MDN en español) — la referencia oficial de JavaScript<br>
+    — <code>javascript.info</code> — el tutorial más completo y claro de JS<br>
+    — Buscá en Google: <em>"javascript [lo que querés hacer] MDN"</em></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="btn btn-ghost" id="bPrev" onclick="prev()" disabled>← Anterior</button>
+  <span class="nav-info" id="navInfo">1 / 12</span>
+  <button class="btn btn-solid" id="bNext" onclick="next()">Siguiente →</button>
+</div>
+
+</main>
+</div>
+
+<script>
+  let cur = 0;
+  const total = 12;
+
+  function go(n) {
+    document.getElementById('p' + cur).classList.remove('on');
+    document.querySelectorAll('.nav-btn')[cur].classList.remove('on');
+    cur = n;
+    document.getElementById('p' + cur).classList.add('on');
+    document.querySelectorAll('.nav-btn')[cur].classList.add('on');
+    document.getElementById('bPrev').disabled = cur === 0;
+    document.getElementById('bNext').disabled = cur === total - 1;
+    document.getElementById('navInfo').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('prog').style.width = ((cur + 1) / total * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function next() { if (cur < total - 1) go(cur + 1); }
+  function prev() { if (cur > 0) go(cur - 1); }
+</script>
+</body>
+</html>

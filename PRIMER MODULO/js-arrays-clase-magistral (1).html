@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JavaScript Arrays — Clase Magistral</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13151c;
+    --bg3: #1a1d27;
+    --border: #252836;
+    --gold: #f0c060;
+    --gold-dim: #a07a30;
+    --green: #4ade80;
+    --green-dim: #166534;
+    --blue: #60a5fa;
+    --blue-dim: #1e3a5f;
+    --red: #f87171;
+    --orange: #fb923c;
+    --purple: #c084fc;
+    --text: #e2e4ef;
+    --text-dim: #7a7f9a;
+    --text-muted: #3d4060;
+    --code-bg: #090b10;
+    --keyword: #c084fc;
+    --string: #4ade80;
+    --number: #fb923c;
+    --comment: #4a5070;
+    --method: #60a5fa;
+    --var: #f0c060;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    width: 260px; height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    padding: 0 0 40px;
+  }
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .sidebar-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .sidebar-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: white;
+    font-weight: 600;
+  }
+  .sidebar nav { padding: 16px 0; }
+  .nav-section {
+    padding: 8px 24px 4px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .nav-link {
+    display: block;
+    padding: 7px 24px;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-link:hover {
+    color: var(--gold);
+    background: rgba(240,192,96,0.05);
+    border-left-color: var(--gold);
+  }
+  .nav-link .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-right: 8px;
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 260px;
+    max-width: 860px;
+    padding: 0 60px 120px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 80px;
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.05;
+    color: white;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 520px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  .hero-meta { display: flex; gap: 32px; flex-wrap: wrap; }
+  .meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-label {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .meta-value { font-size: 14px; color: var(--gold); font-weight: 500; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 90px; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold-dim);
+    letter-spacing: 2px;
+  }
+  .section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: white;
+  }
+  .section h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+    margin: 40px 0 14px;
+  }
+  .section h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--blue);
+    letter-spacing: 1px;
+    margin: 28px 0 10px;
+    text-transform: uppercase;
+  }
+  .section p {
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .section p strong { color: var(--text); font-weight: 500; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0 28px;
+    font-size: 14px;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  pre { padding: 20px 24px; overflow-x: auto; line-height: 1.7; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; }
+  .kw { color: var(--keyword); font-style: italic; }
+  .str { color: var(--string); }
+  .num { color: var(--number); }
+  .cm { color: var(--comment); font-style: italic; }
+  .fn { color: var(--method); }
+  .vr { color: var(--var); }
+  .op { color: var(--text-dim); }
+  p code, li code, td code {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 13px;
+    color: var(--gold);
+  }
+
+  /* CALLOUTS */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 3px solid;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .callout-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .callout p { margin: 0; font-size: 14px; }
+  .callout-info { background: rgba(96,165,250,0.07); border-color: var(--blue); }
+  .callout-info .callout-title { color: var(--blue); }
+  .callout-info p { color: #93b8f5; }
+  .callout-warn { background: rgba(251,146,60,0.07); border-color: var(--orange); }
+  .callout-warn .callout-title { color: var(--orange); }
+  .callout-warn p { color: #f5b07a; }
+  .callout-tip { background: rgba(74,222,128,0.07); border-color: var(--green); }
+  .callout-tip .callout-title { color: var(--green); }
+  .callout-tip p { color: #86e8a6; }
+
+  /* EXERCISES */
+  .exercise {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 28px 0;
+  }
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .exercise-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+  .badge-easy { background: rgba(74,222,128,0.15); color: var(--green); }
+  .badge-medium { background: rgba(251,146,60,0.15); color: var(--orange); }
+  .badge-hard { background: rgba(248,113,113,0.15); color: var(--red); }
+  .exercise-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: white;
+    font-weight: 600;
+  }
+  .exercise-body { padding: 20px; }
+  .exercise-body p { font-size: 14px; color: var(--text-dim); margin-bottom: 12px; }
+  .exercise-body ol, .exercise-body ul { padding-left: 20px; margin-bottom: 12px; }
+  .exercise-body li { font-size: 14px; color: var(--text-dim); margin-bottom: 6px; line-height: 1.6; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(37,40,54,0.5);
+    color: var(--text-dim);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* CHEATSHEET */
+  .cheatsheet {
+    background: var(--code-bg);
+    border: 1px solid var(--gold-dim);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 40px 0;
+  }
+  .cheatsheet-header {
+    background: rgba(240,192,96,0.1);
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--gold-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .cheatsheet-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .cs-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(37,40,54,0.5);
+    border-right: 1px solid rgba(37,40,54,0.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .cs-item:nth-child(even) { border-right: none; }
+  .cs-method { color: var(--blue); margin-bottom: 2px; }
+  .cs-desc { color: var(--text-muted); font-size: 11px; }
+
+  /* LISTS */
+  .section ul { padding-left: 0; list-style: none; margin-bottom: 16px; }
+  .section ul li {
+    padding: 4px 0 4px 20px;
+    position: relative;
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+  .section ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold-dim);
+    font-size: 12px;
+  }
+  .section ol { padding-left: 22px; margin-bottom: 16px; }
+  .section ol li { color: var(--text-dim); font-size: 15px; margin-bottom: 6px; }
+
+  /* VISUAL */
+  .array-visual {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+  .array-cell { min-width: 70px; text-align: center; }
+  .cell-value {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--gold);
+    border-right: none;
+  }
+  .array-cell:last-child .cell-value { border-right: 1px solid var(--border); }
+  .cell-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    padding-top: 6px;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 100px;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 0 24px 80px; }
+    .cheatsheet-grid { grid-template-columns: 1fr; }
+    .cs-item { border-right: none; }
+    .hero h1 { font-size: 42px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">JavaScript</div>
+    <div class="sidebar-title">Arrays — Clase Magistral</div>
+  </div>
+  <nav>
+    <div class="nav-section">Fundamentos</div>
+    <a href="#s1" class="nav-link"><span class="num">01</span> ¿Qué es un Array?</a>
+    <a href="#s2" class="nav-link"><span class="num">02</span> Crear Arrays</a>
+    <a href="#s3" class="nav-link"><span class="num">03</span> Acceder a Elementos</a>
+    <a href="#s4" class="nav-link"><span class="num">04</span> Métodos que Mutan</a>
+
+    <div class="nav-section">Iteración</div>
+    <a href="#s5" class="nav-link"><span class="num">05</span> Bucles y forEach</a>
+    <a href="#s6" class="nav-link"><span class="num">06</span> map</a>
+    <a href="#s7" class="nav-link"><span class="num">07</span> filter</a>
+    <a href="#s8" class="nav-link"><span class="num">08</span> reduce</a>
+
+    <div class="nav-section">Búsqueda</div>
+    <a href="#s9" class="nav-link"><span class="num">09</span> find y findIndex</a>
+    <a href="#s10" class="nav-link"><span class="num">10</span> includes, some, every</a>
+    <a href="#s11" class="nav-link"><span class="num">11</span> sort y reverse</a>
+
+    <div class="nav-section">JS Moderno</div>
+    <a href="#s12" class="nav-link"><span class="num">12</span> Spread y Destructuring</a>
+    <a href="#s13" class="nav-link"><span class="num">13</span> Encadenamiento</a>
+    <a href="#s14" class="nav-link"><span class="num">14</span> flat y flatMap</a>
+
+    <div class="nav-section">Práctica</div>
+    <a href="#s15" class="nav-link"><span class="num">15</span> Ejercicios en Clase</a>
+    <a href="#s16" class="nav-link"><span class="num">16</span> Cheatsheet</a>
+  </nav>
+</aside>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Clase Magistral — Principiantes</div>
+    <h1>JavaScript<br/><span>Arrays</span></h1>
+    <p class="hero-sub">
+      De cero a seguro. Todo lo que necesitás saber para entender, usar y dominar los arrays en JavaScript — con ejemplos reales y ejercicios prácticos.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Nivel</span>
+        <span class="meta-value">Principiante → Intermedio</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Duración</span>
+        <span class="meta-value">2+ Horas</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Ejercicios</span>
+        <span class="meta-value">12 Prácticos</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 1 ── -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>¿Qué es un Array?</h2>
+    </div>
+
+    <p>Un <strong>array</strong> es una lista ordenada de valores guardados en una sola variable. En lugar de crear una variable separada para cada valor, los agrupás juntos.</p>
+
+    <p>Pensá en un array como una fila numerada de cajones. Cada cajón tiene un índice (posición) y un valor adentro.</p>
+
+    <div class="array-visual">
+      <div class="array-cell">
+        <div class="cell-value">"Ana"</div>
+        <div class="cell-index">0</div>
+      </div>
+      <div class="array-cell">
+        <div class="cell-value">"Luis"</div>
+        <div class="cell-index">1</div>
+      </div>
+      <div class="array-cell">
+        <div class="cell-value">"María"</div>
+        <div class="cell-index">2</div>
+      </div>
+      <div class="array-cell">
+        <div class="cell-value">"Pedro"</div>
+        <div class="cell-index">3</div>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Regla clave</div>
+      <p>Los arrays en JavaScript empiezan en el índice <strong>cero</strong>. El primer elemento siempre está en la posición <code>0</code>, no en <code>1</code>.</p>
+    </div>
+
+    <p>Los arrays pueden guardar <strong>cualquier tipo de valor</strong>: strings, números, booleanos, objetos, incluso otros arrays.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">JavaScript</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="cm">// Sin arrays — desprolijo</span>
+<span class="kw">let</span> <span class="vr">estudiante1</span> = <span class="str">"Ana"</span>;
+<span class="kw">let</span> <span class="vr">estudiante2</span> = <span class="str">"Luis"</span>;
+<span class="kw">let</span> <span class="vr">estudiante3</span> = <span class="str">"María"</span>;
+
+<span class="cm">// Con un array — limpio y organizado</span>
+<span class="kw">const</span> <span class="vr">estudiantes</span> = [<span class="str">"Ana"</span>, <span class="str">"Luis"</span>, <span class="str">"María"</span>];
+
+<span class="cm">// Los arrays pueden mezclar tipos (aunque en la práctica es poco común)</span>
+<span class="kw">const</span> <span class="vr">mixto</span> = [<span class="num">42</span>, <span class="str">"hola"</span>, <span class="kw">true</span>, <span class="kw">null</span>];</code></pre>
+    </div>
+
+    <h3>¿Para qué sirven los arrays?</h3>
+    <ul>
+      <li>Guardar datos relacionados en un solo lugar</li>
+      <li>Recorrer muchos valores con un solo bloque de código</li>
+      <li>Aplicar la misma operación a cada elemento</li>
+      <li>Ordenar, filtrar y buscar datos de manera eficiente</li>
+    </ul>
+  </div>
+
+
+  <!-- ── SECCIÓN 2 ── -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Crear Arrays</h2>
+    </div>
+
+    <p>Hay varias formas de crear un array en JavaScript. La más común es el <strong>array literal</strong> — simplemente usar corchetes <code>[]</code>.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">JavaScript — Crear Arrays</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="cm">// Array literal (la forma más común — siempre usá esta)</span>
+<span class="kw">const</span> <span class="vr">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"banana"</span>, <span class="str">"mango"</span>];
+
+<span class="cm">// Array vacío — lo llenás después</span>
+<span class="kw">const</span> <span class="vr">carrito</span> = [];
+
+<span class="cm">// Array de números</span>
+<span class="kw">const</span> <span class="vr">notas</span> = [<span class="num">85</span>, <span class="num">92</span>, <span class="num">78</span>, <span class="num">95</span>, <span class="num">88</span>];
+
+<span class="cm">// Array de objetos (muy común en aplicaciones reales)</span>
+<span class="kw">const</span> <span class="vr">usuarios</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">edad</span>: <span class="num">28</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Luis"</span>, <span class="vr">edad</span>: <span class="num">32</span> }
+];
+
+<span class="cm">// Verificar la cantidad de elementos</span>
+console.<span class="fn">log</span>(frutas.<span class="vr">length</span>); <span class="cm">// 3</span>
+console.<span class="fn">log</span>(notas.<span class="vr">length</span>);  <span class="cm">// 5</span></code></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">const vs let con arrays</div>
+      <p>Usá <code>const</code> para arrays por defecto. <code>const</code> significa que no podés reasignar la variable a un nuevo array, pero <strong>sí podés modificar el contenido del array</strong>. Solo usá <code>let</code> si necesitás reasignar el array completo.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">const vs let con arrays</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"banana"</span>];
+
+frutas.<span class="fn">push</span>(<span class="str">"mango"</span>);     <span class="cm">// OK — modificar el contenido</span>
+frutas[<span class="num">0</span>] = <span class="str">"uva"</span>;        <span class="cm">// OK — cambiar un valor</span>
+
+frutas = [<span class="str">"nuevo"</span>, <span class="str">"array"</span>]; <span class="cm">// ERROR — no se puede reasignar const</span></code></pre>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 3 ── -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>Acceder y Modificar Elementos</h2>
+    </div>
+
+    <p>Accedés a cualquier elemento usando su <strong>índice</strong> entre corchetes. Recordá: siempre empieza en <code>0</code>.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">Acceder a Elementos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">colores</span> = [<span class="str">"rojo"</span>, <span class="str">"verde"</span>, <span class="str">"azul"</span>, <span class="str">"amarillo"</span>];
+
+<span class="cm">// Acceder por índice</span>
+console.<span class="fn">log</span>(colores[<span class="num">0</span>]);  <span class="cm">// "rojo"</span>
+console.<span class="fn">log</span>(colores[<span class="num">2</span>]);  <span class="cm">// "azul"</span>
+console.<span class="fn">log</span>(colores[<span class="num">10</span>]); <span class="cm">// undefined (el índice no existe)</span>
+
+<span class="cm">// Obtener el ÚLTIMO elemento</span>
+console.<span class="fn">log</span>(colores[colores.<span class="vr">length</span> - <span class="num">1</span>]); <span class="cm">// "amarillo"</span>
+console.<span class="fn">log</span>(colores.<span class="fn">at</span>(-<span class="num">1</span>));              <span class="cm">// "amarillo" (forma moderna)</span>
+console.<span class="fn">log</span>(colores.<span class="fn">at</span>(-<span class="num">2</span>));              <span class="cm">// "azul"</span>
+
+<span class="cm">// Modificar un elemento</span>
+colores[<span class="num">1</span>] = <span class="str">"lima"</span>;
+console.<span class="fn">log</span>(colores); <span class="cm">// ["rojo", "lima", "azul", "amarillo"]</span>
+
+<span class="cm">// Acceder a elementos dentro de un array de objetos</span>
+<span class="kw">const</span> <span class="vr">productos</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Laptop"</span>, <span class="vr">precio</span>: <span class="num">1200</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Mouse"</span>, <span class="vr">precio</span>: <span class="num">25</span> }
+];
+
+console.<span class="fn">log</span>(productos[<span class="num">0</span>].<span class="vr">nombre</span>);  <span class="cm">// "Laptop"</span>
+console.<span class="fn">log</span>(productos[<span class="num">1</span>].<span class="vr">precio</span>); <span class="cm">// 25</span></code></pre>
+    </div>
+
+    <h3>slice — Extraer una porción</h3>
+    <p><code>slice(inicio, fin)</code> devuelve un <strong>nuevo array</strong> con una parte del original. El original no se modifica. El parámetro <code>fin</code> es exclusivo (no se incluye).</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">slice</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">nums</span> = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>];
+
+console.<span class="fn">log</span>(nums.<span class="fn">slice</span>(<span class="num">1</span>, <span class="num">3</span>));  <span class="cm">// [20, 30]   (índices 1 y 2)</span>
+console.<span class="fn">log</span>(nums.<span class="fn">slice</span>(<span class="num">2</span>));     <span class="cm">// [30, 40, 50] (desde índice 2 al final)</span>
+console.<span class="fn">log</span>(nums.<span class="fn">slice</span>(-<span class="num">2</span>));    <span class="cm">// [40, 50]   (últimos 2 elementos)</span>
+console.<span class="fn">log</span>(nums);              <span class="cm">// [10, 20, 30, 40, 50] — sin cambios</span></code></pre>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-easy">Fácil</span>
+        <span class="exercise-title">Ejercicio 1 — Explorar el array</span>
+      </div>
+      <div class="exercise-body">
+        <p>Dado este array, respondé las siguientes preguntas en tu consola:</p>
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">ciudades</span> = [<span class="str">"Bogotá"</span>, <span class="str">"Medellín"</span>, <span class="str">"Cali"</span>, <span class="str">"Barranquilla"</span>, <span class="str">"Cartagena"</span>];</code></pre>
+        </div>
+        <ol>
+          <li>Mostrá la primera y la última ciudad usando su índice</li>
+          <li>Mostrá la última ciudad usando <code>.at(-1)</code></li>
+          <li>Mostrá cuántas ciudades hay</li>
+          <li>Extraé un nuevo array con solo las 3 ciudades del medio usando <code>slice</code></li>
+          <li>Cambiá "Cali" por "Bucaramanga" y mostrá el array completo</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 4 ── -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Métodos que Mutan el Array</h2>
+    </div>
+
+    <p>Estos métodos <strong>modifican el array original</strong>. Se llaman "mutantes" porque cambian el array directamente.</p>
+
+    <h3>Agregar elementos</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">push, unshift</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">fila</span> = [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>];
+
+<span class="cm">// push — agrega al FINAL</span>
+fila.<span class="fn">push</span>(<span class="str">"Carol"</span>);
+console.<span class="fn">log</span>(fila); <span class="cm">// ["Alice", "Bob", "Carol"]</span>
+
+<span class="cm">// push con varios elementos a la vez</span>
+fila.<span class="fn">push</span>(<span class="str">"Dave"</span>, <span class="str">"Eve"</span>);
+console.<span class="fn">log</span>(fila); <span class="cm">// ["Alice", "Bob", "Carol", "Dave", "Eve"]</span>
+
+<span class="cm">// unshift — agrega al PRINCIPIO</span>
+fila.<span class="fn">unshift</span>(<span class="str">"Zara"</span>);
+console.<span class="fn">log</span>(fila); <span class="cm">// ["Zara", "Alice", "Bob", "Carol", "Dave", "Eve"]</span>
+
+<span class="cm">// Ambos devuelven el nuevo largo del array</span>
+<span class="kw">const</span> <span class="vr">nuevoLargo</span> = fila.<span class="fn">push</span>(<span class="str">"Frank"</span>);
+console.<span class="fn">log</span>(nuevoLargo); <span class="cm">// 7</span></code></pre>
+    </div>
+
+    <h3>Eliminar elementos</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">pop, shift</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">pila</span> = [<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>, <span class="str">"d"</span>];
+
+<span class="cm">// pop — elimina del FINAL, devuelve el elemento eliminado</span>
+<span class="kw">const</span> <span class="vr">ultimo</span> = pila.<span class="fn">pop</span>();
+console.<span class="fn">log</span>(ultimo); <span class="cm">// "d"</span>
+console.<span class="fn">log</span>(pila);   <span class="cm">// ["a", "b", "c"]</span>
+
+<span class="cm">// shift — elimina del PRINCIPIO, devuelve el elemento eliminado</span>
+<span class="kw">const</span> <span class="vr">primero</span> = pila.<span class="fn">shift</span>();
+console.<span class="fn">log</span>(primero); <span class="cm">// "a"</span>
+console.<span class="fn">log</span>(pila);    <span class="cm">// ["b", "c"]</span></code></pre>
+    </div>
+
+    <h3>splice — La navaja suiza</h3>
+    <p><code>splice(inicio, cantidad, ...elementos)</code> puede eliminar, reemplazar o insertar elementos en cualquier posición.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">splice</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">items</span> = [<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>, <span class="str">"D"</span>, <span class="str">"E"</span>];
+
+<span class="cm">// Eliminar 1 elemento en el índice 2</span>
+<span class="kw">const</span> <span class="vr">eliminado</span> = items.<span class="fn">splice</span>(<span class="num">2</span>, <span class="num">1</span>);
+console.<span class="fn">log</span>(eliminado); <span class="cm">// ["C"]</span>
+console.<span class="fn">log</span>(items);     <span class="cm">// ["A", "B", "D", "E"]</span>
+
+<span class="cm">// Insertar sin eliminar (cantidad = 0)</span>
+items.<span class="fn">splice</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="str">"X"</span>, <span class="str">"Y"</span>);
+console.<span class="fn">log</span>(items); <span class="cm">// ["A", "B", "X", "Y", "D", "E"]</span>
+
+<span class="cm">// Reemplazar: eliminar 1 en índice 1, insertar "Z"</span>
+items.<span class="fn">splice</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="str">"Z"</span>);
+console.<span class="fn">log</span>(items); <span class="cm">// ["A", "Z", "X", "Y", "D", "E"]</span></code></pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>Acción</th>
+            <th>Devuelve</th>
+            <th>¿Muta?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>push(...items)</code></td><td>Agrega al final</td><td>Nuevo largo</td><td>Sí</td></tr>
+          <tr><td><code>pop()</code></td><td>Elimina del final</td><td>Elemento eliminado</td><td>Sí</td></tr>
+          <tr><td><code>unshift(...items)</code></td><td>Agrega al principio</td><td>Nuevo largo</td><td>Sí</td></tr>
+          <tr><td><code>shift()</code></td><td>Elimina del principio</td><td>Elemento eliminado</td><td>Sí</td></tr>
+          <tr><td><code>splice(i, n, ...items)</code></td><td>Elimina/inserta en cualquier posición</td><td>Elementos eliminados</td><td>Sí</td></tr>
+          <tr><td><code>concat(...arrays)</code></td><td>Une arrays</td><td>Nuevo array</td><td>No</td></tr>
+          <tr><td><code>slice(inicio, fin)</code></td><td>Extrae una porción</td><td>Nuevo array</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-easy">Fácil</span>
+        <span class="exercise-title">Ejercicio 2 — Carrito de Compras</span>
+      </div>
+      <div class="exercise-body">
+        <p>Simulá un carrito de compras básico:</p>
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">carrito</span> = [<span class="str">"camisa"</span>, <span class="str">"pantalón"</span>, <span class="str">"zapatos"</span>];</code></pre>
+        </div>
+        <ol>
+          <li>Agregá "gorra" al final del carrito</li>
+          <li>Agregá "medias" al principio</li>
+          <li>Eliminá el último elemento y mostrá cuál fue</li>
+          <li>Reemplazá "pantalón" por "jeans" usando <code>splice</code></li>
+          <li>Mostrá el carrito final y el total de artículos</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 5 ── -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Bucles y forEach</h2>
+    </div>
+
+    <p>Para trabajar con cada elemento de un array necesitás iterar — visitar cada item uno por uno. JavaScript te da varias formas de hacerlo.</p>
+
+    <h3>El bucle for clásico</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">bucle for</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">notas</span> = [<span class="num">85</span>, <span class="num">92</span>, <span class="num">78</span>, <span class="num">95</span>, <span class="num">88</span>];
+
+<span class="kw">for</span> (<span class="kw">let</span> <span class="vr">i</span> = <span class="num">0</span>; <span class="vr">i</span> &lt; notas.<span class="vr">length</span>; <span class="vr">i</span>++) {
+  console.<span class="fn">log</span>(<span class="str">`Nota en índice <span class="vr">${i}</span>: <span class="vr">${notas[i]}</span>`</span>);
+}
+
+<span class="cm">// Nota en índice 0: 85</span>
+<span class="cm">// Nota en índice 1: 92</span>
+<span class="cm">// ...</span></code></pre>
+    </div>
+
+    <h3>for...of — sintaxis más limpia</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">for...of</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"banana"</span>, <span class="str">"mango"</span>];
+
+<span class="kw">for</span> (<span class="kw">const</span> <span class="vr">fruta</span> <span class="kw">of</span> frutas) {
+  console.<span class="fn">log</span>(<span class="str">`Me gusta la <span class="vr">${fruta}</span>`</span>);
+}
+
+<span class="cm">// Usá for...of cuando NO necesitás el índice</span>
+<span class="cm">// Usá el for clásico cuando SÍ necesitás el índice</span></code></pre>
+    </div>
+
+    <h3>forEach — la forma con método de array</h3>
+    <p><code>forEach</code> ejecuta una función una vez por cada elemento. Recibe el elemento, su índice y el array completo.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">forEach</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">nombres</span> = [<span class="str">"Ana"</span>, <span class="str">"Luis"</span>, <span class="str">"María"</span>];
+
+<span class="cm">// forEach básico</span>
+nombres.<span class="fn">forEach</span>(<span class="kw">function</span>(<span class="vr">nombre</span>) {
+  console.<span class="fn">log</span>(<span class="str">`Hola, <span class="vr">${nombre}</span>!`</span>);
+});
+
+<span class="cm">// Con arrow function (más limpio)</span>
+nombres.<span class="fn">forEach</span>((<span class="vr">nombre</span>) => {
+  console.<span class="fn">log</span>(<span class="str">`Hola, <span class="vr">${nombre}</span>!`</span>);
+});
+
+<span class="cm">// Con índice</span>
+nombres.<span class="fn">forEach</span>((<span class="vr">nombre</span>, <span class="vr">indice</span>) => {
+  console.<span class="fn">log</span>(<span class="str">`<span class="vr">${indice + 1}</span>. <span class="vr">${nombre}</span>`</span>);
+});
+<span class="cm">// 1. Ana</span>
+<span class="cm">// 2. Luis</span>
+<span class="cm">// 3. María</span>
+
+<span class="cm">// Con índice y array completo</span>
+nombres.<span class="fn">forEach</span>((<span class="vr">nombre</span>, <span class="vr">i</span>, <span class="vr">arr</span>) => {
+  console.<span class="fn">log</span>(<span class="str">`<span class="vr">${nombre}</span> es el item <span class="vr">${i + 1}</span> de <span class="vr">${arr.length}</span>`</span>);
+});</code></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">forEach no devuelve nada</div>
+      <p><code>forEach</code> siempre devuelve <code>undefined</code>. Solo sirve para efectos secundarios (mostrar en consola, actualizar el DOM, etc.). Si necesitás un nuevo array, usá <code>map</code>.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-easy">Fácil</span>
+        <span class="exercise-title">Ejercicio 3 — Reporte de Notas</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">notas</span> = [
+  { <span class="vr">estudiante</span>: <span class="str">"Ana"</span>, <span class="vr">nota</span>: <span class="num">92</span> },
+  { <span class="vr">estudiante</span>: <span class="str">"Luis"</span>, <span class="vr">nota</span>: <span class="num">78</span> },
+  { <span class="vr">estudiante</span>: <span class="str">"María"</span>, <span class="vr">nota</span>: <span class="num">85</span> },
+  { <span class="vr">estudiante</span>: <span class="str">"Pedro"</span>, <span class="vr">nota</span>: <span class="num">95</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Usá <code>forEach</code> para mostrar el nombre y nota de cada estudiante</li>
+          <li>Mostrá su posición en la lista (comenzando en 1)</li>
+          <li>Mostrá "APROBADO" si nota ≥ 60, "REPROBADO" en caso contrario</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 6 ── -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>map — Transformar cada elemento</h2>
+    </div>
+
+    <p><code>map</code> crea un <strong>nuevo array</strong> aplicando una función a cada elemento. El array original nunca cambia. Pensalo como "traducí este array a una nueva forma".</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Modelo mental</div>
+      <p>Entran N elementos → salen N elementos. <code>map</code> transforma, nunca agrega ni elimina items.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">map — Fundamentos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">numeros</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+
+<span class="cm">// Duplicar cada número</span>
+<span class="kw">const</span> <span class="vr">dobles</span> = numeros.<span class="fn">map</span>((<span class="vr">n</span>) => <span class="vr">n</span> * <span class="num">2</span>);
+console.<span class="fn">log</span>(dobles);  <span class="cm">// [2, 4, 6, 8, 10]</span>
+console.<span class="fn">log</span>(numeros); <span class="cm">// [1, 2, 3, 4, 5] — sin cambios</span>
+
+<span class="cm">// Elevar al cuadrado</span>
+<span class="kw">const</span> <span class="vr">cuadrados</span> = numeros.<span class="fn">map</span>((<span class="vr">n</span>) => <span class="vr">n</span> ** <span class="num">2</span>);
+console.<span class="fn">log</span>(cuadrados); <span class="cm">// [1, 4, 9, 16, 25]</span>
+
+<span class="cm">// Convertir strings</span>
+<span class="kw">const</span> <span class="vr">nombres</span> = [<span class="str">"ana"</span>, <span class="str">"luis"</span>, <span class="str">"maría"</span>];
+<span class="kw">const</span> <span class="vr">mayusculas</span> = nombres.<span class="fn">map</span>((<span class="vr">nombre</span>) => nombre.<span class="fn">toUpperCase</span>());
+console.<span class="fn">log</span>(mayusculas); <span class="cm">// ["ANA", "LUIS", "MARÍA"]</span></code></pre>
+    </div>
+
+    <h3>map con objetos — uso real</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">map con Objetos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">productos</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Laptop"</span>, <span class="vr">precio</span>: <span class="num">1000</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Mouse"</span>, <span class="vr">precio</span>: <span class="num">25</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Teclado"</span>, <span class="vr">precio</span>: <span class="num">80</span> }
+];
+
+<span class="cm">// Aplicar 10% de descuento a todos los precios</span>
+<span class="kw">const</span> <span class="vr">conDescuento</span> = productos.<span class="fn">map</span>((<span class="vr">producto</span>) => ({
+  ...<span class="vr">producto</span>,
+  <span class="vr">precio</span>: producto.<span class="vr">precio</span> * <span class="num">0.9</span>
+}));
+
+<span class="cm">// Extraer solo los nombres</span>
+<span class="kw">const</span> <span class="vr">nombres</span> = productos.<span class="fn">map</span>((<span class="vr">p</span>) => p.<span class="vr">nombre</span>);
+console.<span class="fn">log</span>(nombres); <span class="cm">// ["Laptop", "Mouse", "Teclado"]</span>
+
+<span class="cm">// Agregar una nueva propiedad a cada objeto</span>
+<span class="kw">const</span> <span class="vr">conIva</span> = productos.<span class="fn">map</span>((<span class="vr">p</span>) => ({
+  ...<span class="vr">p</span>,
+  <span class="vr">precioConIva</span>: (p.<span class="vr">precio</span> * <span class="num">1.19</span>).<span class="fn">toFixed</span>(<span class="num">2</span>)
+}));</code></pre>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-easy">Fácil</span>
+        <span class="exercise-title">Ejercicio 4 — Transformaciones</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">temperaturas</span> = [<span class="num">0</span>, <span class="num">20</span>, <span class="num">37</span>, <span class="num">100</span>]; <span class="cm">// en Celsius</span>
+
+<span class="kw">const</span> <span class="vr">empleados</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">salario</span>: <span class="num">3000</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Luis"</span>, <span class="vr">salario</span>: <span class="num">4500</span> },
+  { <span class="vr">nombre</span>: <span class="str">"María"</span>, <span class="vr">salario</span>: <span class="num">2800</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Convertí todas las temperaturas a Fahrenheit: <code>F = C * 9/5 + 32</code></li>
+          <li>Creá un nuevo array solo con los nombres de los empleados</li>
+          <li>Dales a todos un aumento del 15% y devolvé el nuevo array de objetos</li>
+          <li>Creá un array de strings como "Ana gana $3000"</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 7 ── -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2>filter — Quedarse con los que pasan</h2>
+    </div>
+
+    <p><code>filter</code> crea un <strong>nuevo array</strong> con solo los elementos que superan una prueba. La prueba es una función que devuelve <code>true</code> (conservar) o <code>false</code> (descartar).</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Modelo mental</div>
+      <p>Entran N elementos. Salen ≤ N elementos. <code>filter</code> achica arrays, nunca los agranda.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">filter — Fundamentos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">numeros</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>];
+
+<span class="cm">// Solo números pares</span>
+<span class="kw">const</span> <span class="vr">pares</span> = numeros.<span class="fn">filter</span>((<span class="vr">n</span>) => <span class="vr">n</span> % <span class="num">2</span> === <span class="num">0</span>);
+console.<span class="fn">log</span>(pares); <span class="cm">// [2, 4, 6, 8]</span>
+
+<span class="cm">// Solo números mayores a 4</span>
+<span class="kw">const</span> <span class="vr">grandes</span> = numeros.<span class="fn">filter</span>((<span class="vr">n</span>) => <span class="vr">n</span> > <span class="num">4</span>);
+console.<span class="fn">log</span>(grandes); <span class="cm">// [5, 6, 7, 8]</span>
+
+<span class="cm">// Filtrar strings por longitud</span>
+<span class="kw">const</span> <span class="vr">palabras</span> = [<span class="str">"hola"</span>, <span class="str">"mundo"</span>, <span class="str">"hi"</span>, <span class="str">"JavaScript"</span>];
+<span class="kw">const</span> <span class="vr">largas</span> = palabras.<span class="fn">filter</span>((<span class="vr">p</span>) => p.<span class="vr">length</span> > <span class="num">4</span>);
+console.<span class="fn">log</span>(largas); <span class="cm">// ["mundo", "JavaScript"]</span></code></pre>
+    </div>
+
+    <h3>filter con objetos</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">filter con Objetos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">usuarios</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">edad</span>: <span class="num">28</span>, <span class="vr">activo</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Luis"</span>, <span class="vr">edad</span>: <span class="num">16</span>, <span class="vr">activo</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"María"</span>, <span class="vr">edad</span>: <span class="num">35</span>, <span class="vr">activo</span>: <span class="kw">false</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Pedro"</span>, <span class="vr">edad</span>: <span class="num">22</span>, <span class="vr">activo</span>: <span class="kw">true</span> }
+];
+
+<span class="cm">// Solo mayores de edad (18+)</span>
+<span class="kw">const</span> <span class="vr">mayores</span> = usuarios.<span class="fn">filter</span>((<span class="vr">u</span>) => u.<span class="vr">edad</span> >= <span class="num">18</span>);
+
+<span class="cm">// Solo usuarios activos</span>
+<span class="kw">const</span> <span class="vr">activos</span> = usuarios.<span class="fn">filter</span>((<span class="vr">u</span>) => u.<span class="vr">activo</span>);
+
+<span class="cm">// Activos Y mayores de edad</span>
+<span class="kw">const</span> <span class="vr">elegibles</span> = usuarios.<span class="fn">filter</span>((<span class="vr">u</span>) => u.<span class="vr">activo</span> && u.<span class="vr">edad</span> >= <span class="num">18</span>);
+console.<span class="fn">log</span>(elegibles);
+<span class="cm">// [{ nombre: "Ana", edad: 28 }, { nombre: "Pedro", edad: 22 }]</span></code></pre>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-medium">Medio</span>
+        <span class="exercise-title">Ejercicio 5 — Filtrar Catálogo</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">productos</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Laptop"</span>, <span class="vr">precio</span>: <span class="num">1200</span>, <span class="vr">categoria</span>: <span class="str">"tecnología"</span>, <span class="vr">enStock</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Camiseta"</span>, <span class="vr">precio</span>: <span class="num">25</span>, <span class="vr">categoria</span>: <span class="str">"ropa"</span>, <span class="vr">enStock</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Auriculares"</span>, <span class="vr">precio</span>: <span class="num">150</span>, <span class="vr">categoria</span>: <span class="str">"tecnología"</span>, <span class="vr">enStock</span>: <span class="kw">false</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Zapatillas"</span>, <span class="vr">precio</span>: <span class="num">90</span>, <span class="vr">categoria</span>: <span class="str">"ropa"</span>, <span class="vr">enStock</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Tablet"</span>, <span class="vr">precio</span>: <span class="num">500</span>, <span class="vr">categoria</span>: <span class="str">"tecnología"</span>, <span class="vr">enStock</span>: <span class="kw">true</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Filtrá solo los productos que tienen stock</li>
+          <li>Filtrá solo los productos de "tecnología"</li>
+          <li>Filtrá productos con precio menor a $200</li>
+          <li>Filtrá productos de tecnología, en stock y menores a $600</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 8 ── -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2>reduce — Colapsar a un solo valor</h2>
+    </div>
+
+    <p><code>reduce</code> es el método más poderoso. Procesa cada elemento y acumula un <strong>único resultado</strong> — un número, string, objeto, o hasta un nuevo array.</p>
+
+    <p>Recibe dos argumentos: una <strong>función callback</strong> y un <strong>valor inicial</strong>. El callback recibe el <em>acumulador</em> (el resultado parcial) y el elemento actual.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">reduce — Fundamentos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">numeros</span> = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>];
+
+<span class="cm">// Sumar todos los números</span>
+<span class="kw">const</span> <span class="vr">suma</span> = numeros.<span class="fn">reduce</span>((<span class="vr">acumulador</span>, <span class="vr">actual</span>) => {
+  <span class="kw">return</span> <span class="vr">acumulador</span> + <span class="vr">actual</span>;
+}, <span class="num">0</span>); <span class="cm">// 0 es el valor inicial</span>
+
+console.<span class="fn">log</span>(suma); <span class="cm">// 100</span>
+
+<span class="cm">// Paso a paso:</span>
+<span class="cm">// Inicio: acc = 0</span>
+<span class="cm">// Paso 1: acc = 0 + 10  = 10</span>
+<span class="cm">// Paso 2: acc = 10 + 20 = 30</span>
+<span class="cm">// Paso 3: acc = 30 + 30 = 60</span>
+<span class="cm">// Paso 4: acc = 60 + 40 = 100 ← resultado final</span>
+
+<span class="cm">// Versión corta con arrow function</span>
+<span class="kw">const</span> <span class="vr">total</span> = numeros.<span class="fn">reduce</span>((<span class="vr">acc</span>, <span class="vr">cur</span>) => <span class="vr">acc</span> + <span class="vr">cur</span>, <span class="num">0</span>);
+
+<span class="cm">// Encontrar el valor máximo</span>
+<span class="kw">const</span> <span class="vr">maximo</span> = numeros.<span class="fn">reduce</span>((<span class="vr">acc</span>, <span class="vr">cur</span>) => cur > acc ? cur : acc, -Infinity);
+console.<span class="fn">log</span>(maximo); <span class="cm">// 40</span></code></pre>
+    </div>
+
+    <h3>reduce con objetos</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">reduce — Usos reales</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">pedidos</span> = [
+  { <span class="vr">producto</span>: <span class="str">"Laptop"</span>, <span class="vr">cantidad</span>: <span class="num">1</span>, <span class="vr">precio</span>: <span class="num">1200</span> },
+  { <span class="vr">producto</span>: <span class="str">"Mouse"</span>, <span class="vr">cantidad</span>: <span class="num">2</span>, <span class="vr">precio</span>: <span class="num">25</span> },
+  { <span class="vr">producto</span>: <span class="str">"Teclado"</span>, <span class="vr">cantidad</span>: <span class="num">1</span>, <span class="vr">precio</span>: <span class="num">80</span> }
+];
+
+<span class="cm">// Calcular el total de la factura</span>
+<span class="kw">const</span> <span class="vr">total</span> = pedidos.<span class="fn">reduce</span>((<span class="vr">acc</span>, <span class="vr">pedido</span>) => {
+  <span class="kw">return</span> <span class="vr">acc</span> + (<span class="vr">pedido</span>.<span class="vr">precio</span> * <span class="vr">pedido</span>.<span class="vr">cantidad</span>);
+}, <span class="num">0</span>);
+console.<span class="fn">log</span>(total); <span class="cm">// 1330</span>
+
+<span class="cm">// Contar elementos (el acumulador es un objeto)</span>
+<span class="kw">const</span> <span class="vr">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"banana"</span>, <span class="str">"manzana"</span>, <span class="str">"cereza"</span>, <span class="str">"banana"</span>, <span class="str">"manzana"</span>];
+
+<span class="kw">const</span> <span class="vr">conteo</span> = frutas.<span class="fn">reduce</span>((<span class="vr">acc</span>, <span class="vr">fruta</span>) => {
+  <span class="vr">acc</span>[<span class="vr">fruta</span>] = (<span class="vr">acc</span>[<span class="vr">fruta</span>] || <span class="num">0</span>) + <span class="num">1</span>;
+  <span class="kw">return</span> <span class="vr">acc</span>;
+}, {});
+
+console.<span class="fn">log</span>(conteo);
+<span class="cm">// { manzana: 3, banana: 2, cereza: 1 }</span></code></pre>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-medium">Medio</span>
+        <span class="exercise-title">Ejercicio 6 — Factura del Café</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">pedido</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Café"</span>, <span class="vr">precio</span>: <span class="num">5.5</span>, <span class="vr">cantidad</span>: <span class="num">3</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Croissant"</span>, <span class="vr">precio</span>: <span class="num">2.0</span>, <span class="vr">cantidad</span>: <span class="num">2</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Jugo"</span>, <span class="vr">precio</span>: <span class="num">4.0</span>, <span class="vr">cantidad</span>: <span class="num">1</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Calculá el precio total del pedido</li>
+          <li>Calculá el total de artículos comprados</li>
+          <li>Encontrá el artículo más caro</li>
+          <li>Construí un resumen: "Café x3 = $16.50, ..."</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 9 ── -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2>find y findIndex</h2>
+    </div>
+
+    <p>Estos métodos buscan en un array y devuelven <strong>el primer elemento</strong> que cumple una condición.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">find y findIndex</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">usuarios</span> = [
+  { <span class="vr">id</span>: <span class="num">1</span>, <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">rol</span>: <span class="str">"admin"</span> },
+  { <span class="vr">id</span>: <span class="num">2</span>, <span class="vr">nombre</span>: <span class="str">"Luis"</span>, <span class="vr">rol</span>: <span class="str">"usuario"</span> },
+  { <span class="vr">id</span>: <span class="num">3</span>, <span class="vr">nombre</span>: <span class="str">"María"</span>, <span class="vr">rol</span>: <span class="str">"usuario"</span> }
+];
+
+<span class="cm">// find — devuelve EL ELEMENTO (o undefined si no existe)</span>
+<span class="kw">const</span> <span class="vr">admin</span> = usuarios.<span class="fn">find</span>((<span class="vr">u</span>) => u.<span class="vr">rol</span> === <span class="str">"admin"</span>);
+console.<span class="fn">log</span>(admin); <span class="cm">// { id: 1, nombre: "Ana", rol: "admin" }</span>
+
+<span class="kw">const</span> <span class="vr">porId</span> = usuarios.<span class="fn">find</span>((<span class="vr">u</span>) => u.<span class="vr">id</span> === <span class="num">2</span>);
+console.<span class="fn">log</span>(porId); <span class="cm">// { id: 2, nombre: "Luis", rol: "usuario" }</span>
+
+<span class="kw">const</span> <span class="vr">noExiste</span> = usuarios.<span class="fn">find</span>((<span class="vr">u</span>) => u.<span class="vr">rol</span> === <span class="str">"superadmin"</span>);
+console.<span class="fn">log</span>(noExiste); <span class="cm">// undefined</span>
+
+<span class="cm">// findIndex — devuelve EL ÍNDICE (o -1 si no existe)</span>
+<span class="kw">const</span> <span class="vr">idx</span> = usuarios.<span class="fn">findIndex</span>((<span class="vr">u</span>) => u.<span class="vr">nombre</span> === <span class="str">"María"</span>);
+console.<span class="fn">log</span>(idx); <span class="cm">// 2</span>
+
+<span class="cm">// Usar -1 como guarda de "no encontrado"</span>
+<span class="kw">const</span> <span class="vr">pos</span> = usuarios.<span class="fn">findIndex</span>((<span class="vr">u</span>) => u.<span class="vr">id</span> === <span class="num">99</span>);
+<span class="kw">if</span> (pos === -<span class="num">1</span>) console.<span class="fn">log</span>(<span class="str">"Usuario no encontrado"</span>);</code></pre>
+    </div>
+
+    <h3>indexOf — para valores simples</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">indexOf y lastIndexOf</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"banana"</span>, <span class="str">"manzana"</span>, <span class="str">"mango"</span>];
+
+<span class="cm">// Primera ocurrencia</span>
+console.<span class="fn">log</span>(frutas.<span class="fn">indexOf</span>(<span class="str">"manzana"</span>));     <span class="cm">// 0</span>
+console.<span class="fn">log</span>(frutas.<span class="fn">indexOf</span>(<span class="str">"uva"</span>));         <span class="cm">// -1 (no existe)</span>
+
+<span class="cm">// Última ocurrencia</span>
+console.<span class="fn">log</span>(frutas.<span class="fn">lastIndexOf</span>(<span class="str">"manzana"</span>)); <span class="cm">// 2</span></code></pre>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 10 ── -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <h2>includes, some, every</h2>
+    </div>
+
+    <p>Estos tres métodos devuelven un <strong>booleano</strong> — responden preguntas de sí o no sobre el array.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">includes, some, every</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="cm">// includes — "¿está este valor en el array?"</span>
+<span class="kw">const</span> <span class="vr">permitidos</span> = [<span class="str">"admin"</span>, <span class="str">"editor"</span>, <span class="str">"viewer"</span>];
+console.<span class="fn">log</span>(permitidos.<span class="fn">includes</span>(<span class="str">"admin"</span>));  <span class="cm">// true</span>
+console.<span class="fn">log</span>(permitidos.<span class="fn">includes</span>(<span class="str">"invitado"</span>)); <span class="cm">// false</span>
+
+<span class="cm">// some — "¿AL MENOS UN elemento pasa la prueba?"</span>
+<span class="kw">const</span> <span class="vr">edades</span> = [<span class="num">14</span>, <span class="num">22</span>, <span class="num">17</span>, <span class="num">30</span>];
+<span class="kw">const</span> <span class="vr">hayMayor</span> = edades.<span class="fn">some</span>((<span class="vr">edad</span>) => edad >= <span class="num">18</span>);
+console.<span class="fn">log</span>(hayMayor); <span class="cm">// true</span>
+
+<span class="kw">const</span> <span class="vr">notas</span> = [<span class="num">55</span>, <span class="num">40</span>, <span class="num">65</span>, <span class="num">50</span>];
+<span class="kw">const</span> <span class="vr">algunoAprobó</span> = notas.<span class="fn">some</span>((<span class="vr">n</span>) => n >= <span class="num">70</span>);
+console.<span class="fn">log</span>(algunoAprobó); <span class="cm">// false</span>
+
+<span class="cm">// every — "¿TODOS los elementos pasan la prueba?"</span>
+<span class="kw">const</span> <span class="vr">todosMayores</span> = edades.<span class="fn">every</span>((<span class="vr">edad</span>) => edad >= <span class="num">18</span>);
+console.<span class="fn">log</span>(todosMayores); <span class="cm">// false (14 y 17 no pasan)</span>
+
+<span class="kw">const</span> <span class="vr">precios</span> = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">15</span>, <span class="num">8</span>];
+<span class="kw">const</span> <span class="vr">todosEconómicos</span> = precios.<span class="fn">every</span>((<span class="vr">p</span>) => p < <span class="num">50</span>);
+console.<span class="fn">log</span>(todosEconómicos); <span class="cm">// true</span>
+
+<span class="cm">// Ejemplo práctico: validación de formulario</span>
+<span class="kw">const</span> <span class="vr">campos</span> = [<span class="str">"Ana"</span>, <span class="str">"ana@email.com"</span>, <span class="str">"contraseña123"</span>];
+<span class="kw">const</span> <span class="vr">formularioValido</span> = campos.<span class="fn">every</span>((<span class="vr">c</span>) => c.<span class="vr">length</span> > <span class="num">0</span>);
+console.<span class="fn">log</span>(formularioValido); <span class="cm">// true — todos los campos completos</span></code></pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Método</th><th>Pregunta</th><th>Devuelve</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>includes(valor)</code></td><td>¿Está presente este valor?</td><td><code>true</code> / <code>false</code></td></tr>
+          <tr><td><code>some(fn)</code></td><td>¿Al menos uno pasa la prueba?</td><td><code>true</code> / <code>false</code></td></tr>
+          <tr><td><code>every(fn)</code></td><td>¿Todos pasan la prueba?</td><td><code>true</code> / <code>false</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 11 ── -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <h2>sort y reverse</h2>
+    </div>
+
+    <p>Estos métodos <strong>mutan el array original</strong>. Siempre ordená una copia si necesitás preservar el original.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">sort y reverse</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="cm">// Strings — ordenar alfabéticamente</span>
+<span class="kw">const</span> <span class="vr">frutas</span> = [<span class="str">"banana"</span>, <span class="str">"manzana"</span>, <span class="str">"mango"</span>, <span class="str">"cereza"</span>];
+frutas.<span class="fn">sort</span>();
+console.<span class="fn">log</span>(frutas); <span class="cm">// ["banana", "cereza", "mango", "manzana"]</span>
+
+<span class="cm">// Números — SIEMPRE usá una función comparadora</span>
+<span class="kw">const</span> <span class="vr">nums</span> = [<span class="num">10</span>, <span class="num">5</span>, <span class="num">100</span>, <span class="num">2</span>, <span class="num">40</span>];
+
+nums.<span class="fn">sort</span>();
+console.<span class="fn">log</span>(nums); <span class="cm">// [10, 100, 2, 40, 5] — MAL (ordena como strings)</span>
+
+nums.<span class="fn">sort</span>((<span class="vr">a</span>, <span class="vr">b</span>) => <span class="vr">a</span> - <span class="vr">b</span>);
+console.<span class="fn">log</span>(nums); <span class="cm">// [2, 5, 10, 40, 100] — Ascendente</span>
+
+nums.<span class="fn">sort</span>((<span class="vr">a</span>, <span class="vr">b</span>) => <span class="vr">b</span> - <span class="vr">a</span>);
+console.<span class="fn">log</span>(nums); <span class="cm">// [100, 40, 10, 5, 2] — Descendente</span>
+
+<span class="cm">// Ordenar objetos por propiedad</span>
+<span class="kw">const</span> <span class="vr">personas</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Carlos"</span>, <span class="vr">edad</span>: <span class="num">34</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">edad</span>: <span class="num">28</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Beto"</span>, <span class="vr">edad</span>: <span class="num">45</span> }
+];
+
+<span class="cm">// Por edad ascendente — ordenar una COPIA para preservar el original</span>
+<span class="kw">const</span> <span class="vr">porEdad</span> = [...personas].<span class="fn">sort</span>((<span class="vr">a</span>, <span class="vr">b</span>) => a.<span class="vr">edad</span> - b.<span class="vr">edad</span>);
+
+<span class="cm">// Por nombre alfabéticamente</span>
+<span class="kw">const</span> <span class="vr">porNombre</span> = [...personas].<span class="fn">sort</span>((<span class="vr">a</span>, <span class="vr">b</span>) => a.<span class="vr">nombre</span>.<span class="fn">localeCompare</span>(b.<span class="vr">nombre</span>));
+
+<span class="cm">// reverse — invierte el array en su lugar</span>
+<span class="kw">const</span> <span class="vr">arr</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+arr.<span class="fn">reverse</span>();
+console.<span class="fn">log</span>(arr); <span class="cm">// [5, 4, 3, 2, 1]</span></code></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">La trampa del sort con números</div>
+      <p>Sin función comparadora, <code>sort()</code> convierte todo a strings primero. <code>[10, 2, 100]</code> se ordena como <code>[10, 100, 2]</code> porque "1" va antes que "2". Siempre pasá <code>(a, b) => a - b</code> para números.</p>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 12 ── -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <h2>Spread y Destructuring</h2>
+    </div>
+
+    <h3>El operador spread (...)</h3>
+    <p>El operador spread "desempaca" un array en elementos individuales. Es la forma moderna de copiar y combinar arrays sin mutaciones.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">Spread</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">a</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];
+<span class="kw">const</span> <span class="vr">b</span> = [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>];
+
+<span class="cm">// Copiar un array (copia superficial)</span>
+<span class="kw">const</span> <span class="vr">copia</span> = [...a];
+copia.<span class="fn">push</span>(<span class="num">99</span>);
+console.<span class="fn">log</span>(a);     <span class="cm">// [1, 2, 3] — intacto</span>
+console.<span class="fn">log</span>(copia); <span class="cm">// [1, 2, 3, 99]</span>
+
+<span class="cm">// Combinar arrays</span>
+<span class="kw">const</span> <span class="vr">combinado</span> = [...a, ...b];
+console.<span class="fn">log</span>(combinado); <span class="cm">// [1, 2, 3, 4, 5, 6]</span>
+
+<span class="cm">// Insertar elementos en el medio</span>
+<span class="kw">const</span> <span class="vr">insertado</span> = [...a, <span class="num">10</span>, <span class="num">11</span>, ...b];
+console.<span class="fn">log</span>(insertado); <span class="cm">// [1, 2, 3, 10, 11, 4, 5, 6]</span>
+
+<span class="cm">// Pasar array como argumentos de función</span>
+<span class="kw">const</span> <span class="vr">numeros</span> = [<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>, <span class="num">9</span>];
+console.<span class="fn">log</span>(Math.<span class="fn">max</span>(...numeros)); <span class="cm">// 9</span></code></pre>
+    </div>
+
+    <h3>Destructuring de arrays</h3>
+    <p>La desestructuración te permite extraer valores del array en variables de forma limpia y legible.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">Destructuring</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">coordenadas</span> = [<span class="num">4.7110</span>, -<span class="num">74.0721</span>]; <span class="cm">// Bogotá</span>
+
+<span class="cm">// Sin desestructuración</span>
+<span class="kw">const</span> <span class="vr">lat</span> = coordenadas[<span class="num">0</span>];
+<span class="kw">const</span> <span class="vr">lng</span> = coordenadas[<span class="num">1</span>];
+
+<span class="cm">// Con desestructuración — mucho más limpio</span>
+<span class="kw">const</span> [<span class="vr">latitud</span>, <span class="vr">longitud</span>] = coordenadas;
+console.<span class="fn">log</span>(latitud);  <span class="cm">// 4.7110</span>
+console.<span class="fn">log</span>(longitud); <span class="cm">// -74.0721</span>
+
+<span class="cm">// Saltear elementos con comas</span>
+<span class="kw">const</span> [<span class="vr">primero</span>, , <span class="vr">tercero</span>] = [<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>];
+console.<span class="fn">log</span>(primero, tercero); <span class="cm">// "a" "c"</span>
+
+<span class="cm">// Rest — capturar el resto de elementos</span>
+<span class="kw">const</span> [<span class="vr">cabeza</span>, ...cola] = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+console.<span class="fn">log</span>(cabeza); <span class="cm">// 1</span>
+console.<span class="fn">log</span>(cola);  <span class="cm">// [2, 3, 4, 5]</span>
+
+<span class="cm">// Valores por defecto</span>
+<span class="kw">const</span> [<span class="vr">x</span> = <span class="num">0</span>, <span class="vr">y</span> = <span class="num">0</span>, <span class="vr">z</span> = <span class="num">0</span>] = [<span class="num">10</span>, <span class="num">20</span>];
+console.<span class="fn">log</span>(x, y, z); <span class="cm">// 10, 20, 0</span>
+
+<span class="cm">// Intercambiar variables — uso clásico</span>
+<span class="kw">let</span> <span class="vr">p</span> = <span class="num">1</span>, <span class="vr">q</span> = <span class="num">2</span>;
+[p, q] = [q, p];
+console.<span class="fn">log</span>(p, q); <span class="cm">// 2, 1</span></code></pre>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 13 ── -->
+  <div class="section" id="s13">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <h2>Encadenamiento de Métodos</h2>
+    </div>
+
+    <p>El verdadero poder de los métodos de array aparece cuando los encadenás. Cada método devuelve un nuevo array, sobre el que podés llamar otro método inmediatamente.</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Leé las cadenas de izquierda a derecha</div>
+      <p>Pensalo como un pipeline: los datos crudos entran, cada paso los transforma, el resultado final sale al final.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">Encadenamiento de Métodos</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="kw">const</span> <span class="vr">empleados</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">area</span>: <span class="str">"tech"</span>, <span class="vr">salario</span>: <span class="num">5000</span>, <span class="vr">activo</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Luis"</span>, <span class="vr">area</span>: <span class="str">"diseño"</span>, <span class="vr">salario</span>: <span class="num">4000</span>, <span class="vr">activo</span>: <span class="kw">false</span> },
+  { <span class="vr">nombre</span>: <span class="str">"María"</span>, <span class="vr">area</span>: <span class="str">"tech"</span>, <span class="vr">salario</span>: <span class="num">6000</span>, <span class="vr">activo</span>: <span class="kw">true</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Pedro"</span>, <span class="vr">area</span>: <span class="str">"tech"</span>, <span class="vr">salario</span>: <span class="num">3500</span>, <span class="vr">activo</span>: <span class="kw">true</span> }
+];
+
+<span class="cm">// "Nombres de empleados activos de tech, ordenados alfabéticamente"</span>
+<span class="kw">const</span> <span class="vr">resultado</span> = empleados
+  .<span class="fn">filter</span>((<span class="vr">e</span>) => e.<span class="vr">activo</span> && e.<span class="vr">area</span> === <span class="str">"tech"</span>)  <span class="cm">// [Ana, María, Pedro]</span>
+  .<span class="fn">map</span>((<span class="vr">e</span>) => e.<span class="vr">nombre</span>)                         <span class="cm">// ["Ana", "María", "Pedro"]</span>
+  .<span class="fn">sort</span>();                                      <span class="cm">// orden alfabético</span>
+
+console.<span class="fn">log</span>(resultado); <span class="cm">// ["Ana", "María", "Pedro"]</span>
+
+<span class="cm">// "Presupuesto total de nómina de empleados activos"</span>
+<span class="kw">const</span> <span class="vr">presupuesto</span> = empleados
+  .<span class="fn">filter</span>((<span class="vr">e</span>) => e.<span class="vr">activo</span>)
+  .<span class="fn">reduce</span>((<span class="vr">total</span>, <span class="vr">e</span>) => total + e.<span class="vr">salario</span>, <span class="num">0</span>);
+
+console.<span class="fn">log</span>(presupuesto); <span class="cm">// 14500</span>
+
+<span class="cm">// "Los 2 empleados activos mejor pagados"</span>
+<span class="kw">const</span> <span class="vr">top2</span> = empleados
+  .<span class="fn">filter</span>((<span class="vr">e</span>) => e.<span class="vr">activo</span>)
+  .<span class="fn">sort</span>((<span class="vr">a</span>, <span class="vr">b</span>) => b.<span class="vr">salario</span> - a.<span class="vr">salario</span>)
+  .<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">2</span>)
+  .<span class="fn">map</span>((<span class="vr">e</span>) => e.<span class="vr">nombre</span>);
+
+console.<span class="fn">log</span>(top2); <span class="cm">// ["María", "Ana"]</span></code></pre>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-hard">Difícil</span>
+        <span class="exercise-title">Ejercicio 7 — Pipeline de Datos</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">pedidos</span> = [
+  { <span class="vr">id</span>: <span class="num">1</span>, <span class="vr">cliente</span>: <span class="str">"Ana"</span>, <span class="vr">total</span>: <span class="num">120</span>, <span class="vr">estado</span>: <span class="str">"entregado"</span>, <span class="vr">categoria</span>: <span class="str">"tech"</span> },
+  { <span class="vr">id</span>: <span class="num">2</span>, <span class="vr">cliente</span>: <span class="str">"Luis"</span>, <span class="vr">total</span>: <span class="num">45</span>, <span class="vr">estado</span>: <span class="str">"pendiente"</span>, <span class="vr">categoria</span>: <span class="str">"ropa"</span> },
+  { <span class="vr">id</span>: <span class="num">3</span>, <span class="vr">cliente</span>: <span class="str">"Ana"</span>, <span class="vr">total</span>: <span class="num">300</span>, <span class="vr">estado</span>: <span class="str">"entregado"</span>, <span class="vr">categoria</span>: <span class="str">"tech"</span> },
+  { <span class="vr">id</span>: <span class="num">4</span>, <span class="vr">cliente</span>: <span class="str">"María"</span>, <span class="vr">total</span>: <span class="num">80</span>, <span class="vr">estado</span>: <span class="str">"entregado"</span>, <span class="vr">categoria</span>: <span class="str">"libros"</span> },
+  { <span class="vr">id</span>: <span class="num">5</span>, <span class="vr">cliente</span>: <span class="str">"Luis"</span>, <span class="vr">total</span>: <span class="num">200</span>, <span class="vr">estado</span>: <span class="str">"cancelado"</span>, <span class="vr">categoria</span>: <span class="str">"tech"</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Calculá el total de ingresos de pedidos entregados (usando encadenamiento)</li>
+          <li>Obtené los nombres de clientes con pedidos entregados, sin duplicados, ordenados A-Z</li>
+          <li>Obtené los 2 pedidos entregados más caros</li>
+          <li>Creá un resumen: "Ana: $420, María: $80" para pedidos entregados agrupados por cliente</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 14 ── -->
+  <div class="section" id="s14">
+    <div class="section-header">
+      <span class="section-num">14</span>
+      <h2>flat y flatMap</h2>
+    </div>
+
+    <p>A veces los arrays contienen otros arrays. <code>flat</code> y <code>flatMap</code> te ayudan a trabajar con arrays anidados.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">flat y flatMap</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="cm">// flat — aplanar arrays anidados</span>
+<span class="kw">const</span> <span class="vr">anidado</span> = [<span class="num">1</span>, [<span class="num">2</span>, <span class="num">3</span>], [<span class="num">4</span>, [<span class="num">5</span>, <span class="num">6</span>]]];
+
+console.<span class="fn">log</span>(anidado.<span class="fn">flat</span>());        <span class="cm">// [1, 2, 3, 4, [5, 6]] — 1 nivel</span>
+console.<span class="fn">log</span>(anidado.<span class="fn">flat</span>(<span class="num">2</span>));       <span class="cm">// [1, 2, 3, 4, 5, 6]   — 2 niveles</span>
+console.<span class="fn">log</span>(anidado.<span class="fn">flat</span>(Infinity));  <span class="cm">// [1, 2, 3, 4, 5, 6]   — todos</span>
+
+<span class="cm">// flatMap — map + flat(1) combinados</span>
+<span class="kw">const</span> <span class="vr">oraciones</span> = [<span class="str">"hola mundo"</span>, <span class="str">"foo bar"</span>];
+
+<span class="cm">// Sin flatMap</span>
+<span class="kw">const</span> <span class="vr">palabrasAnidadas</span> = oraciones.<span class="fn">map</span>((<span class="vr">s</span>) => s.<span class="fn">split</span>(<span class="str">" "</span>));
+console.<span class="fn">log</span>(palabrasAnidadas); <span class="cm">// [["hola", "mundo"], ["foo", "bar"]]</span>
+
+<span class="cm">// Con flatMap</span>
+<span class="kw">const</span> <span class="vr">palabras</span> = oraciones.<span class="fn">flatMap</span>((<span class="vr">s</span>) => s.<span class="fn">split</span>(<span class="str">" "</span>));
+console.<span class="fn">log</span>(palabras); <span class="cm">// ["hola", "mundo", "foo", "bar"]</span>
+
+<span class="cm">// Caso práctico: obtener todos los tags de un blog</span>
+<span class="kw">const</span> <span class="vr">posts</span> = [
+  { <span class="vr">titulo</span>: <span class="str">"Post 1"</span>, <span class="vr">tags</span>: [<span class="str">"js"</span>, <span class="str">"web"</span>] },
+  { <span class="vr">titulo</span>: <span class="str">"Post 2"</span>, <span class="vr">tags</span>: [<span class="str">"css"</span>, <span class="str">"web"</span>] }
+];
+
+<span class="kw">const</span> <span class="vr">todosTags</span> = posts.<span class="fn">flatMap</span>((<span class="vr">post</span>) => post.<span class="vr">tags</span>);
+console.<span class="fn">log</span>(todosTags); <span class="cm">// ["js", "web", "css", "web"]</span></code></pre>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 15 ── EJERCICIOS -->
+  <div class="section" id="s15">
+    <div class="section-header">
+      <span class="section-num">15</span>
+      <h2>Ejercicios en Clase</h2>
+    </div>
+
+    <p>Estos ejercicios combinan múltiples métodos y simulan situaciones del mundo real. Trabajalos en orden — se apoyan entre sí.</p>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-easy">Fácil</span>
+        <span class="exercise-title">Ejercicio 8 — Estadísticas de Estudiantes</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">estudiantes</span> = [
+  { <span class="vr">nombre</span>: <span class="str">"Ana"</span>, <span class="vr">nota</span>: <span class="num">92</span>, <span class="vr">materia</span>: <span class="str">"matemáticas"</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Luis"</span>, <span class="vr">nota</span>: <span class="num">65</span>, <span class="vr">materia</span>: <span class="str">"ciencias"</span> },
+  { <span class="vr">nombre</span>: <span class="str">"María"</span>, <span class="vr">nota</span>: <span class="num">88</span>, <span class="vr">materia</span>: <span class="str">"matemáticas"</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Pedro"</span>, <span class="vr">nota</span>: <span class="num">74</span>, <span class="vr">materia</span>: <span class="str">"ciencias"</span> },
+  { <span class="vr">nombre</span>: <span class="str">"Laura"</span>, <span class="vr">nota</span>: <span class="num">95</span>, <span class="vr">materia</span>: <span class="str">"matemáticas"</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Calculá el promedio de notas de todos los estudiantes</li>
+          <li>Obtené los nombres de quienes aprobaron (nota ≥ 70)</li>
+          <li>Encontrá al mejor estudiante (nota más alta)</li>
+          <li>Ordená los estudiantes de mayor a menor nota</li>
+          <li>Contá cuántos estudiantes hay en cada materia</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-medium">Medio</span>
+        <span class="exercise-title">Ejercicio 9 — Gestor de Inventario</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">inventario</span> = [
+  { <span class="vr">id</span>: <span class="num">1</span>, <span class="vr">nombre</span>: <span class="str">"Widget A"</span>, <span class="vr">stock</span>: <span class="num">50</span>, <span class="vr">precio</span>: <span class="num">9.99</span>, <span class="vr">categoria</span>: <span class="str">"hardware"</span> },
+  { <span class="vr">id</span>: <span class="num">2</span>, <span class="vr">nombre</span>: <span class="str">"Widget B"</span>, <span class="vr">stock</span>: <span class="num">0</span>, <span class="vr">precio</span>: <span class="num">14.99</span>, <span class="vr">categoria</span>: <span class="str">"hardware"</span> },
+  { <span class="vr">id</span>: <span class="num">3</span>, <span class="vr">nombre</span>: <span class="str">"Gadget X"</span>, <span class="vr">stock</span>: <span class="num">12</span>, <span class="vr">precio</span>: <span class="num">49.99</span>, <span class="vr">categoria</span>: <span class="str">"electrónica"</span> },
+  { <span class="vr">id</span>: <span class="num">4</span>, <span class="vr">nombre</span>: <span class="str">"Gadget Y"</span>, <span class="vr">stock</span>: <span class="num">3</span>, <span class="vr">precio</span>: <span class="num">29.99</span>, <span class="vr">categoria</span>: <span class="str">"electrónica"</span> },
+  { <span class="vr">id</span>: <span class="num">5</span>, <span class="vr">nombre</span>: <span class="str">"Pieza Z"</span>, <span class="vr">stock</span>: <span class="num">100</span>, <span class="vr">precio</span>: <span class="num">2.50</span>, <span class="vr">categoria</span>: <span class="str">"hardware"</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Listá todos los productos sin stock</li>
+          <li>Calculá el valor total del inventario (stock × precio de cada uno, luego sumá)</li>
+          <li>Encontrá productos con stock bajo (menos de 5 unidades)</li>
+          <li>Obtené la lista de categorías disponibles (sin repetidos)</li>
+          <li>Generá alertas de restock: "Gadget Y: ¡solo quedan 3 unidades!"</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-medium">Medio</span>
+        <span class="exercise-title">Ejercicio 10 — Feed de Publicaciones</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">publicaciones</span> = [
+  { <span class="vr">id</span>: <span class="num">1</span>, <span class="vr">autor</span>: <span class="str">"Ana"</span>, <span class="vr">likes</span>: <span class="num">42</span>, <span class="vr">tags</span>: [<span class="str">"js"</span>, <span class="str">"web"</span>], <span class="vr">publicado</span>: <span class="kw">true</span> },
+  { <span class="vr">id</span>: <span class="num">2</span>, <span class="vr">autor</span>: <span class="str">"Luis"</span>, <span class="vr">likes</span>: <span class="num">8</span>, <span class="vr">tags</span>: [<span class="str">"css"</span>], <span class="vr">publicado</span>: <span class="kw">false</span> },
+  { <span class="vr">id</span>: <span class="num">3</span>, <span class="vr">autor</span>: <span class="str">"Ana"</span>, <span class="vr">likes</span>: <span class="num">120</span>, <span class="vr">tags</span>: [<span class="str">"js"</span>, <span class="str">"tutorial"</span>], <span class="vr">publicado</span>: <span class="kw">true</span> },
+  { <span class="vr">id</span>: <span class="num">4</span>, <span class="vr">autor</span>: <span class="str">"María"</span>, <span class="vr">likes</span>: <span class="num">67</span>, <span class="vr">tags</span>: [<span class="str">"web"</span>, <span class="str">"tutorial"</span>], <span class="vr">publicado</span>: <span class="kw">true</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Mostrá solo publicaciones publicadas, ordenadas por likes (de mayor a menor)</li>
+          <li>Obtené todos los tags únicos de las publicaciones publicadas</li>
+          <li>Calculá el total de likes de las publicaciones publicadas</li>
+          <li>Verificá si Ana tiene alguna publicación con más de 100 likes</li>
+          <li>Comprobá si todas las publicaciones publicadas tienen al menos un tag</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-hard">Difícil</span>
+        <span class="exercise-title">Ejercicio 11 — Transacciones Bancarias</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">transacciones</span> = [
+  { <span class="vr">id</span>: <span class="str">"t1"</span>, <span class="vr">tipo</span>: <span class="str">"deposito"</span>, <span class="vr">monto</span>: <span class="num">1500</span>, <span class="vr">mes</span>: <span class="str">"2024-01"</span> },
+  { <span class="vr">id</span>: <span class="str">"t2"</span>, <span class="vr">tipo</span>: <span class="str">"retiro"</span>, <span class="vr">monto</span>: <span class="num">200</span>, <span class="vr">mes</span>: <span class="str">"2024-01"</span> },
+  { <span class="vr">id</span>: <span class="str">"t3"</span>, <span class="vr">tipo</span>: <span class="str">"deposito"</span>, <span class="vr">monto</span>: <span class="num">3000</span>, <span class="vr">mes</span>: <span class="str">"2024-02"</span> },
+  { <span class="vr">id</span>: <span class="str">"t4"</span>, <span class="vr">tipo</span>: <span class="str">"retiro"</span>, <span class="vr">monto</span>: <span class="num">850</span>, <span class="vr">mes</span>: <span class="str">"2024-02"</span> },
+  { <span class="vr">id</span>: <span class="str">"t5"</span>, <span class="vr">tipo</span>: <span class="str">"retiro"</span>, <span class="vr">monto</span>: <span class="num">400</span>, <span class="vr">mes</span>: <span class="str">"2024-02"</span> }
+];</code></pre>
+        </div>
+        <ol>
+          <li>Calculá el saldo final (depósitos − retiros)</li>
+          <li>Obtené el total depositado y el total retirado por separado</li>
+          <li>Encontrá la transacción individual más grande (cualquier tipo)</li>
+          <li>Calculá el saldo mes a mes: <code>{"2024-01": 1300, "2024-02": 1750}</code></li>
+          <li>Determiná si la cuenta llegó a quedar en negativo en algún momento (procesando en orden)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge badge-hard">Difícil</span>
+        <span class="exercise-title">Ejercicio 12 — Mini Motor de Búsqueda</span>
+      </div>
+      <div class="exercise-body">
+        <div class="code-block" style="margin:0 0 14px">
+          <pre><code><span class="kw">const</span> <span class="vr">catalogo</span> = [
+  { <span class="vr">id</span>: <span class="num">1</span>, <span class="vr">titulo</span>: <span class="str">"JavaScript para Principiantes"</span>, <span class="vr">autor</span>: <span class="str">"Alice"</span>, <span class="vr">tags</span>: [<span class="str">"js"</span>, <span class="str">"principiante"</span>], <span class="vr">rating</span>: <span class="num">4.5</span> },
+  { <span class="vr">id</span>: <span class="num">2</span>, <span class="vr">titulo</span>: <span class="str">"CSS Avanzado"</span>, <span class="vr">autor</span>: <span class="str">"Bob"</span>, <span class="vr">tags</span>: [<span class="str">"css"</span>, <span class="str">"avanzado"</span>], <span class="vr">rating</span>: <span class="num">4.2</span> },
+  { <span class="vr">id</span>: <span class="num">3</span>, <span class="vr">titulo</span>: <span class="str">"Patrones JavaScript"</span>, <span class="vr">autor</span>: <span class="str">"Alice"</span>, <span class="vr">tags</span>: [<span class="str">"js"</span>, <span class="str">"patrones"</span>], <span class="vr">rating</span>: <span class="num">4.8</span> },
+  { <span class="vr">id</span>: <span class="num">4</span>, <span class="vr">titulo</span>: <span class="str">"Rendimiento Web"</span>, <span class="vr">autor</span>: <span class="str">"Carol"</span>, <span class="vr">tags</span>: [<span class="str">"web"</span>, <span class="str">"avanzado"</span>], <span class="vr">rating</span>: <span class="num">3.9</span> }
+];</code></pre>
+        </div>
+        <p>Construí una función <code>buscar(consulta, opciones)</code> que:</p>
+        <ol>
+          <li>Filtre libros cuyo título contenga la consulta (sin distinguir mayúsculas)</li>
+          <li>Filtre opcionalmente por un tag si se pasa <code>opciones.tag</code></li>
+          <li>Filtre opcionalmente por rating mínimo si se pasa <code>opciones.ratingMinimo</code></li>
+          <li>Devuelva los resultados ordenados por rating de mayor a menor</li>
+          <li>Devuelva solo título y rating en el resultado final</li>
+        </ol>
+        <p>Probala con: <code>buscar("javascript", { ratingMinimo: 4.5 })</code></p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SECCIÓN 16 ── CHEATSHEET -->
+  <div class="section" id="s16">
+    <div class="section-header">
+      <span class="section-num">16</span>
+      <h2>Cheatsheet Completo</h2>
+    </div>
+
+    <div class="cheatsheet">
+      <div class="cheatsheet-header">Todos los Métodos de Array — Referencia Rápida</div>
+      <div class="cheatsheet-grid">
+        <div class="cs-item">
+          <div class="cs-method">arr.push(...items)</div>
+          <div class="cs-desc">Agrega al final. Devuelve nuevo largo. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.pop()</div>
+          <div class="cs-desc">Elimina del final. Devuelve el elemento. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.unshift(...items)</div>
+          <div class="cs-desc">Agrega al principio. Devuelve nuevo largo. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.shift()</div>
+          <div class="cs-desc">Elimina del principio. Devuelve el elemento. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.splice(i, n, ...items)</div>
+          <div class="cs-desc">Elimina/reemplaza/inserta en cualquier posición. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.slice(inicio, fin)</div>
+          <div class="cs-desc">Extrae una porción. Devuelve nuevo array. No muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.concat(...arrays)</div>
+          <div class="cs-desc">Une arrays. Devuelve nuevo array. No muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.reverse()</div>
+          <div class="cs-desc">Invierte en su lugar. Devuelve el mismo array. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.sort(compareFn)</div>
+          <div class="cs-desc">Ordena en su lugar. Siempre pasá compareFn para números. Muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.join(separador)</div>
+          <div class="cs-desc">Une elementos en un string. No muta.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.forEach(fn)</div>
+          <div class="cs-desc">Ejecuta fn en cada elemento. Devuelve undefined.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.map(fn)</div>
+          <div class="cs-desc">Transforma cada elemento. Devuelve nuevo array (mismo largo).</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.filter(fn)</div>
+          <div class="cs-desc">Conserva los que pasan la prueba. Devuelve nuevo array.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.reduce(fn, init)</div>
+          <div class="cs-desc">Acumula en un único valor. Siempre pasá el valor inicial.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.find(fn)</div>
+          <div class="cs-desc">Primer elemento que pasa la prueba. Devuelve elemento o undefined.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.findIndex(fn)</div>
+          <div class="cs-desc">Índice del primer elemento que pasa. Devuelve índice o -1.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.indexOf(valor)</div>
+          <div class="cs-desc">Índice de la primera ocurrencia. Devuelve índice o -1.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.includes(valor)</div>
+          <div class="cs-desc">¿Está el valor presente? Devuelve booleano.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.some(fn)</div>
+          <div class="cs-desc">¿Algún elemento pasa la prueba? Devuelve booleano.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.every(fn)</div>
+          <div class="cs-desc">¿Todos los elementos pasan? Devuelve booleano.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.flat(profundidad)</div>
+          <div class="cs-desc">Aplana arrays anidados. Profundidad por defecto = 1.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.flatMap(fn)</div>
+          <div class="cs-desc">map() seguido de flat(1) combinados.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.at(indice)</div>
+          <div class="cs-desc">Accede a un elemento. Soporta índices negativos (-1 = último).</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">arr.length</div>
+          <div class="cs-desc">Número de elementos. Se puede asignar para truncar el array.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">[...arr]</div>
+          <div class="cs-desc">Spread / copia superficial. Combiná libremente con otros elementos.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">const [a, b, ...resto] = arr</div>
+          <div class="cs-desc">Destructuring. Extraé valores en variables.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">Array.from(iterable)</div>
+          <div class="cs-desc">Creá un array desde un string, Set, NodeList, etc.</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-method">Array.isArray(valor)</div>
+          <div class="cs-desc">¿Es un array? Devuelve booleano.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Árbol de decisión</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-label">¿Qué método necesito?</span>
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <pre><code><span class="cm">// "Quiero HACER algo con cada elemento" → forEach</span>
+arr.<span class="fn">forEach</span>(item => console.<span class="fn">log</span>(item))
+
+<span class="cm">// "Quiero TRANSFORMAR cada elemento (misma cantidad de salida)" → map</span>
+arr.<span class="fn">map</span>(item => item * <span class="num">2</span>)
+
+<span class="cm">// "Quiero ALGUNOS elementos (menos de salida)" → filter</span>
+arr.<span class="fn">filter</span>(item => item > <span class="num">10</span>)
+
+<span class="cm">// "Quiero UN SOLO VALOR de todos los elementos" → reduce</span>
+arr.<span class="fn">reduce</span>((acc, item) => acc + item, <span class="num">0</span>)
+
+<span class="cm">// "Quiero ENCONTRAR un elemento" → find</span>
+arr.<span class="fn">find</span>(item => item.id === <span class="num">5</span>)
+
+<span class="cm">// "Quiero ENCONTRAR EL ÍNDICE de un elemento" → findIndex</span>
+arr.<span class="fn">findIndex</span>(item => item.id === <span class="num">5</span>)
+
+<span class="cm">// "Quiero VERIFICAR si algo existe" → includes / some</span>
+arr.<span class="fn">includes</span>(<span class="str">"valor"</span>)
+arr.<span class="fn">some</span>(item => item.activo)
+
+<span class="cm">// "Quiero VERIFICAR que TODOS pasen" → every</span>
+arr.<span class="fn">every</span>(item => item.precio > <span class="num">0</span>)
+
+<span class="cm">// "Quiero AGREGAR / ELIMINAR elementos" → push/pop/shift/unshift/splice</span>
+arr.<span class="fn">push</span>(nuevoItem)
+arr.<span class="fn">splice</span>(indice, <span class="num">1</span>)
+
+<span class="cm">// "Quiero ORDENAR" → sort (copiá primero con [...])</span>
+[...arr].<span class="fn">sort</span>((a, b) => a - b)
+
+<span class="cm">// "Quiero UNA COPIA de una parte del array" → slice</span>
+arr.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">3</span>)</code></pre>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>JavaScript Arrays — Clase Magistral para Principiantes</span>
+    <span>12 Ejercicios · 16 Secciones</span>
+  </div>
+
+</main>
+</body>
+</html>

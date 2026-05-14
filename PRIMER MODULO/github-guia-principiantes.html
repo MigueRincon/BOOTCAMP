@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub para Principiantes — BIT</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg2: #0d1117;
+    --bg3: #161b22;
+    --bg4: #1c2333;
+    --border: #21262d;
+    --green: #39d353;
+    --green-dim: #26a641;
+    --orange: #f78166;
+    --blue: #58a6ff;
+    --yellow: #e3b341;
+    --purple: #bc8cff;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --text-muted: #484f58;
+    --red: #f85149;
+    --cyan: #39c5cf;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(57,211,83,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(88,166,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(57,211,83,0.1);
+    border: 1px solid rgba(57,211,83,0.3);
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+
+  .badge::before { content: '●'; font-size: 8px; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, var(--green) 60%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin-bottom: 36px;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .meta-item .icon { font-size: 16px; }
+
+  /* PROGRESS NAV */
+  .progress-nav {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 40px;
+  }
+
+  .progress-nav-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .progress-nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-module {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .nav-module:hover { color: var(--text); border-bottom-color: var(--border); }
+
+  .nav-module.m1:hover, .nav-module.m1.active { color: var(--green); border-bottom-color: var(--green); }
+  .nav-module.m2:hover, .nav-module.m2.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .nav-module.m3:hover, .nav-module.m3.active { color: var(--orange); border-bottom-color: var(--orange); }
+  .nav-module.m4:hover, .nav-module.m4.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+  .nav-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .m1 .nav-num { background: rgba(57,211,83,0.15); color: var(--green); }
+  .m2 .nav-num { background: rgba(88,166,255,0.15); color: var(--blue); }
+  .m3 .nav-num { background: rgba(247,129,102,0.15); color: var(--orange); }
+  .m4 .nav-num { background: rgba(188,140,255,0.15); color: var(--purple); }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  /* MODULE */
+  .module {
+    margin-bottom: 72px;
+    scroll-margin-top: 60px;
+  }
+
+  .module-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .m1 .module-icon { background: rgba(57,211,83,0.1); border: 1px solid rgba(57,211,83,0.2); }
+  .m2 .module-icon { background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.2); }
+  .m3 .module-icon { background: rgba(247,129,102,0.1); border: 1px solid rgba(247,129,102,0.2); }
+  .m4 .module-icon { background: rgba(188,140,255,0.1); border: 1px solid rgba(188,140,255,0.2); }
+
+  .module-title-block { flex: 1; }
+
+  .module-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .m1 .module-label { color: var(--green); }
+  .m2 .module-label { color: var(--blue); }
+  .m3 .module-label { color: var(--orange); }
+  .m4 .module-label { color: var(--purple); }
+
+  .module h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .module-time {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* CONTENT BLOCKS */
+  .section {
+    margin-bottom: 36px;
+  }
+
+  .section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section h3::before {
+    content: '';
+    width: 4px; height: 20px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .m1 .section h3::before { background: var(--green); }
+  .m2 .section h3::before { background: var(--blue); }
+  .m3 .section h3::before { background: var(--orange); }
+  .m4 .section h3::before { background: var(--purple); }
+
+  .section p {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .section p strong { color: var(--text); font-weight: 500; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { border-color: var(--green); color: var(--green); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  .code-content {
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .code-content pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .code-content .comment { color: var(--text-muted); }
+  .code-content .cmd { color: var(--green); }
+  .code-content .flag { color: var(--blue); }
+  .code-content .string { color: var(--yellow); }
+  .code-content .path { color: var(--orange); }
+  .code-content .output { color: var(--text-dim); }
+
+  /* CONCEPT CARD */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .concept-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .concept-card:hover { border-color: var(--text-muted); }
+
+  .concept-emoji { font-size: 28px; margin-bottom: 12px; display: block; }
+
+  .concept-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .concept-card p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  /* ANALOGY BOX */
+  .analogy {
+    background: rgba(57,211,83,0.05);
+    border: 1px solid rgba(57,211,83,0.15);
+    border-left: 3px solid var(--green);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+
+  .analogy-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .analogy p { font-size: 14px; color: var(--text-dim); margin: 0; }
+  .analogy p strong { color: var(--green); }
+
+  /* WARNING / INFO BOX */
+  .info-box {
+    background: rgba(88,166,255,0.05);
+    border: 1px solid rgba(88,166,255,0.2);
+    border-left: 3px solid var(--blue);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+
+  .info-box .info-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--blue);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .info-box p { font-size: 14px; color: var(--text-dim); margin: 0; }
+
+  .warn-box {
+    background: rgba(227,179,65,0.05);
+    border: 1px solid rgba(227,179,65,0.2);
+    border-left: 3px solid var(--yellow);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+
+  .warn-box .warn-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .warn-box p { font-size: 14px; color: var(--text-dim); margin: 0; }
+  .warn-box p strong { color: var(--yellow); }
+
+  /* EXERCISE */
+  .exercise {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 24px;
+    background: var(--bg4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exercise-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .ex-practice { background: rgba(57,211,83,0.12); color: var(--green); border: 1px solid rgba(57,211,83,0.25); }
+  .ex-challenge { background: rgba(247,129,102,0.12); color: var(--orange); border: 1px solid rgba(247,129,102,0.25); }
+  .ex-group { background: rgba(188,140,255,0.12); color: var(--purple); border: 1px solid rgba(188,140,255,0.25); }
+
+  .exercise-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .exercise-time {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .exercise-body { padding: 24px; }
+
+  .exercise-objective {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border-radius: 8px;
+    border-left: 3px solid var(--green-dim);
+  }
+
+  .steps-list {
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .steps-list li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .steps-list li::before {
+    content: counter(step);
+    width: 26px; height: 26px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .steps-list li .step-content {
+    flex: 1;
+  }
+
+  .steps-list li .step-content strong {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .steps-list li .step-content span {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* DIAGRAM */
+  .diagram {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    overflow-x: auto;
+  }
+
+  .diagram pre {
+    color: var(--text-dim);
+    line-height: 2;
+  }
+
+  .diagram .d-green { color: var(--green); }
+  .diagram .d-blue { color: var(--blue); }
+  .diagram .d-orange { color: var(--orange); }
+  .diagram .d-yellow { color: var(--yellow); }
+  .diagram .d-purple { color: var(--purple); }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  .compare-table th {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .compare-table td {
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .compare-table .highlight-cell { color: var(--green); font-weight: 500; }
+
+  /* CHEATSHEET */
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .cheat-item {
+    background: var(--bg3);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .cheat-item:hover { background: var(--bg4); }
+
+  .cheat-cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .cheat-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+    margin: 16px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px; top: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--green);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--green);
+  }
+
+  .timeline-item h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .timeline-item p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  /* SUMMARY BOX */
+  .summary-box {
+    background: linear-gradient(135deg, rgba(57,211,83,0.06) 0%, rgba(88,166,255,0.06) 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin: 32px 0;
+    text-align: center;
+  }
+
+  .summary-box h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .summary-box p {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    padding: 40px;
+    text-align: center;
+    margin-top: 80px;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--green), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .footer p { font-size: 13px; color: var(--text-muted); }
+
+  /* SCROLL ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* INLINE CODE */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--orange);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .hero, .main { padding: 32px 20px; }
+    .progress-nav { padding: 0 20px; }
+    .module h2 { font-size: 22px; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .cheat-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="badge">BIT · Clase práctica</div>
+    <h1>GitHub para<br>Principiantes</h1>
+    <p class="hero-sub">Control de versiones desde cero: entiende Git, domina GitHub y trabaja como un profesional desde el primer día.</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="icon">🕐</span> 2 horas · 4 módulos</div>
+      <div class="meta-item"><span class="icon">🧑‍💻</span> Nivel: Principiante</div>
+      <div class="meta-item"><span class="icon">🛠️</span> 4 ejercicios prácticos</div>
+      <div class="meta-item"><span class="icon">📋</span> Cheatsheet incluida</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="progress-nav">
+  <div class="progress-nav-inner">
+    <a href="#modulo1" class="nav-module m1 active">
+      <span class="nav-num">1</span>
+      Fundamentos
+    </a>
+    <a href="#modulo2" class="nav-module m2">
+      <span class="nav-num">2</span>
+      Primeros comandos
+    </a>
+    <a href="#modulo3" class="nav-module m3">
+      <span class="nav-num">3</span>
+      GitHub remoto
+    </a>
+    <a href="#modulo4" class="nav-module m4">
+      <span class="nav-num">4</span>
+      Ramas y colaboración
+    </a>
+    <a href="#cheatsheet" class="nav-module" style="color: var(--yellow);">
+      <span class="nav-num" style="background: rgba(227,179,65,0.15); color: var(--yellow);">★</span>
+      Cheatsheet
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ═══════════════════════════════════════════════
+       MÓDULO 1: FUNDAMENTOS
+  ════════════════════════════════════════════════ -->
+  <section class="module m1 fade-in" id="modulo1">
+    <div class="module-header">
+      <div class="module-icon">🌱</div>
+      <div class="module-title-block">
+        <div class="module-label">Módulo 1 · 30 min</div>
+        <h2>¿Qué es Git y por qué existe?</h2>
+        <div class="module-time">⏱ 0:00 — 0:30</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>El problema que Git resuelve</h3>
+      <p>Imagina que llevas semanas desarrollando un sitio web. De repente, algo se rompe y no recuerdas qué cambiaste. O peor: dos compañeros editan el mismo archivo y uno sobreescribe el trabajo del otro.</p>
+      <p>Eso es exactamente lo que pasaba antes de que existieran herramientas de control de versiones. La gente hacía esto:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">EL INFIERNO SIN GIT</span>
+        </div>
+        <div class="code-content">
+          <pre>📁 mi-proyecto/
+   ├── <span class="path">index.html</span>
+   ├── <span class="path">index-final.html</span>
+   ├── <span class="path">index-final-v2.html</span>
+   ├── <span class="path">index-final-v2-ESTE.html</span>
+   ├── <span class="path">index-BUENO.html</span>
+   └── <span class="path">index-ESTE-SI-FUNCIONA.html</span>   <span class="comment">← 😱</span></pre>
+        </div>
+      </div>
+
+      <div class="analogy">
+        <div class="analogy-label">💡 Analogía</div>
+        <p>Git es como el <strong>historial de cambios de Google Docs</strong>, pero para cualquier tipo de archivo o proyecto. Guarda una "foto" de tu proyecto cada vez que tú decides, y puedes regresar a cualquier momento en el pasado.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Git vs GitHub — No son lo mismo</h3>
+      <p>Este es el error más común de los principiantes. Son dos cosas distintas:</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>Git</th>
+            <th>GitHub</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>¿Qué es?</td>
+            <td class="highlight-cell">Herramienta de software</td>
+            <td>Plataforma web (empresa)</td>
+          </tr>
+          <tr>
+            <td>¿Dónde vive?</td>
+            <td class="highlight-cell">En tu computadora</td>
+            <td>En internet (la nube)</td>
+          </tr>
+          <tr>
+            <td>¿Creado por?</td>
+            <td class="highlight-cell">Linus Torvalds (2005)</td>
+            <td>Tom Preston-Werner (2008)</td>
+          </tr>
+          <tr>
+            <td>¿Necesita internet?</td>
+            <td class="highlight-cell">No</td>
+            <td>Sí</td>
+          </tr>
+          <tr>
+            <td>¿Costo?</td>
+            <td class="highlight-cell">Gratuito y open source</td>
+            <td>Gratis con planes pagos</td>
+          </tr>
+          <tr>
+            <td>Alternativas</td>
+            <td class="highlight-cell">SVN, Mercurial</td>
+            <td>GitLab, Bitbucket</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="analogy">
+        <div class="analogy-label">💡 Analogía</div>
+        <p><strong>Git</strong> es como Microsoft Word (el programa). <strong>GitHub</strong> es como Google Drive (el lugar donde guardas y compartes tus archivos de Word). Puedes usar Word sin Drive, pero juntos son más poderosos.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Conceptos clave que usarás hoy</h3>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <span class="concept-emoji">📁</span>
+          <h4>Repositorio (repo)</h4>
+          <p>Es la carpeta de tu proyecto con todo su historial de cambios. Puede ser local (en tu PC) o remoto (en GitHub).</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">📸</span>
+          <h4>Commit</h4>
+          <p>Es una "foto" de tu proyecto en un momento dado. Cada commit tiene un mensaje que describe qué cambiaste.</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">🌿</span>
+          <h4>Branch (rama)</h4>
+          <p>Una línea de desarrollo independiente. Puedes trabajar en una nueva función sin afectar el código principal.</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">🔀</span>
+          <h4>Merge</h4>
+          <p>Combinar los cambios de una rama con otra. Es como unir dos versiones del mismo documento.</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">⬆️</span>
+          <h4>Push</h4>
+          <p>Enviar tus commits locales al repositorio remoto (GitHub). "Subir" tu trabajo.</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">⬇️</span>
+          <h4>Pull</h4>
+          <p>Descargar los cambios del repositorio remoto a tu máquina local. "Bajar" el trabajo de otros.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Instalación y configuración inicial</h3>
+      <p>Antes de empezar, verifica si Git ya está instalado en tu computadora:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">TERMINAL / BASH</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Verificar si Git está instalado</span>
+<span class="cmd">git --version</span>
+
+<span class="output"># Respuesta esperada: git version 2.x.x</span></pre>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">📥 Instalación</div>
+        <p>Si no tienes Git instalado: ve a <strong>git-scm.com</strong> → Download → ejecuta el instalador. En Mac usa <code>brew install git</code>. En Ubuntu: <code>sudo apt install git</code></p>
+      </div>
+
+      <p>Ahora configura tu identidad. Git necesita saber quién hace cada commit:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">CONFIGURACIÓN GLOBAL — SOLO SE HACE UNA VEZ</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Tu nombre (aparecerá en cada commit)</span>
+<span class="cmd">git config <span class="flag">--global</span> user.name <span class="string">"Tu Nombre Aquí"</span></span>
+
+<span class="comment"># Tu correo (debe ser el mismo de tu cuenta GitHub)</span>
+<span class="cmd">git config <span class="flag">--global</span> user.email <span class="string">"tucorreo@ejemplo.com"</span></span>
+
+<span class="comment"># Editor por defecto (recomendado: VS Code)</span>
+<span class="cmd">git config <span class="flag">--global</span> core.editor <span class="string">"code --wait"</span></span>
+
+<span class="comment"># Verificar que todo quedó bien</span>
+<span class="cmd">git config <span class="flag">--list</span></span></pre>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <div class="warn-label">⚠️ Importante</div>
+        <p>El correo que configures aquí <strong>debe coincidir exactamente</strong> con el correo de tu cuenta de GitHub. De lo contrario, tus commits no quedarán vinculados a tu perfil.</p>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge ex-practice">⚡ Ejercicio 1</span>
+        <div class="exercise-title">Configura Git en tu máquina</div>
+        <div class="exercise-time">⏱ 5 min</div>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-objective">
+          🎯 <strong>Objetivo:</strong> Instalar Git (si no lo tienes) y configurar tu identidad para que todos tus futuros commits lleven tu nombre.
+        </div>
+        <ol class="steps-list">
+          <li>
+            <div class="step-content">
+              <strong>Abre tu terminal</strong>
+              <span>Windows: busca "Git Bash" o "PowerShell". Mac/Linux: Terminal normal.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Verifica la instalación con <code>git --version</code></strong>
+              <span>Debes ver algo como "git version 2.43.0"</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Configura tu nombre: <code>git config --global user.name "Tu Nombre"</code></strong>
+              <span>Usa tu nombre real tal como aparece en GitHub o como lo quieras ver en los commits.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Configura tu correo: <code>git config --global user.email "correo@..."</code></strong>
+              <span>Usa el mismo correo de tu cuenta de GitHub.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Verifica con <code>git config --list</code></strong>
+              <span>Confirma que aparece tu nombre y correo correctamente.</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       MÓDULO 2: PRIMEROS COMANDOS
+  ════════════════════════════════════════════════ -->
+  <section class="module m2 fade-in" id="modulo2">
+    <div class="module-header">
+      <div class="module-icon">⌨️</div>
+      <div class="module-title-block">
+        <div class="module-label">Módulo 2 · 30 min</div>
+        <h2>Tu primer repositorio local</h2>
+        <div class="module-time">⏱ 0:30 — 1:00</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>El flujo básico de Git</h3>
+      <p>Antes de ver comandos, entiende el flujo. En Git hay tres "zonas" donde viven tus archivos:</p>
+
+      <div class="diagram">
+        <pre>
+  <span class="d-orange">WORKING DIRECTORY</span>       <span class="d-yellow">STAGING AREA</span>          <span class="d-green">REPOSITORIO (commits)</span>
+  ┌─────────────────┐     ┌──────────────────┐    ┌──────────────────────┐
+  │                 │     │                  │    │                      │
+  │  Archivos que   │────▶│  Archivos listos │───▶│  Historial de commits│
+  │  estás editando │     │  para el commit  │    │  (permanente)        │
+  │                 │     │                  │    │                      │
+  └─────────────────┘     └──────────────────┘    └──────────────────────┘
+         ↑                      ↑                          ↑
+    <span class="d-orange">Donde trabajas</span>        <span class="d-yellow">git add</span>                <span class="d-green">git commit</span>
+        </pre>
+      </div>
+
+      <div class="analogy">
+        <div class="analogy-label">💡 Analogía del supermercado</div>
+        <p>Piensa en hacer mercado: el <strong>Working Directory</strong> es tu carrito (donde vas echando cosas), el <strong>Staging Area</strong> es la banda transportadora (los artículos que decidiste comprar), y el <strong>commit</strong> es el tiquete de compra (el registro permanente de lo que llevaste).</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Comandos fundamentales</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">INICIALIZAR UN REPOSITORIO</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># 1. Crear una carpeta nueva y entrar en ella</span>
+<span class="cmd">mkdir mi-primer-repo</span>
+<span class="cmd">cd mi-primer-repo</span>
+
+<span class="comment"># 2. Inicializar Git en esa carpeta</span>
+<span class="cmd">git init</span>
+
+<span class="output"># Respuesta: Initialized empty Git repository in .../mi-primer-repo/.git/</span>
+
+<span class="comment"># Ahora existe una carpeta oculta .git — ¡ahí vive toda la magia!</span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">VER EL ESTADO DEL REPOSITORIO</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Este comando es tu mejor amigo — úsalo TODO el tiempo</span>
+<span class="cmd">git status</span>
+
+<span class="output"># Sin archivos:
+# On branch main
+# No commits yet
+# nothing to commit</span>
+
+<span class="comment"># Después de crear un archivo:</span>
+<span class="output"># Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#         index.html</span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">AÑADIR ARCHIVOS AL STAGING AREA</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Añadir un archivo específico</span>
+<span class="cmd">git add <span class="path">index.html</span></span>
+
+<span class="comment"># Añadir múltiples archivos</span>
+<span class="cmd">git add <span class="path">index.html</span> <span class="path">style.css</span></span>
+
+<span class="comment"># Añadir TODOS los archivos modificados (el más común)</span>
+<span class="cmd">git add .</span>
+
+<span class="comment"># Verificar qué quedó en staging</span>
+<span class="cmd">git status</span>
+<span class="output"># Changes to be committed:
+#       new file: index.html</span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">HACER UN COMMIT</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Commit con mensaje (forma más común)</span>
+<span class="cmd">git commit <span class="flag">-m</span> <span class="string">"Agrega estructura inicial del HTML"</span></span>
+
+<span class="output"># [main (root-commit) a1b2c3d] Agrega estructura inicial del HTML
+#  1 file changed, 12 insertions(+)</span>
+
+<span class="comment"># Añadir al staging Y hacer commit en un solo paso (solo archivos ya tracked)</span>
+<span class="cmd">git commit <span class="flag">-am</span> <span class="string">"Actualiza el título de la página"</span></span></pre>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <div class="warn-label">💬 Buenos mensajes de commit</div>
+        <p>Un buen mensaje describe <strong>QUÉ cambiaste y POR QUÉ</strong>, no el cómo. ✅ <code>"Corrige error de validación en formulario de contacto"</code> — ❌ <code>"cambios"</code>, <code>"fix"</code>, <code>"asdfg"</code></p>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">VER EL HISTORIAL DE COMMITS</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Ver historial completo</span>
+<span class="cmd">git log</span>
+
+<span class="comment"># Vista resumida (la más usada en el día a día)</span>
+<span class="cmd">git log <span class="flag">--oneline</span></span>
+<span class="output"># a1b2c3d Agrega estilos de la página principal
+# 9f8e7d6 Corrige error en el formulario
+# 3c2b1a0 Agrega estructura inicial del HTML</span>
+
+<span class="comment"># Ver con gráfico de ramas</span>
+<span class="cmd">git log <span class="flag">--oneline --graph --all</span></span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">VER DIFERENCIAS ENTRE VERSIONES</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Ver qué cambié en archivos no añadidos aún</span>
+<span class="cmd">git diff</span>
+
+<span class="comment"># Ver qué hay en staging (lo que va en el próximo commit)</span>
+<span class="cmd">git diff <span class="flag">--staged</span></span>
+
+<span class="comment"># Comparar dos commits específicos</span>
+<span class="cmd">git diff <span class="path">a1b2c3d</span> <span class="path">9f8e7d6</span></span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Deshacer cambios — No entres en pánico</h3>
+      <p>Una de las grandes ventajas de Git es que casi siempre puedes deshacer errores:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">DESHACER CAMBIOS</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Quitar un archivo del staging (sin perder los cambios)</span>
+<span class="cmd">git restore <span class="flag">--staged</span> <span class="path">index.html</span></span>
+
+<span class="comment"># Descartar cambios en un archivo (vuelve al último commit)</span>
+<span class="cmd">git restore <span class="path">index.html</span></span>
+
+<span class="comment"># Deshacer el último commit (mantiene los cambios en staging)</span>
+<span class="cmd">git reset <span class="flag">--soft</span> HEAD~1</span>
+
+<span class="comment"># Corregir el mensaje del último commit</span>
+<span class="cmd">git commit <span class="flag">--amend -m</span> <span class="string">"Mensaje corregido"</span></span></pre>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">🔒 Regla de oro</div>
+        <p>Nunca uses <code>git reset --hard</code> si no sabes exactamente qué hace. Es el comando más peligroso para principiantes porque elimina cambios de forma permanente. Cuando tengas dudas, usa <code>git status</code> para entender dónde estás.</p>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge ex-practice">⚡ Ejercicio 2</span>
+        <div class="exercise-title">Tu primera sesión de Git local</div>
+        <div class="exercise-time">⏱ 15 min</div>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-objective">
+          🎯 <strong>Objetivo:</strong> Crear un repositorio local, hacer al menos 3 commits y practicar el ciclo completo: editar → add → commit → log.
+        </div>
+        <ol class="steps-list">
+          <li>
+            <div class="step-content">
+              <strong>Crea la carpeta y entra en ella</strong>
+              <span><code>mkdir mi-sitio-web</code> y luego <code>cd mi-sitio-web</code></span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Inicializa el repositorio con <code>git init</code></strong>
+              <span>Verifica que aparezca el mensaje de inicialización.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Crea un archivo <code>index.html</code> con estructura básica</strong>
+              <span>Puedes abrirlo con VS Code: <code>code index.html</code>. Escribe un HTML simple con un título y un párrafo.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Haz <code>git status</code> — ¿qué ves?</strong>
+              <span>Debes ver <code>index.html</code> en rojo como "untracked file".</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Añade el archivo: <code>git add index.html</code> y confirma con <code>git status</code></strong>
+              <span>Ahora debería aparecer en verde como "new file".</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Haz tu primer commit: <code>git commit -m "Crea página principal con estructura HTML"</code></strong>
+              <span>¡Felicitaciones! Acabas de hacer tu primer commit. 🎉</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Modifica el archivo, añade un CSS, haz 2 commits más</strong>
+              <span>Practica el ciclo completo. Verifica el historial con <code>git log --oneline</code>.</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       MÓDULO 3: GITHUB REMOTO
+  ════════════════════════════════════════════════ -->
+  <section class="module m3 fade-in" id="modulo3">
+    <div class="module-header">
+      <div class="module-icon">☁️</div>
+      <div class="module-title-block">
+        <div class="module-label">Módulo 3 · 30 min</div>
+        <h2>Conectando con GitHub</h2>
+        <div class="module-time">⏱ 1:00 — 1:30</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Crear tu cuenta en GitHub</h3>
+      <p>Si aún no tienes cuenta, ve a <strong>github.com</strong> y regístrate. Elige un nombre de usuario profesional — ese nombre aparecerá en tus proyectos y en tu perfil público.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <span class="concept-emoji">🏠</span>
+          <h4>Perfil público</h4>
+          <p>Tu GitHub es como tu portafolio profesional. Los empleadores lo revisan. Cuídalo.</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">⭐</span>
+          <h4>Stars y forks</h4>
+          <p>Puedes "marcar" repos que te gustan con estrella, o "forkearlos" para hacer tu propia copia.</p>
+        </div>
+        <div class="concept-card">
+          <span class="concept-emoji">🔍</span>
+          <h4>Explorar repos</h4>
+          <p>GitHub tiene millones de proyectos open source. Todo lo que usas tiene código aquí.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Crear un repositorio en GitHub</h3>
+      <p>Ahora vamos a crear el repositorio remoto en GitHub para subir tu proyecto local:</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>1. Click en el botón "+" → "New repository"</h4>
+          <p>Está en la esquina superior derecha de GitHub.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>2. Dale un nombre al repositorio</h4>
+          <p>Usa el mismo nombre de tu carpeta local. Sin espacios, sin tildes. Ejemplo: <code>mi-sitio-web</code></p>
+        </div>
+        <div class="timeline-item">
+          <h4>3. Elige Public o Private</h4>
+          <p><strong>Public:</strong> cualquiera puede verlo. <strong>Private:</strong> solo tú y colaboradores que invites.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>4. NO marques "Initialize this repository"</h4>
+          <p>Porque ya tienes commits locales. Si lo inicializas en GitHub también, habrá conflicto.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>5. Click en "Create repository"</h4>
+          <p>GitHub te mostrará instrucciones. ¡Ya tienes tu repositorio remoto!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Conectar tu repo local con GitHub</h3>
+      <p>GitHub te dará comandos exactos al crear el repo. Así es como funciona:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">CONECTAR Y SUBIR POR PRIMERA VEZ</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># 1. Agregar el remoto (tu repo de GitHub como destino)</span>
+<span class="cmd">git remote add origin https://github.com/tu-usuario/mi-sitio-web.git</span>
+
+<span class="comment"># 2. Verificar que quedó bien</span>
+<span class="cmd">git remote <span class="flag">-v</span></span>
+<span class="output"># origin  https://github.com/tu-usuario/mi-sitio-web.git (fetch)
+# origin  https://github.com/tu-usuario/mi-sitio-web.git (push)</span>
+
+<span class="comment"># 3. Subir tu código por primera vez</span>
+<span class="cmd">git push <span class="flag">-u</span> origin main</span>
+
+<span class="output"># Enumerating objects: 6, done.
+# Writing objects: 100% (6/6), 1.23 KiB | 1.23 MiB/s, done.
+# To https://github.com/tu-usuario/mi-sitio-web.git
+#  * [new branch]      main -> main</span></pre>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">🔑 Autenticación</div>
+        <p>La primera vez que hagas push, GitHub puede pedirte autenticarte. La forma moderna es usar un <strong>Personal Access Token (PAT)</strong>: ve a Settings → Developer Settings → Personal Access Tokens → Generate new token. Úsalo como contraseña cuando te lo pida.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Flujo diario con GitHub</h3>
+      <p>Una vez conectado, tu flujo de trabajo diario será este:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">FLUJO DE TRABAJO DIARIO</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Al inicio del día: bajar cambios del equipo</span>
+<span class="cmd">git pull origin main</span>
+
+<span class="comment"># ... trabajas, editas archivos ...</span>
+
+<span class="comment"># Ver qué cambiaste</span>
+<span class="cmd">git status</span>
+
+<span class="comment"># Añadir cambios</span>
+<span class="cmd">git add .</span>
+
+<span class="comment"># Guardar con descripción</span>
+<span class="cmd">git commit <span class="flag">-m</span> <span class="string">"Implementa sección de contacto con validación"</span></span>
+
+<span class="comment"># Subir a GitHub</span>
+<span class="cmd">git push origin main</span>
+
+<span class="comment"># ¡Listo! Tu trabajo está en la nube 🚀</span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">CLONAR UN REPOSITORIO EXISTENTE</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Clonar un proyecto de GitHub a tu PC (crea la carpeta automáticamente)</span>
+<span class="cmd">git clone https://github.com/usuario/nombre-repo.git</span>
+
+<span class="comment"># Entrar a la carpeta clonada</span>
+<span class="cmd">cd nombre-repo</span>
+
+<span class="comment"># Ya tienes todo: archivos + historial completo</span>
+<span class="cmd">git log <span class="flag">--oneline</span></span></pre>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <pre>
+  <span class="d-blue">TU PC (LOCAL)</span>                             <span class="d-green">GITHUB (REMOTO)</span>
+
+  ┌────────────────────┐                    ┌────────────────────┐
+  │                    │   git push ──────▶ │                    │
+  │   Working Dir      │                    │   Repositorio      │
+  │   + Commits        │   ◀────── git pull │   Remoto           │
+  │                    │                    │   (origin)         │
+  └────────────────────┘                    └────────────────────┘
+                                                     │
+                              git clone ─────────────┘
+                              (para empezar desde cero en otra PC)
+        </pre>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge ex-practice">⚡ Ejercicio 3</span>
+        <div class="exercise-title">Sube tu proyecto a GitHub</div>
+        <div class="exercise-time">⏱ 15 min</div>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-objective">
+          🎯 <strong>Objetivo:</strong> Crear un repositorio en GitHub y subir el proyecto del ejercicio anterior. Al finalizar, debes poder compartir la URL de tu repo con el profesor.
+        </div>
+        <ol class="steps-list">
+          <li>
+            <div class="step-content">
+              <strong>Ve a github.com y crea un nuevo repositorio público llamado "mi-sitio-web"</strong>
+              <span>NO marques "Initialize this repository with a README".</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Copia la URL del repo (termina en .git)</strong>
+              <span>Ej: <code>https://github.com/tuusuario/mi-sitio-web.git</code></span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>En tu terminal (dentro del repo): <code>git remote add origin URL_COPIADA</code></strong>
+              <span>Reemplaza URL_COPIADA con la URL real de tu repositorio.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Sube con <code>git push -u origin main</code></strong>
+              <span>Puede pedirte autenticar. Usa tu token o credenciales de GitHub.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Recarga la página de tu repo en GitHub</strong>
+              <span>¡Debes ver tus archivos ahí! Comparte la URL con tu compañero de mesa y clona el suyo.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Clona el repo de tu compañero: <code>git clone URL_COMPAÑERO</code></strong>
+              <span>Explora su código. ¿Ves el historial de commits con <code>git log --oneline</code>?</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       MÓDULO 4: RAMAS Y COLABORACIÓN
+  ════════════════════════════════════════════════ -->
+  <section class="module m4 fade-in" id="modulo4">
+    <div class="module-header">
+      <div class="module-icon">🌿</div>
+      <div class="module-title-block">
+        <div class="module-label">Módulo 4 · 30 min</div>
+        <h2>Ramas y Pull Requests</h2>
+        <div class="module-time">⏱ 1:30 — 2:00</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>¿Por qué usar ramas?</h3>
+      <p>Imagina que tu sitio web ya está en producción y funciona perfecto. Tu jefe te pide agregar una nueva sección. No quieres tocar el código que ya funciona mientras experimentas. Para eso existen las ramas.</p>
+
+      <div class="analogy">
+        <div class="analogy-label">💡 Analogía</div>
+        <p>Las ramas son como <strong>universos paralelos</strong> de tu proyecto. En el universo principal (<code>main</code>) todo funciona. En tu rama nueva (<code>feature/nueva-seccion</code>) puedes experimentar sin miedo. Cuando termines y todo esté bien, "fusionas" (merge) esos universos.</p>
+      </div>
+
+      <div class="diagram">
+        <pre>
+                                          <span class="d-purple">feature/nueva-seccion</span>
+                                         ●─────●─────●
+                                        /               \
+  <span class="d-green">main</span>   ●─────●─────●─────────────────●─────────────────●  ◀ merge
+               C1    C2    C3           C4              C7
+                                (branching point)   (merge commit)
+        </pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Comandos para trabajar con ramas</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">CREAR Y CAMBIAR DE RAMA</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Ver en qué rama estás y qué ramas existen</span>
+<span class="cmd">git branch</span>
+<span class="output"># * main      ← el asterisco indica la rama actual</span>
+
+<span class="comment"># Crear una rama nueva</span>
+<span class="cmd">git branch <span class="path">feature/nueva-seccion</span></span>
+
+<span class="comment"># Cambiar a esa rama</span>
+<span class="cmd">git checkout <span class="path">feature/nueva-seccion</span></span>
+
+<span class="comment"># Forma moderna: crear Y cambiar en un solo comando</span>
+<span class="cmd">git checkout <span class="flag">-b</span> <span class="path">feature/nueva-seccion</span></span>
+<span class="comment"># O también:</span>
+<span class="cmd">git switch <span class="flag">-c</span> <span class="path">feature/nueva-seccion</span></span>
+
+<span class="comment"># Volver a main</span>
+<span class="cmd">git checkout main</span>
+<span class="comment"># O también:</span>
+<span class="cmd">git switch main</span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">FUSIONAR RAMAS (MERGE)</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Primero vuelve a la rama destino (normalmente main)</span>
+<span class="cmd">git checkout main</span>
+
+<span class="comment"># Fusionar la rama de la feature con main</span>
+<span class="cmd">git merge <span class="path">feature/nueva-seccion</span></span>
+
+<span class="output"># Updating a1b2c3d..9f8e7d6
+# Fast-forward
+#  nueva-seccion.html | 15 +++++++++++++
+#  1 file changed, 15 insertions(+)</span>
+
+<span class="comment"># Eliminar la rama (ya no la necesitas)</span>
+<span class="cmd">git branch <span class="flag">-d</span> <span class="path">feature/nueva-seccion</span></span></pre>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">SUBIR UNA RAMA A GITHUB</span>
+          <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Subir la rama a GitHub (para que tu equipo la vea)</span>
+<span class="cmd">git push origin <span class="path">feature/nueva-seccion</span></span>
+
+<span class="comment"># Ver todas las ramas (locales y remotas)</span>
+<span class="cmd">git branch <span class="flag">-a</span></span>
+<span class="output"># * feature/nueva-seccion
+#   main
+#   remotes/origin/feature/nueva-seccion
+#   remotes/origin/main</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Pull Requests — La forma profesional de trabajar</h3>
+      <p>Un <strong>Pull Request (PR)</strong> es una solicitud para que alguien revise tu código antes de fusionarlo con la rama principal. Es la base del trabajo en equipo moderno.</p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>1. Creas una rama y trabajas en tu feature</h4>
+          <p><code>git checkout -b feature/mi-nueva-funcion</code> → haces commits.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>2. Subes la rama a GitHub</h4>
+          <p><code>git push origin feature/mi-nueva-funcion</code></p>
+        </div>
+        <div class="timeline-item">
+          <h4>3. Abres el Pull Request en GitHub</h4>
+          <p>GitHub te muestra un botón "Compare & pull request". Escribes una descripción de qué cambiaste y por qué.</p>
+        </div>
+        <div class="timeline-item">
+          <h4>4. Tu equipo revisa el código</h4>
+          <p>Pueden dejar comentarios, pedir cambios, o aprobar. Es la "revisión de código" (code review).</p>
+        </div>
+        <div class="timeline-item">
+          <h4>5. Se hace el merge</h4>
+          <p>El responsable del proyecto acepta el PR. Tu código queda en <code>main</code>. La rama se puede eliminar.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">🏆 Buenas prácticas de PR</div>
+        <p>Un buen PR tiene: título claro, descripción de qué se hizo y por qué, capturas de pantalla si hay cambios visuales, y es pequeño (1 PR = 1 tarea). Los PRs gigantes son difíciles de revisar y son una mala práctica.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Conflictos de merge — ¿Qué hacer?</h3>
+      <p>Un conflicto ocurre cuando dos personas modificaron la misma línea del mismo archivo. Git no sabe con cuál versión quedarse y te pide que decidas:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">CÓMO SE VE UN CONFLICTO</span>
+        </div>
+        <div class="code-content">
+          <pre><span class="comment"># Cuando hay conflicto, Git modifica el archivo así:</span>
+
+<span class="output">&lt;h1&gt;Mi Página Web&lt;/h1&gt;
+
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+<span class="string">&lt;p&gt;Versión que tienes TÚ en tu rama&lt;/p&gt;</span>
+<span class="output">=======</span>
+<span class="path">&lt;p&gt;Versión del COMPAÑERO que quiere entrar&lt;/p&gt;</span>
+<span class="output">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/rama-compañero</span>
+
+<span class="comment"># Debes editar el archivo manualmente, elegir qué queda y eliminar
+# las marcas &lt;&lt;&lt;&lt;&lt;&lt;&lt;, =======, &gt;&gt;&gt;&gt;&gt;&gt;&gt;
+# Luego:
+git add index.html
+git commit -m "Resuelve conflicto en index.html"</span></pre>
+        </div>
+      </div>
+
+      <div class="analogy">
+        <div class="analogy-label">💡 No entres en pánico</div>
+        <p>Los conflictos son <strong>normales</strong> en trabajo en equipo. No los rompiste. Git solo necesita que <strong>tú decidas</strong> cuál versión es la correcta. VS Code tiene una interfaz visual muy buena para resolverlos.</p>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <span class="exercise-badge ex-group">👥 Ejercicio 4 — En parejas</span>
+        <div class="exercise-title">Flujo completo con Pull Request</div>
+        <div class="exercise-time">⏱ 20 min</div>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-objective">
+          🎯 <strong>Objetivo:</strong> Simular el flujo real de trabajo en equipo: uno es el "owner" del repo y el otro hace un PR con una mejora.
+        </div>
+        <ol class="steps-list">
+          <li>
+            <div class="step-content">
+              <strong>Persona A: en GitHub, ve a Settings → Collaborators y añade a Persona B</strong>
+              <span>Comparte el repositorio del ejercicio anterior con tu compañero.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona B: acepta la invitación y clona el repo de A</strong>
+              <span><code>git clone URL_DEL_REPO_DE_A</code></span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona B: crea una rama nueva</strong>
+              <span><code>git checkout -b feature/mejora-estilos</code></span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona B: modifica el CSS o añade contenido nuevo. Hace commit</strong>
+              <span><code>git add .</code> → <code>git commit -m "Mejora los estilos del header"</code></span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona B: sube la rama: <code>git push origin feature/mejora-estilos</code></strong>
+              <span>GitHub mostrará un banner "Compare & pull request". Haz click.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona B: abre el Pull Request con descripción</strong>
+              <span>Describe qué cambiaste. Asigna la revisión a Persona A.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona A: revisa el código en GitHub y aprueba / comenta</strong>
+              <span>Ve a la pestaña "Files changed" y deja al menos un comentario.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-content">
+              <strong>Persona A: hace el merge del PR</strong>
+              <span>Click en "Merge pull request" → "Confirm merge". ¡Listo! El código de B está en main.</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       CHEATSHEET
+  ════════════════════════════════════════════════ -->
+  <section id="cheatsheet" class="fade-in" style="margin-bottom: 72px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <div style="display: inline-block; background: rgba(227,179,65,0.1); border: 1px solid rgba(227,179,65,0.3); color: var(--yellow); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; margin-bottom: 16px;">★ Referencia rápida</div>
+      <h2 style="font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px;">Cheatsheet de Git</h2>
+      <p style="color: var(--text-dim); font-size: 15px;">Todos los comandos que necesitas. Guárdala para siempre.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">📋 Configuración</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git config --global user.name "Nombre"</div><div class="cheat-desc">Configura tu nombre</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git config --global user.email "mail"</div><div class="cheat-desc">Configura tu correo</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git config --list</div><div class="cheat-desc">Ver toda la configuración</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">🚀 Inicio de proyecto</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git init</div><div class="cheat-desc">Inicializar repo local</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git clone URL</div><div class="cheat-desc">Clonar repo existente</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git remote add origin URL</div><div class="cheat-desc">Conectar con GitHub</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git remote -v</div><div class="cheat-desc">Ver remotos configurados</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">📸 Guardar cambios</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git status</div><div class="cheat-desc">Ver estado del repo</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git add .</div><div class="cheat-desc">Añadir todos los cambios</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git add archivo.html</div><div class="cheat-desc">Añadir un archivo específico</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git commit -m "mensaje"</div><div class="cheat-desc">Crear un commit</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git commit -am "mensaje"</div><div class="cheat-desc">Add + commit (solo tracked)</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git diff</div><div class="cheat-desc">Ver cambios no staged</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git diff --staged</div><div class="cheat-desc">Ver cambios en staging</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">📜 Historial</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git log</div><div class="cheat-desc">Ver historial completo</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git log --oneline</div><div class="cheat-desc">Historial resumido</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git log --oneline --graph --all</div><div class="cheat-desc">Historial con ramas visual</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git show HASH</div><div class="cheat-desc">Ver detalles de un commit</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">☁️ Sincronización con GitHub</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git push origin main</div><div class="cheat-desc">Subir cambios a GitHub</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git push -u origin main</div><div class="cheat-desc">Primera subida + tracking</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git pull origin main</div><div class="cheat-desc">Bajar cambios de GitHub</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git fetch origin</div><div class="cheat-desc">Ver cambios sin aplicar</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">🌿 Ramas</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git branch</div><div class="cheat-desc">Ver ramas locales</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git branch -a</div><div class="cheat-desc">Ver todas las ramas</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git checkout -b nueva-rama</div><div class="cheat-desc">Crear y cambiar de rama</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git checkout main</div><div class="cheat-desc">Cambiar a rama main</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git merge feature/rama</div><div class="cheat-desc">Fusionar rama con actual</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git branch -d rama</div><div class="cheat-desc">Eliminar rama local</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git push origin --delete rama</div><div class="cheat-desc">Eliminar rama remota</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">↩️ Deshacer</h3>
+      <div class="cheat-grid">
+        <div class="cheat-item"><div class="cheat-cmd">git restore archivo</div><div class="cheat-desc">Descartar cambios locales</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git restore --staged archivo</div><div class="cheat-desc">Quitar del staging</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git reset --soft HEAD~1</div><div class="cheat-desc">Deshacer último commit (guarda cambios)</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git commit --amend -m "msg"</div><div class="cheat-desc">Editar último commit</div></div>
+        <div class="cheat-item"><div class="cheat-cmd">git revert HASH</div><div class="cheat-desc">Revertir commit con nuevo commit</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESUMEN FINAL -->
+  <div class="summary-box fade-in">
+    <div style="font-size: 40px; margin-bottom: 16px;">🎉</div>
+    <h3>¡Clase completada!</h3>
+    <p style="margin-bottom: 16px;">Hoy aprendiste los fundamentos de Git y GitHub que usan los desarrolladores profesionales. Sigue practicando: la única forma de dominar Git es usarlo en proyectos reales.</p>
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-top: 20px;">
+      <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; font-size: 13px; color: var(--text-dim);">
+        📖 <strong style="color: var(--text);">Próximo paso:</strong> Explora GitHub Pages para publicar tu sitio gratis
+      </div>
+      <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; font-size: 13px; color: var(--text-dim);">
+        🎮 <strong style="color: var(--text);">Practica:</strong> learngitbranching.js.org
+      </div>
+      <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; font-size: 13px; color: var(--text-dim);">
+        📚 <strong style="color: var(--text);">Docs oficiales:</strong> docs.github.com
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-logo">BIT · Clase de Git y GitHub</div>
+  <p style="margin-top: 6px;">Material de clase — Nivel principiante · 2 horas</p>
+</footer>
+
+<script>
+  // COPY CODE
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ copiado';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'copiar';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // FADE IN ON SCROLL
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // ACTIVE NAV
+  const modules = document.querySelectorAll('.module, #cheatsheet');
+  const navLinks = document.querySelectorAll('.nav-module');
+
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const id = e.target.id;
+        const active = document.querySelector(`.nav-module[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  modules.forEach(m => navObserver.observe(m));
+</script>
+</body>
+</html>

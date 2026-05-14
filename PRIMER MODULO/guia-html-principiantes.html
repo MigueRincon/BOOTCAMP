@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía HTML para Principiantes · BIT</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Bricolage+Grotesque:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════ */
+:root {
+  --ink:     #1a110a;
+  --ink2:    #3d2c22;
+  --paper:   #faf6f0;
+  --paper2:  #f2ece2;
+  --paper3:  #e8dece;
+  --amber:   #e07c28;
+  --amber2:  #f5a623;
+  --teal:    #1a7a6e;
+  --teal2:   #24a898;
+  --red:     #c0392b;
+  --blue:    #2563a8;
+  --green:   #2d7a45;
+  --muted:   #8a7060;
+  --border:  #d9cfc4;
+  --code-bg: #1c1410;
+  --code-fg: #f0e6d8;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ── LAYOUT ────────────────────────────── */
+.page-wrap {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+#sidebar {
+  width: 270px;
+  flex-shrink: 0;
+  background: var(--ink);
+  color: #e8dece;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 2rem 0 4rem;
+  display: flex;
+  flex-direction: column;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: #3d2c22; }
+
+.sb-brand {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid #2e1e14;
+}
+.sb-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  color: var(--amber);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: .3rem;
+}
+.sb-title {
+  font-family: 'Lora', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #faf6f0;
+  line-height: 1.3;
+}
+
+.sb-nav { padding: 1rem 0; flex: 1; }
+.sb-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: #5a3e30;
+  padding: 1rem 1.5rem .4rem;
+}
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .45rem 1.5rem;
+  color: #a89080;
+  text-decoration: none;
+  font-size: .82rem;
+  transition: all .2s;
+  border-left: 2px solid transparent;
+}
+.sb-link:hover, .sb-link.active {
+  color: var(--amber2);
+  border-left-color: var(--amber);
+  background: rgba(224,124,40,.06);
+}
+.sb-link .icon { font-size: .95rem; }
+
+.sb-progress {
+  padding: 1rem 1.5rem 0;
+  border-top: 1px solid #2e1e14;
+  margin-top: auto;
+}
+.sb-prog-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  color: #5a3e30;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: .4rem;
+}
+.prog-bar { height: 4px; background: #2e1e14; border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width .5s; width: 0%; }
+.prog-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+  color: var(--amber);
+  margin-top: .3rem;
+}
+
+/* MAIN CONTENT */
+#main {
+  flex: 1;
+  max-width: 860px;
+  padding: 0 3.5rem 8rem;
+  min-width: 0;
+}
+
+/* ── HERO ──────────────────────────────── */
+.hero {
+  padding: 4rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4rem;
+}
+.hero-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: .8rem;
+}
+.hero h1 {
+  font-family: 'Lora', serif;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--amber);
+}
+.hero-desc {
+  font-size: 1.05rem;
+  color: var(--ink2);
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.hero-tags { display: flex; gap: .5rem; flex-wrap: wrap; }
+.hero-tag {
+  background: var(--paper2);
+  border: 1px solid var(--border);
+  padding: .3rem .75rem;
+  border-radius: 9999px;
+  font-size: .78rem;
+  color: var(--ink2);
+}
+
+/* ── SECTIONS ──────────────────────────── */
+.section {
+  margin-bottom: 5rem;
+  scroll-margin-top: 2rem;
+}
+.section-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  color: var(--amber);
+  margin-bottom: .5rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.section-kicker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  max-width: 200px;
+}
+h2 {
+  font-family: 'Lora', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink);
+  margin-bottom: .5rem;
+}
+p { color: var(--ink2); margin-bottom: 1rem; }
+
+/* ── ANALOGY BOX ───────────────────────── */
+.analogy {
+  background: linear-gradient(135deg, #fff8ee, #fff3e0);
+  border: 1px solid #f0d8a8;
+  border-left: 4px solid var(--amber);
+  border-radius: 0 12px 12px 0;
+  padding: 1.1rem 1.4rem;
+  margin: 1.5rem 0;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.analogy-icon { font-size: 1.6rem; flex-shrink: 0; }
+.analogy-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--amber);
+  margin-bottom: .25rem;
+}
+.analogy p { margin: 0; font-size: .92rem; }
+
+/* ── TIP / WARNING / INFO ──────────────── */
+.callout {
+  border-radius: 10px;
+  padding: .9rem 1.2rem;
+  margin: 1.2rem 0;
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  font-size: .88rem;
+}
+.callout p { margin: 0; }
+.tip   { background: #edf7f0; border: 1px solid #b7e0c4; }
+.warn  { background: #fff8e6; border: 1px solid #fad98a; }
+.info  { background: #eaf3fd; border: 1px solid #a8cdf5; }
+.tip-icon, .warn-icon, .info-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+
+/* ── CODE BLOCKS ───────────────────────── */
+.code-wrap {
+  background: var(--code-bg);
+  border-radius: 12px;
+  margin: 1.2rem 0;
+  overflow: hidden;
+  border: 1px solid #3d2010;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .55rem 1rem;
+  background: #120d08;
+  border-bottom: 1px solid #2a1808;
+}
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--amber);
+}
+.copy-btn {
+  background: rgba(224,124,40,.12);
+  border: 1px solid rgba(224,124,40,.25);
+  color: var(--amber2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+  padding: .2rem .6rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.copy-btn:hover { background: rgba(224,124,40,.22); }
+pre {
+  padding: 1.1rem 1.2rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem;
+  line-height: 1.9;
+  color: var(--code-fg);
+}
+pre::-webkit-scrollbar { height: 4px; }
+pre::-webkit-scrollbar-thumb { background: #3d2010; }
+
+.ht { color: #f5a623; }   /* html tag */
+.at { color: #7ec8d8; }   /* attribute */
+.vl { color: #98e08a; }   /* value */
+.cm { color: #6a4a38; font-style:italic; }  /* comment */
+.tx { color: var(--code-fg); }  /* text */
+.sel { color: #f5a623; }  /* css selector */
+.prop { color: #7ec8d8; } /* css property */
+.val { color: #98e08a; }  /* css value */
+.kw { color: #c792ea; }   /* js keyword */
+.fn { color: #82aaff; }   /* js function */
+.str { color: #c3e88d; }  /* js string */
+
+/* ── LIVE PREVIEW ──────────────────────── */
+.live-wrap {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+.live-header {
+  background: var(--paper2);
+  border-bottom: 1px solid var(--border);
+  padding: .55rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.live-dots { display: flex; gap: .35rem; }
+.live-dot { width: 10px; height: 10px; border-radius: 50%; }
+.live-body { display: grid; grid-template-columns: 1fr 1fr; }
+.live-editor {
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.live-editor textarea {
+  width: 100%;
+  min-height: 180px;
+  background: #120d08;
+  color: var(--code-fg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .78rem;
+  line-height: 1.8;
+  padding: 1rem;
+  border: none;
+  resize: vertical;
+  outline: none;
+}
+.live-preview-frame {
+  background: white;
+  padding: 1rem;
+  min-height: 180px;
+  overflow: auto;
+  font-family: serif;
+  font-size: 14px;
+}
+.live-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+/* ── TAG CARDS ─────────────────────────── */
+.tag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: .85rem;
+  margin: 1.5rem 0;
+}
+.tag-card {
+  background: var(--paper2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .9rem 1rem;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+.tag-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--border);
+  transition: background .2s;
+}
+.tag-card:hover { border-color: var(--amber); transform: translateY(-2px); }
+.tag-card:hover::before { background: var(--amber); }
+.tag-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--amber);
+  margin-bottom: .25rem;
+}
+.tag-desc { font-size: .8rem; color: var(--muted); margin: 0; }
+.tag-example {
+  display: none;
+  margin-top: .6rem;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: .5rem .7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  color: var(--code-fg);
+  line-height: 1.6;
+}
+.tag-card.open .tag-example { display: block; }
+
+/* ── TOOL CARDS ────────────────────────── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.tool-card {
+  background: var(--paper2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  transition: all .2s;
+  text-decoration: none;
+  display: block;
+}
+.tool-card:hover { border-color: var(--teal); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(26,122,110,.1); }
+.tool-emoji { font-size: 1.8rem; margin-bottom: .5rem; }
+.tool-name { font-weight: 700; font-size: .95rem; color: var(--ink); margin-bottom: .2rem; }
+.tool-cat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--teal);
+  margin-bottom: .4rem;
+}
+.tool-desc { font-size: .82rem; color: var(--muted); margin: 0; line-height: 1.5; }
+.tool-badge {
+  display: inline-block;
+  background: #edf7f0;
+  border: 1px solid #b7e0c4;
+  color: var(--green);
+  font-size: .6rem;
+  padding: .1rem .5rem;
+  border-radius: 9999px;
+  margin-top: .5rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── QUIZ ──────────────────────────────── */
+.quiz {
+  background: var(--paper2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.3rem 1.5rem;
+  margin: 2rem 0;
+}
+.quiz-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: var(--amber);
+  margin-bottom: .6rem;
+}
+.quiz-q { font-weight: 600; font-size: .95rem; color: var(--ink); margin-bottom: .8rem; }
+.quiz-opts { display: flex; flex-direction: column; gap: .4rem; }
+.quiz-opt {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: .55rem 1rem;
+  cursor: pointer;
+  font-size: .88rem;
+  transition: all .2s;
+  display: flex;
+  gap: .7rem;
+  align-items: center;
+  color: var(--ink2);
+}
+.quiz-opt:hover { border-color: var(--amber); background: #fff8ee; }
+.quiz-opt.correct { background: #edf7f0; border-color: var(--green); color: var(--green); }
+.quiz-opt.wrong { background: #fdf0ef; border-color: var(--red); color: var(--red); }
+.quiz-opt .marker {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem;
+}
+.quiz-feedback {
+  margin-top: .8rem;
+  font-size: .85rem;
+  padding: .55rem .9rem;
+  border-radius: 8px;
+  display: none;
+}
+.fb-ok { background: #edf7f0; border: 1px solid #b7e0c4; color: var(--green); }
+.fb-er { background: #fdf0ef; border: 1px solid #f5b8b2; color: var(--red); }
+
+/* ── CHEATSHEET TABLE ──────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: .85rem;
+}
+th {
+  background: var(--ink);
+  color: var(--amber2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  padding: .65rem 1rem;
+  text-align: left;
+}
+td {
+  padding: .6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink2);
+  vertical-align: top;
+}
+tr:nth-child(even) td { background: var(--paper2); }
+tr:hover td { background: #fff3e0; }
+td code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .78rem;
+  background: var(--paper3);
+  padding: .1rem .35rem;
+  border-radius: 4px;
+  color: var(--amber);
+}
+
+/* ── CHECKLIST ─────────────────────────── */
+.checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  margin: 1rem 0;
+}
+.checklist li {
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  font-size: .88rem;
+  color: var(--ink2);
+  cursor: pointer;
+  padding: .4rem .6rem;
+  border-radius: 7px;
+  transition: background .15s;
+}
+.checklist li:hover { background: var(--paper2); }
+.cbox {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: .18rem;
+  transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.checklist li.done .cbox {
+  background: var(--green);
+  border-color: var(--green);
+}
+.checklist li.done .cbox::after { content: '✓'; color: white; font-size: .6rem; }
+.checklist li.done > span { text-decoration: line-through; color: var(--muted); }
+
+/* ── DIVIDER ───────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── SEMANTIC DIAGRAM ──────────────────── */
+.sem-diagram {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 1.5rem 0;
+  background: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  line-height: 1;
+}
+.sem-block {
+  border: 1.5px dashed var(--border);
+  border-radius: 6px;
+  padding: .5rem .75rem;
+  margin-bottom: .5rem;
+  position: relative;
+}
+.sem-label {
+  position: absolute;
+  top: -9px; left: 8px;
+  background: white;
+  padding: 0 .3rem;
+  font-size: .65rem;
+  font-weight: 600;
+}
+.sb-header { border-color: var(--amber); }
+.sb-header .sem-label { color: var(--amber); }
+.sb-nav { border-color: var(--blue); }
+.sb-nav .sem-label { color: var(--blue); }
+.sb-main { border-color: var(--teal); }
+.sb-main .sem-label { color: var(--teal); }
+.sb-section { border-color: var(--green); }
+.sb-section .sem-label { color: var(--green); }
+.sb-aside { border-color: var(--red); }
+.sb-aside .sem-label { color: var(--red); }
+.sb-footer { border-color: var(--muted); }
+.sb-footer .sem-label { color: var(--muted); }
+.sem-inner { color: var(--muted); font-size: .68rem; padding: .3rem; }
+
+/* ── STEPS ─────────────────────────────── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 1.5rem 0;
+}
+.step-item {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+  padding: .8rem 0;
+  position: relative;
+}
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 2.8rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.step-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: white;
+  font-weight: 700;
+  font-size: .82rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.step-content h3 { margin-bottom: .2rem; font-size: .95rem; }
+.step-content p { font-size: .88rem; margin: 0; }
+
+/* ── ATTRIBUTE EXPLORER ────────────────── */
+.attr-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: .7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: .85rem;
+  transition: background .15s;
+}
+.attr-row:hover { background: #fff8ee; }
+.attr-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .8rem;
+  color: var(--teal);
+  min-width: 90px;
+}
+.attr-use { color: var(--ink2); flex: 1; }
+.attr-ex {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  color: var(--muted);
+  background: var(--paper2);
+  padding: .15rem .4rem;
+  border-radius: 4px;
+  min-width: 160px;
+  text-align: right;
+}
+
+/* ── MOBILE ────────────────────────────── */
+#menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem; left: 1rem;
+  z-index: 200;
+  background: var(--amber);
+  border: none;
+  color: white;
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 900px) {
+  #menu-toggle { display: flex; align-items: center; justify-content: center; }
+  #sidebar {
+    position: fixed;
+    left: -280px;
+    z-index: 100;
+    transition: left .3s;
+  }
+  #sidebar.open { left: 0; }
+  #main { padding: 0 1.5rem 6rem; margin-top: 3rem; }
+  .live-body { grid-template-columns: 1fr; }
+  .live-editor { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+/* ── SCROLL REVEAL ─────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── TOC MOBILE STRIP ──────────────────── */
+.mobile-strip {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<div class="page-wrap">
+
+<!-- ════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">BIT · Módulo 1</div>
+    <div class="sb-title">Guía HTML<br>para Principiantes</div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section-label">Inicio</div>
+    <a class="sb-link active" href="#inicio"><span class="icon">🏠</span>Bienvenida</a>
+    <a class="sb-link" href="#que-es"><span class="icon">❓</span>¿Qué es HTML?</a>
+    <a class="sb-link" href="#herramientas"><span class="icon">🛠️</span>Herramientas</a>
+
+    <div class="sb-section-label">Fundamentos</div>
+    <a class="sb-link" href="#estructura"><span class="icon">🏗️</span>Estructura base</a>
+    <a class="sb-link" href="#etiquetas"><span class="icon">🏷️</span>Etiquetas esenciales</a>
+    <a class="sb-link" href="#atributos"><span class="icon">⚙️</span>Atributos</a>
+    <a class="sb-link" href="#listas"><span class="icon">📋</span>Listas</a>
+    <a class="sb-link" href="#enlaces-imagenes"><span class="icon">🔗</span>Links e Imágenes</a>
+
+    <div class="sb-section-label">Nivel Medio</div>
+    <a class="sb-link" href="#tablas"><span class="icon">📊</span>Tablas</a>
+    <a class="sb-link" href="#formularios"><span class="icon">📝</span>Formularios</a>
+    <a class="sb-link" href="#semantica"><span class="icon">🧠</span>HTML Semántico</a>
+
+    <div class="sb-section-label">Más</div>
+    <a class="sb-link" href="#casos-uso"><span class="icon">💼</span>Casos de uso reales</a>
+    <a class="sb-link" href="#buenas-practicas"><span class="icon">✅</span>Buenas prácticas</a>
+    <a class="sb-link" href="#cheatsheet"><span class="icon">📄</span>Cheatsheet</a>
+    <a class="sb-link" href="#recursos"><span class="icon">📚</span>Recursos</a>
+  </nav>
+
+  <div class="sb-progress">
+    <div class="sb-prog-label">Tu progreso de lectura</div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-pct" id="progPct">0%</div>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════
+     MAIN
+════════════════════════════════════════ -->
+<main id="main">
+
+<!-- HERO -->
+<div class="hero reveal" id="inicio">
+  <div class="hero-kicker">Guía Completa · Nivel Principiante</div>
+  <h1>Aprende <em>HTML</em> desde<br>cero, de verdad</h1>
+  <p class="hero-desc">Esta guía está diseñada para que entiendas no solo <em>cómo</em> funciona HTML, sino <em>por qué</em>. Con analogías del mundo real, ejemplos interactivos y las herramientas que usan los profesionales.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">📖 Guía completa</span>
+    <span class="hero-tag">⚡ Interactiva</span>
+    <span class="hero-tag">🎯 Analogías reales</span>
+    <span class="hero-tag">🛠️ Herramientas pro</span>
+    <span class="hero-tag">✅ Ejercicios incluidos</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ¿QUÉ ES HTML?
+═══════════════════════════════════════ -->
+<section class="section reveal" id="que-es">
+  <div class="section-kicker">01 · Fundamento</div>
+  <h2>¿Qué es HTML?</h2>
+  <p><strong>HTML</strong> (HyperText Markup Language) es el lenguaje de marcado con el que se construye la estructura de toda página web. No es un lenguaje de programación — no "calcula" ni "toma decisiones". Es más bien el <strong>esqueleto</strong> o el <strong>andamio</strong> de lo que ves en el navegador.</p>
+
+  <div class="analogy">
+    <div class="analogy-icon">🏠</div>
+    <div>
+      <div class="analogy-label">Analogía · La casa</div>
+      <p>HTML es como los <strong>planos y la estructura de una casa</strong>: columnas, paredes, puertas, ventanas. <strong>CSS</strong> es la decoración y pintura. <strong>JavaScript</strong> es la electricidad y la domótica que hace que las cosas se muevan. Sin la estructura (HTML), no hay casa.</p>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-icon">📰</div>
+    <div>
+      <div class="analogy-label">Analogía · El periódico</div>
+      <p>Un periódico tiene <strong>titular, subtítulo, cuerpo del artículo, imágenes y pie de foto</strong>. HTML hace exactamente eso: etiqueta qué parte del contenido es qué cosa, para que el navegador lo muestre correctamente.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <div class="info-icon">💡</div>
+    <p><strong>Dato clave:</strong> HTML fue creado en 1991 por <strong>Tim Berners-Lee</strong> en el CERN para compartir documentos entre científicos. La versión actual, <strong>HTML5</strong>, es el estándar desde 2014 y sigue evolucionando.</p>
+  </div>
+
+  <h3>¿Cómo lo ve el navegador?</h3>
+  <p>Cuando abres una página web, el navegador descarga un archivo <code style="font-family:'JetBrains Mono',monospace;background:var(--paper2);padding:.1rem .3rem;border-radius:3px;font-size:.85rem;color:var(--amber)">.html</code>, lo lee de arriba hacia abajo, y construye el <strong>DOM</strong> (árbol de elementos) que finalmente pinta en pantalla.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">Flujo básico</span>
+    </div>
+    <pre>Tú escribes HTML  →  Navegador lo lee  →  Construye el DOM  →  Pinta la página</pre>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     HERRAMIENTAS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="herramientas">
+  <div class="section-kicker">02 · Setup</div>
+  <h2>Herramientas recomendadas</h2>
+  <p>Antes de escribir una sola línea, necesitas el entorno correcto. Estas son las herramientas que usan los desarrolladores reales:</p>
+
+  <h3 style="margin-bottom:.8rem">✏️ Editores de código</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tool-emoji">💙</div>
+      <div class="tool-name">VS Code</div>
+      <div class="tool-cat">Editor · Gratis</div>
+      <p class="tool-desc">El editor más popular del mundo. Hecho por Microsoft. Tiene autocompletado, extensiones, terminal integrada y miles de temas.</p>
+      <span class="tool-badge">⭐ Recomendado #1</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🔮</div>
+      <div class="tool-name">Sublime Text</div>
+      <div class="tool-cat">Editor · Gratis/Pago</div>
+      <p class="tool-desc">Ultrarrápido y liviano. Ideal si tu computadora es más antigua. Muy limpio y sin distracciones.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">☁️</div>
+      <div class="tool-name">CodePen</div>
+      <div class="tool-cat">Editor en línea · Gratis</div>
+      <p class="tool-desc">Sin instalar nada. Escribes HTML/CSS/JS y ves el resultado en tiempo real. Perfecto para practicar.</p>
+      <span class="tool-badge">Sin instalación</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">⚡</div>
+      <div class="tool-name">StackBlitz</div>
+      <div class="tool-cat">IDE en línea · Gratis</div>
+      <p class="tool-desc">Como VS Code pero en el navegador. Puedes hacer proyectos completos y compartirlos con un link.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:.8rem;margin-top:1.5rem">🧩 Extensiones de VS Code imprescindibles</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tool-emoji">🔴</div>
+      <div class="tool-name">Live Server</div>
+      <div class="tool-cat">Extensión</div>
+      <p class="tool-desc">Recarga automáticamente el navegador cada vez que guardas el archivo. ¡Indispensable!</p>
+      <span class="tool-badge">Instalar primero</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🎨</div>
+      <div class="tool-name">Prettier</div>
+      <div class="tool-cat">Extensión</div>
+      <p class="tool-desc">Formatea tu código automáticamente. Tu HTML siempre estará perfectamente indentado.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🌈</div>
+      <div class="tool-name">Color Highlight</div>
+      <div class="tool-cat">Extensión</div>
+      <p class="tool-desc">Muestra el color real junto al código HEX o RGB en el editor. Muy útil para CSS.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">✂️</div>
+      <div class="tool-name">HTML Snippets</div>
+      <div class="tool-cat">Extensión</div>
+      <p class="tool-desc">Autocompletado inteligente para etiquetas HTML. Escribe <code style="font-size:.75rem">div</code> + Tab y genera el código.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:.8rem;margin-top:1.5rem">🌐 Navegadores y DevTools</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tool-emoji">🟡</div>
+      <div class="tool-name">Chrome DevTools</div>
+      <div class="tool-cat">Herramienta del navegador</div>
+      <p class="tool-desc">Presiona <strong>F12</strong> en Chrome. Puedes inspeccionar cualquier elemento, ver el HTML generado, editar en vivo y mucho más.</p>
+      <span class="tool-badge">F12 para abrir</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🦊</div>
+      <div class="tool-name">Firefox Developer</div>
+      <div class="tool-cat">Navegador</div>
+      <p class="tool-desc">Versión de Firefox con herramientas de desarrollo superiores, especialmente para CSS Grid y Flexbox.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">✅</div>
+      <div class="tool-name">W3C Validator</div>
+      <div class="tool-cat">Validador online</div>
+      <p class="tool-desc">Valida que tu HTML sea correcto. validator.w3.org — pega tu código y te dice qué está mal.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <div class="tip-icon">💡</div>
+    <p><strong>Tip pro:</strong> En VS Code, escribe <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">!</code> y presiona <strong>Tab</strong> — genera automáticamente toda la estructura base de HTML5. Es un "snippet" de Emmet, el sistema de abreviaciones incluido en VS Code.</p>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     ESTRUCTURA BASE
+═══════════════════════════════════════ -->
+<section class="section reveal" id="estructura">
+  <div class="section-kicker">03 · Fundamentos</div>
+  <h2>La estructura base de todo HTML</h2>
+  <p>Todo archivo HTML válido tiene siempre la misma base. Es como el <strong>certificado de nacimiento</strong> de tu página.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">index.html · Estructura mínima</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><span class="cm">&lt;!-- 1. DOCTYPE: dice qué versión de HTML usamos --&gt;</span>
+<span class="ht">&lt;!DOCTYPE html&gt;</span>
+
+<span class="cm">&lt;!-- 2. Raíz del documento --&gt;</span>
+<span class="ht">&lt;html</span> <span class="at">lang</span>=<span class="vl">"es"</span><span class="ht">&gt;</span>
+
+  <span class="cm">&lt;!-- 3. HEAD: datos de la página (no visibles) --&gt;</span>
+  <span class="ht">&lt;head&gt;</span>
+    <span class="ht">&lt;meta</span> <span class="at">charset</span>=<span class="vl">"UTF-8"</span><span class="ht">&gt;</span>
+    <span class="ht">&lt;meta</span> <span class="at">name</span>=<span class="vl">"viewport"</span> <span class="at">content</span>=<span class="vl">"width=device-width, initial-scale=1.0"</span><span class="ht">&gt;</span>
+    <span class="ht">&lt;title&gt;</span><span class="tx">Mi primera página</span><span class="ht">&lt;/title&gt;</span>
+  <span class="ht">&lt;/head&gt;</span>
+
+  <span class="cm">&lt;!-- 4. BODY: todo lo que el usuario VE --&gt;</span>
+  <span class="ht">&lt;body&gt;</span>
+    <span class="ht">&lt;h1&gt;</span><span class="tx">Hola Mundo</span><span class="ht">&lt;/h1&gt;</span>
+    <span class="ht">&lt;p&gt;</span><span class="tx">Mi primera página web.</span><span class="ht">&lt;/p&gt;</span>
+  <span class="ht">&lt;/body&gt;</span>
+
+<span class="ht">&lt;/html&gt;</span></pre>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-icon">✉️</div>
+    <div>
+      <div class="analogy-label">Analogía · La carta</div>
+      <p>El <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--amber)">&lt;head&gt;</code> es el <strong>sobre de la carta</strong>: tiene el remitente, destinatario y datos de envío, pero tú no lo lees. El <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--amber)">&lt;body&gt;</code> es el <strong>contenido de la carta</strong>: lo que realmente lees.</p>
+    </div>
+  </div>
+
+  <h3>¿Qué hace cada parte?</h3>
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3><code style="font-family:'JetBrains Mono',monospace;color:var(--amber)">&lt;!DOCTYPE html&gt;</code></h3>
+        <p>Le dice al navegador "este archivo usa HTML5". Siempre va primero. Sin esto, el navegador entra en "modo raro" y puede mostrar mal tu página.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3><code style="font-family:'JetBrains Mono',monospace;color:var(--amber)">&lt;html lang="es"&gt;</code></h3>
+        <p>Envuelve todo el documento. El atributo <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">lang</code> ayuda a los lectores de pantalla y al SEO (posicionamiento en Google).</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3><code style="font-family:'JetBrains Mono',monospace;color:var(--amber)">&lt;meta charset="UTF-8"&gt;</code></h3>
+        <p>Permite mostrar tildes (á, é, ñ) y caracteres especiales. ¡Sin esto, los acentos se ven como símbolos raros!</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3><code style="font-family:'JetBrains Mono',monospace;color:var(--amber)">&lt;meta name="viewport"&gt;</code></h3>
+        <p>Hace que la página se vea bien en celulares. Sin esto, el móvil muestra la versión de escritorio reducida.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE EDITOR 1 -->
+  <div class="live-wrap">
+    <div class="live-header">
+      <div class="live-dots">
+        <div class="live-dot" style="background:#ff5f57"></div>
+        <div class="live-dot" style="background:#ffbd2e"></div>
+        <div class="live-dot" style="background:#28c840"></div>
+      </div>
+      <span class="live-label">✏️ Editor en vivo — edita y ve el resultado</span>
+      <span class="live-label">👁️ Preview</span>
+    </div>
+    <div class="live-body">
+      <div class="live-editor">
+        <textarea id="live1" oninput="updatePreview('live1','prev1')">&lt;h1&gt;Mi primera página&lt;/h1&gt;
+&lt;p&gt;Hola, soy &lt;strong&gt;Ana&lt;/strong&gt; y estoy aprendiendo HTML.&lt;/p&gt;
+&lt;p&gt;Esto es &lt;em&gt;muy&lt;/em&gt; emocionante.&lt;/p&gt;</textarea>
+      </div>
+      <div class="live-preview-frame" id="prev1"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     ETIQUETAS ESENCIALES
+═══════════════════════════════════════ -->
+<section class="section reveal" id="etiquetas">
+  <div class="section-kicker">04 · Core</div>
+  <h2>Etiquetas esenciales</h2>
+  <p>Hay más de 100 etiquetas HTML, pero con estas 20 puedes construir el 90% de cualquier página. Haz clic en cada tarjeta para ver un ejemplo.</p>
+
+  <h3 style="margin-bottom:.7rem;margin-top:1.2rem">📝 Texto y jerarquía</h3>
+  <div class="tag-grid">
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;h1&gt; — &lt;h6&gt;</div>
+      <p class="tag-desc">Títulos y subtítulos. h1 es el más importante, h6 el menor.</p>
+      <div class="tag-example">&lt;h1&gt;Título principal&lt;/h1&gt;<br>&lt;h2&gt;Subtítulo&lt;/h2&gt;<br>&lt;h3&gt;Sub-subtítulo&lt;/h3&gt;</div>
+    </div>
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;p&gt;</div>
+      <p class="tag-desc">Párrafo. Bloque de texto. El más usado de todos.</p>
+      <div class="tag-example">&lt;p&gt;Esto es un párrafo de texto normal.&lt;/p&gt;</div>
+    </div>
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;strong&gt;</div>
+      <p class="tag-desc">Texto en negrita con significado semántico importante.</p>
+      <div class="tag-example">&lt;p&gt;Esto es &lt;strong&gt;muy importante&lt;/strong&gt;.&lt;/p&gt;</div>
+    </div>
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;em&gt;</div>
+      <p class="tag-desc">Énfasis. Texto en cursiva con significado.</p>
+      <div class="tag-example">&lt;p&gt;Esto es &lt;em&gt;énfasis&lt;/em&gt;.&lt;/p&gt;</div>
+    </div>
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;br&gt;</div>
+      <p class="tag-desc">Salto de línea. Es la única etiqueta sin cierre aquí.</p>
+      <div class="tag-example">&lt;p&gt;Línea 1&lt;br&gt;Línea 2&lt;/p&gt;</div>
+    </div>
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;hr&gt;</div>
+      <p class="tag-desc">Línea horizontal divisoria entre secciones.</p>
+      <div class="tag-example">&lt;p&gt;Sección A&lt;/p&gt;<br>&lt;hr&gt;<br>&lt;p&gt;Sección B&lt;/p&gt;</div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:.7rem;margin-top:1.5rem">📦 Contenedores</h3>
+  <div class="tag-grid">
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;div&gt;</div>
+      <p class="tag-desc">Contenedor en bloque. El más versátil. Para agrupar.</p>
+      <div class="tag-example">&lt;div class="tarjeta"&gt;<br>  &lt;h2&gt;Título&lt;/h2&gt;<br>  &lt;p&gt;Contenido&lt;/p&gt;<br>&lt;/div&gt;</div>
+    </div>
+    <div class="tag-card" onclick="this.classList.toggle('open')">
+      <div class="tag-name">&lt;span&gt;</div>
+      <p class="tag-desc">Contenedor en línea. Para estilizar partes de texto.</p>
+      <div class="tag-example">&lt;p&gt;El precio es &lt;span class="precio"&gt;$99&lt;/span&gt;&lt;/p&gt;</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="warn-icon">⚠️</div>
+    <p><strong>&lt;div&gt; vs &lt;span&gt;:</strong> <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;div&gt;</code> ocupa toda la línea (bloque). <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;span&gt;</code> solo ocupa lo que necesita (en línea). Como caja vs. palabra subrayada.</p>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz">
+    <div class="quiz-title">🧠 Quiz rápido</div>
+    <div class="quiz-q">¿Qué etiqueta usarías para el título principal de una página?</div>
+    <div class="quiz-opts" id="q1opts">
+      <div class="quiz-opt" onclick="answer(this,'wrong','q1fb')">
+        <div class="marker"></div> &lt;title&gt;
+      </div>
+      <div class="quiz-opt" onclick="answer(this,'correct','q1fb')">
+        <div class="marker"></div> &lt;h1&gt;
+      </div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','q1fb')">
+        <div class="marker"></div> &lt;p&gt;
+      </div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','q1fb')">
+        <div class="marker"></div> &lt;strong&gt;
+      </div>
+    </div>
+    <div class="quiz-feedback fb-ok" id="q1fb-ok">✅ ¡Correcto! &lt;h1&gt; es el encabezado principal. Solo debe haber uno por página.</div>
+    <div class="quiz-feedback fb-er" id="q1fb-er">❌ Casi. &lt;title&gt; va en el &lt;head&gt; y aparece en la pestaña del navegador, no en la página. Para el contenido visible usamos &lt;h1&gt;.</div>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     ATRIBUTOS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="atributos">
+  <div class="section-kicker">05 · Atributos</div>
+  <h2>Atributos: los datos extra</h2>
+  <p>Los atributos dan información adicional a las etiquetas. Van dentro de la etiqueta de apertura con el formato <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;background:var(--paper2);padding:.1rem .3rem;border-radius:3px;color:var(--amber)">nombre="valor"</code>.</p>
+
+  <div class="analogy">
+    <div class="analogy-icon">👤</div>
+    <div>
+      <div class="analogy-label">Analogía · La persona</div>
+      <p>Si una etiqueta es una persona, sus atributos son sus <strong>características</strong>: nombre, edad, color de ojos. La persona es <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;img&gt;</code>, su nombre (atributo) es <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">src</code>, y su valor es la foto en sí.</p>
+    </div>
+  </div>
+
+  <div style="border: 1px solid var(--border); border-radius:10px; overflow:hidden; margin: 1.2rem 0;">
+    <div class="attr-row" style="background:var(--paper2);font-weight:600">
+      <div class="attr-name" style="color:var(--ink)">Atributo</div>
+      <div class="attr-use" style="color:var(--ink)">¿Para qué sirve?</div>
+      <div class="attr-ex" style="color:var(--ink)">Ejemplo</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">id</div>
+      <div class="attr-use">Identificador único del elemento en la página</div>
+      <div class="attr-ex">id="menu-principal"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">class</div>
+      <div class="attr-use">Clase(s) para aplicar CSS. Puede repetirse</div>
+      <div class="attr-ex">class="tarjeta activa"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">href</div>
+      <div class="attr-use">URL de destino en enlaces &lt;a&gt;</div>
+      <div class="attr-ex">href="https://google.com"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">src</div>
+      <div class="attr-use">Ruta de la imagen en &lt;img&gt;</div>
+      <div class="attr-ex">src="foto.jpg"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">alt</div>
+      <div class="attr-use">Texto alternativo de imagen (accesibilidad)</div>
+      <div class="attr-ex">alt="Foto de perfil"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">target</div>
+      <div class="attr-use">Dónde abrir el enlace</div>
+      <div class="attr-ex">target="_blank"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">style</div>
+      <div class="attr-use">CSS en línea (evitar en proyectos reales)</div>
+      <div class="attr-ex">style="color:red"</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">disabled</div>
+      <div class="attr-use">Desactiva un botón o input</div>
+      <div class="attr-ex">disabled</div>
+    </div>
+    <div class="attr-row">
+      <div class="attr-name">placeholder</div>
+      <div class="attr-use">Texto de ejemplo en campos de formulario</div>
+      <div class="attr-ex">placeholder="Tu email..."</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="warn-icon">⚠️</div>
+    <p><strong>id vs class:</strong> <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">id</code> es como el número de cédula — único, irrepetible. <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">class</code> es como el uniforme del colegio — pueden usarlo muchos elementos a la vez.</p>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     LISTAS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="listas">
+  <div class="section-kicker">06 · Contenido</div>
+  <h2>Listas</h2>
+  <p>Las listas son fundamentales para organizar información. Hay 3 tipos:</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">Los 3 tipos de listas</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><span class="cm">&lt;!-- Lista sin orden (bullets) --&gt;</span>
+<span class="ht">&lt;ul&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="tx">HTML</span><span class="ht">&lt;/li&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="tx">CSS</span><span class="ht">&lt;/li&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="tx">JavaScript</span><span class="ht">&lt;/li&gt;</span>
+<span class="ht">&lt;/ul&gt;</span>
+
+<span class="cm">&lt;!-- Lista ordenada (numerada) --&gt;</span>
+<span class="ht">&lt;ol&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="tx">Abrir VS Code</span><span class="ht">&lt;/li&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="tx">Crear index.html</span><span class="ht">&lt;/li&gt;</span>
+  <span class="ht">&lt;li&gt;</span><span class="tx">Escribir código</span><span class="ht">&lt;/li&gt;</span>
+<span class="ht">&lt;/ol&gt;</span>
+
+<span class="cm">&lt;!-- Lista de definición --&gt;</span>
+<span class="ht">&lt;dl&gt;</span>
+  <span class="ht">&lt;dt&gt;</span><span class="tx">HTML</span><span class="ht">&lt;/dt&gt;</span>
+  <span class="ht">&lt;dd&gt;</span><span class="tx">Lenguaje de marcado para estructurar páginas</span><span class="ht">&lt;/dd&gt;</span>
+<span class="ht">&lt;/dl&gt;</span></pre>
+  </div>
+
+  <!-- LIVE 2 -->
+  <div class="live-wrap">
+    <div class="live-header">
+      <div class="live-dots">
+        <div class="live-dot" style="background:#ff5f57"></div>
+        <div class="live-dot" style="background:#ffbd2e"></div>
+        <div class="live-dot" style="background:#28c840"></div>
+      </div>
+      <span class="live-label">✏️ Practica con listas</span>
+      <span class="live-label">👁️ Preview</span>
+    </div>
+    <div class="live-body">
+      <div class="live-editor">
+        <textarea id="live2" oninput="updatePreview('live2','prev2')">&lt;h2&gt;Mis tecnologías favoritas&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;HTML 🏗️&lt;/li&gt;
+  &lt;li&gt;CSS 🎨&lt;/li&gt;
+  &lt;li&gt;JavaScript ⚡&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Pasos para aprender&lt;/h2&gt;
+&lt;ol&gt;
+  &lt;li&gt;Leer esta guía&lt;/li&gt;
+  &lt;li&gt;Practicar todos los días&lt;/li&gt;
+  &lt;li&gt;Construir proyectos&lt;/li&gt;
+&lt;/ol&gt;</textarea>
+      </div>
+      <div class="live-preview-frame" id="prev2"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     ENLACES E IMÁGENES
+═══════════════════════════════════════ -->
+<section class="section reveal" id="enlaces-imagenes">
+  <div class="section-kicker">07 · Multimedia</div>
+  <h2>Enlaces e imágenes</h2>
+
+  <h3>🔗 El enlace: &lt;a&gt;</h3>
+  <p>La <strong>A</strong> viene de <em>Anchor</em> (ancla). Es lo que conecta páginas entre sí. Sin &lt;a&gt;, no existiría la web.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">Tipos de enlaces</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><span class="cm">&lt;!-- Enlace externo (abre en nueva pestaña) --&gt;</span>
+<span class="ht">&lt;a</span> <span class="at">href</span>=<span class="vl">"https://google.com"</span> <span class="at">target</span>=<span class="vl">"_blank"</span><span class="ht">&gt;</span>
+  <span class="tx">Ir a Google</span>
+<span class="ht">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Enlace interno (otra página del sitio) --&gt;</span>
+<span class="ht">&lt;a</span> <span class="at">href</span>=<span class="vl">"contacto.html"</span><span class="ht">&gt;</span><span class="tx">Contacto</span><span class="ht">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Enlace a sección de la misma página --&gt;</span>
+<span class="ht">&lt;a</span> <span class="at">href</span>=<span class="vl">"#sobre-mi"</span><span class="ht">&gt;</span><span class="tx">Sobre mí</span><span class="ht">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Enlace de email --&gt;</span>
+<span class="ht">&lt;a</span> <span class="at">href</span>=<span class="vl">"mailto:hola@email.com"</span><span class="ht">&gt;</span><span class="tx">Escríbeme</span><span class="ht">&lt;/a&gt;</span></pre>
+  </div>
+
+  <h3 style="margin-top:1.5rem">🖼️ La imagen: &lt;img&gt;</h3>
+  <p>Las imágenes son etiquetas <strong>auto-cerradas</strong> (no necesitan <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;/img&gt;</code>). El atributo <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">alt</code> es obligatorio por accesibilidad.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">Imágenes</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><span class="cm">&lt;!-- Imagen local --&gt;</span>
+<span class="ht">&lt;img</span> <span class="at">src</span>=<span class="vl">"fotos/mi-foto.jpg"</span>
+     <span class="at">alt</span>=<span class="vl">"Mi foto de perfil"</span>
+     <span class="at">width</span>=<span class="vl">"300"</span>
+     <span class="at">height</span>=<span class="vl">"200"</span><span class="ht">&gt;</span>
+
+<span class="cm">&lt;!-- Imagen desde URL --&gt;</span>
+<span class="ht">&lt;img</span> <span class="at">src</span>=<span class="vl">"https://placekitten.com/300/200"</span>
+     <span class="at">alt</span>=<span class="vl">"Un gatito adorable"</span><span class="ht">&gt;</span>
+
+<span class="cm">&lt;!-- Imagen dentro de enlace --&gt;</span>
+<span class="ht">&lt;a</span> <span class="at">href</span>=<span class="vl">"portfolio.html"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;img</span> <span class="at">src</span>=<span class="vl">"proyecto1.jpg"</span> <span class="at">alt</span>=<span class="vl">"Proyecto 1"</span><span class="ht">&gt;</span>
+<span class="ht">&lt;/a&gt;</span></pre>
+  </div>
+
+  <div class="callout tip">
+    <div class="tip-icon">💡</div>
+    <p><strong>Nunca olvides el alt:</strong> El atributo <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">alt</code> es leído por los lectores de pantalla para personas con discapacidad visual. Además, Google lo usa para entender tus imágenes y posicionarlas en búsquedas.</p>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     TABLAS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="tablas">
+  <div class="section-kicker">08 · Datos</div>
+  <h2>Tablas</h2>
+  <p>Las tablas se usan para mostrar <strong>datos tabulares</strong>: horarios, comparativas, estadísticas. No para diseñar layouts (eso es CSS).</p>
+
+  <div class="analogy">
+    <div class="analogy-icon">📊</div>
+    <div>
+      <div class="analogy-label">Analogía · La hoja de Excel</div>
+      <p>Una tabla HTML es como una hoja de cálculo: tiene <strong>filas</strong> (<code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;tr&gt;</code>), <strong>columnas de cabecera</strong> (<code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;th&gt;</code>) y <strong>celdas de datos</strong> (<code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;td&gt;</code>).</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">Tabla completa con thead / tbody / tfoot</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><span class="ht">&lt;table&gt;</span>
+
+  <span class="cm">&lt;!-- Cabecera --&gt;</span>
+  <span class="ht">&lt;thead&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;th&gt;</span><span class="tx">Tecnología</span><span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span><span class="tx">Creada en</span><span class="ht">&lt;/th&gt;</span>
+      <span class="ht">&lt;th&gt;</span><span class="tx">Uso principal</span><span class="ht">&lt;/th&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/thead&gt;</span>
+
+  <span class="cm">&lt;!-- Cuerpo de datos --&gt;</span>
+  <span class="ht">&lt;tbody&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="tx">HTML</span><span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="tx">1991</span><span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="tx">Estructura de páginas web</span><span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+    <span class="ht">&lt;tr&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="tx">CSS</span><span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="tx">1996</span><span class="ht">&lt;/td&gt;</span>
+      <span class="ht">&lt;td&gt;</span><span class="tx">Estilos y diseño visual</span><span class="ht">&lt;/td&gt;</span>
+    <span class="ht">&lt;/tr&gt;</span>
+  <span class="ht">&lt;/tbody&gt;</span>
+
+<span class="ht">&lt;/table&gt;</span></pre>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     FORMULARIOS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="formularios">
+  <div class="section-kicker">09 · Interacción</div>
+  <h2>Formularios</h2>
+  <p>Los formularios son la forma en que los usuarios envían información. Login, registro, búsqueda, contacto — todo es un formulario.</p>
+
+  <div class="analogy">
+    <div class="analogy-icon">📋</div>
+    <div>
+      <div class="analogy-label">Analogía · El formulario del banco</div>
+      <p>Un formulario HTML es como llenar un formulario físico: tiene campos para escribir, opciones para marcar y un botón para entregar. La diferencia es que los datos viajan a un servidor.</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">Formulario de registro completo</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><span class="ht">&lt;form</span> <span class="at">action</span>=<span class="vl">"/registro"</span> <span class="at">method</span>=<span class="vl">"POST"</span><span class="ht">&gt;</span>
+
+  <span class="cm">&lt;!-- Campo de texto --&gt;</span>
+  <span class="ht">&lt;label</span> <span class="at">for</span>=<span class="vl">"nombre"</span><span class="ht">&gt;</span><span class="tx">Nombre:</span><span class="ht">&lt;/label&gt;</span>
+  <span class="ht">&lt;input</span> <span class="at">type</span>=<span class="vl">"text"</span>
+         <span class="at">id</span>=<span class="vl">"nombre"</span>
+         <span class="at">name</span>=<span class="vl">"nombre"</span>
+         <span class="at">placeholder</span>=<span class="vl">"Tu nombre completo"</span>
+         <span class="at">required</span><span class="ht">&gt;</span>
+
+  <span class="cm">&lt;!-- Email --&gt;</span>
+  <span class="ht">&lt;label</span> <span class="at">for</span>=<span class="vl">"email"</span><span class="ht">&gt;</span><span class="tx">Email:</span><span class="ht">&lt;/label&gt;</span>
+  <span class="ht">&lt;input</span> <span class="at">type</span>=<span class="vl">"email"</span> <span class="at">id</span>=<span class="vl">"email"</span> <span class="at">required</span><span class="ht">&gt;</span>
+
+  <span class="cm">&lt;!-- Contraseña --&gt;</span>
+  <span class="ht">&lt;input</span> <span class="at">type</span>=<span class="vl">"password"</span> <span class="at">id</span>=<span class="vl">"pass"</span> <span class="at">minlength</span>=<span class="vl">"8"</span><span class="ht">&gt;</span>
+
+  <span class="cm">&lt;!-- Selector --&gt;</span>
+  <span class="ht">&lt;select</span> <span class="at">name</span>=<span class="vl">"rol"</span><span class="ht">&gt;</span>
+    <span class="ht">&lt;option</span> <span class="at">value</span>=<span class="vl">"estudiante"</span><span class="ht">&gt;</span><span class="tx">Estudiante</span><span class="ht">&lt;/option&gt;</span>
+    <span class="ht">&lt;option</span> <span class="at">value</span>=<span class="vl">"profesional"</span><span class="ht">&gt;</span><span class="tx">Profesional</span><span class="ht">&lt;/option&gt;</span>
+  <span class="ht">&lt;/select&gt;</span>
+
+  <span class="cm">&lt;!-- Checkbox --&gt;</span>
+  <span class="ht">&lt;input</span> <span class="at">type</span>=<span class="vl">"checkbox"</span> <span class="at">id</span>=<span class="vl">"terminos"</span> <span class="at">required</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;label</span> <span class="at">for</span>=<span class="vl">"terminos"</span><span class="ht">&gt;</span><span class="tx">Acepto los términos</span><span class="ht">&lt;/label&gt;</span>
+
+  <span class="cm">&lt;!-- Botón enviar --&gt;</span>
+  <span class="ht">&lt;button</span> <span class="at">type</span>=<span class="vl">"submit"</span><span class="ht">&gt;</span><span class="tx">Registrarme</span><span class="ht">&lt;/button&gt;</span>
+
+<span class="ht">&lt;/form&gt;</span></pre>
+  </div>
+
+  <h3 style="margin-top:1rem">Tipos de &lt;input&gt; más usados</h3>
+  <table>
+    <thead><tr><th>type=""</th><th>¿Para qué?</th><th>Validación automática</th></tr></thead>
+    <tbody>
+      <tr><td><code>text</code></td><td>Texto libre</td><td>Longitud min/max</td></tr>
+      <tr><td><code>email</code></td><td>Correo electrónico</td><td>Formato @</td></tr>
+      <tr><td><code>password</code></td><td>Contraseña (oculta)</td><td>Longitud mínima</td></tr>
+      <tr><td><code>number</code></td><td>Solo números</td><td>min, max, step</td></tr>
+      <tr><td><code>date</code></td><td>Selector de fecha</td><td>Calendario nativo</td></tr>
+      <tr><td><code>checkbox</code></td><td>Opción sí/no</td><td>required</td></tr>
+      <tr><td><code>radio</code></td><td>Elegir una entre varias</td><td>Mismo name</td></tr>
+      <tr><td><code>file</code></td><td>Subir archivos</td><td>accept=".pdf,.jpg"</td></tr>
+      <tr><td><code>range</code></td><td>Slider numérico</td><td>min, max</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     HTML SEMÁNTICO
+═══════════════════════════════════════ -->
+<section class="section reveal" id="semantica">
+  <div class="section-kicker">10 · Semántica</div>
+  <h2>HTML Semántico: código con significado</h2>
+  <p>HTML5 trajo etiquetas con <strong>significado propio</strong>. En vez de poner todo en <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">&lt;div&gt;</code>, usamos etiquetas que describen qué es cada parte.</p>
+
+  <div class="analogy">
+    <div class="analogy-icon">🏛️</div>
+    <div>
+      <div class="analogy-label">Analogía · El edificio</div>
+      <p>Antes: todo era "cuarto". Ahora: hay <strong>recepción, sala, cocina, baño, dormitorio</strong>. Todos son cuartos, pero su nombre describe para qué sirven. HTML semántico hace lo mismo.</p>
+    </div>
+  </div>
+
+  <div class="sem-diagram">
+    <div class="sem-block sb-header">
+      <div class="sem-label">&lt;header&gt;</div>
+      <div class="sem-inner">Logo · Nombre del sitio · Tagline</div>
+    </div>
+    <div class="sem-block sb-nav">
+      <div class="sem-label">&lt;nav&gt;</div>
+      <div class="sem-inner">Inicio · Sobre mí · Proyectos · Contacto</div>
+    </div>
+    <div class="sem-block sb-main" style="padding-bottom:.5rem">
+      <div class="sem-label">&lt;main&gt;</div>
+      <div class="sem-block sb-section" style="margin-top:.4rem">
+        <div class="sem-label">&lt;section&gt;</div>
+        <div class="sem-inner">
+          <div class="sem-block" style="border-color:#ccc;border-style:solid">
+            <div class="sem-label" style="color:#666">&lt;article&gt;</div>
+            <div class="sem-inner">Entrada del blog · tarjeta de proyecto</div>
+          </div>
+        </div>
+      </div>
+      <div class="sem-block sb-aside" style="margin-top:.4rem">
+        <div class="sem-label">&lt;aside&gt;</div>
+        <div class="sem-inner">Sidebar · Contenido relacionado · Publicidad</div>
+      </div>
+    </div>
+    <div class="sem-block sb-footer" style="margin-bottom:0">
+      <div class="sem-label">&lt;footer&gt;</div>
+      <div class="sem-inner">© 2025 · Links · Redes sociales</div>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Etiqueta</th><th>¿Para qué sirve?</th><th>Equivalente antiguo</th></tr></thead>
+    <tbody>
+      <tr><td><code>&lt;header&gt;</code></td><td>Cabecera del sitio o sección</td><td>&lt;div id="header"&gt;</td></tr>
+      <tr><td><code>&lt;nav&gt;</code></td><td>Navegación principal</td><td>&lt;div id="nav"&gt;</td></tr>
+      <tr><td><code>&lt;main&gt;</code></td><td>Contenido principal (solo uno)</td><td>&lt;div id="main"&gt;</td></tr>
+      <tr><td><code>&lt;section&gt;</code></td><td>Sección temática con título</td><td>&lt;div class="section"&gt;</td></tr>
+      <tr><td><code>&lt;article&gt;</code></td><td>Contenido independiente (post, noticia)</td><td>&lt;div class="post"&gt;</td></tr>
+      <tr><td><code>&lt;aside&gt;</code></td><td>Contenido relacionado (sidebar)</td><td>&lt;div id="sidebar"&gt;</td></tr>
+      <tr><td><code>&lt;footer&gt;</code></td><td>Pie de página</td><td>&lt;div id="footer"&gt;</td></tr>
+      <tr><td><code>&lt;figure&gt;</code></td><td>Imagen con caption</td><td>&lt;div class="img-wrap"&gt;</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout tip">
+    <div class="tip-icon">💡</div>
+    <p><strong>¿Por qué importa?</strong> El HTML semántico mejora el SEO (Google lo entiende mejor), la accesibilidad (los lectores de pantalla navegan por secciones) y la mantenibilidad del código (tú y tus compañeros lo entenderán en 6 meses).</p>
+  </div>
+
+  <!-- QUIZ 2 -->
+  <div class="quiz">
+    <div class="quiz-title">🧠 Quiz rápido</div>
+    <div class="quiz-q">Tienes el menú de navegación de tu sitio. ¿Qué etiqueta semántica deberías usar?</div>
+    <div class="quiz-opts" id="q2opts">
+      <div class="quiz-opt" onclick="answer(this,'wrong','q2fb')"><div class="marker"></div>&lt;div id="menu"&gt;</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','q2fb')"><div class="marker"></div>&lt;header&gt;</div>
+      <div class="quiz-opt" onclick="answer(this,'correct','q2fb')"><div class="marker"></div>&lt;nav&gt;</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','q2fb')"><div class="marker"></div>&lt;section&gt;</div>
+    </div>
+    <div class="quiz-feedback fb-ok" id="q2fb-ok">✅ ¡Exacto! &lt;nav&gt; es específicamente para bloques de navegación. Los motores de búsqueda y lectores de pantalla lo reconocen como el menú del sitio.</div>
+    <div class="quiz-feedback fb-er" id="q2fb-er">❌ Técnicamente funciona, pero lo correcto semánticamente es &lt;nav&gt;, que describe exactamente su propósito: navegación.</div>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     CASOS DE USO
+═══════════════════════════════════════ -->
+<section class="section reveal" id="casos-uso">
+  <div class="section-kicker">11 · Mundo real</div>
+  <h2>Casos de uso reales</h2>
+  <p>HTML no es "un ejercicio académico". Está en absolutamente todo lo que usas en internet:</p>
+
+  <div class="tool-grid">
+    <div class="tool-card" style="border-color:rgba(224,124,40,.3)">
+      <div class="tool-emoji">🛒</div>
+      <div class="tool-name">E-commerce</div>
+      <div class="tool-cat">Tiendas online</div>
+      <p class="tool-desc">Cada producto es un &lt;article&gt;, cada precio un &lt;span&gt;, el carrito un &lt;aside&gt;. Mercado Libre, Amazon — puro HTML estructurado.</p>
+    </div>
+    <div class="tool-card" style="border-color:rgba(224,124,40,.3)">
+      <div class="tool-emoji">📰</div>
+      <div class="tool-name">Noticias y blogs</div>
+      <div class="tool-cat">Medios digitales</div>
+      <p class="tool-desc">El New York Times usa &lt;article&gt; para cada noticia, &lt;header&gt; con el título y &lt;time&gt; para la fecha exacta.</p>
+    </div>
+    <div class="tool-card" style="border-color:rgba(224,124,40,.3)">
+      <div class="tool-emoji">🎓</div>
+      <div class="tool-name">Plataformas educativas</div>
+      <div class="tool-cat">EdTech</div>
+      <p class="tool-desc">Coursera, Platzi, Duolingo: formularios de progreso, videos &lt;video&gt;, listas de lecciones &lt;ol&gt; y cuestionarios con &lt;form&gt;.</p>
+    </div>
+    <div class="tool-card" style="border-color:rgba(224,124,40,.3)">
+      <div class="tool-emoji">💼</div>
+      <div class="tool-name">Portafolio personal</div>
+      <div class="tool-cat">Tu carrera</div>
+      <p class="tool-desc">Lo primero que revisará un reclutador es tu sitio web. Un portafolio en HTML + CSS te consigue el primer empleo.</p>
+    </div>
+    <div class="tool-card" style="border-color:rgba(224,124,40,.3)">
+      <div class="tool-emoji">📱</div>
+      <div class="tool-name">Apps web</div>
+      <div class="tool-cat">PWA · SPA</div>
+      <p class="tool-desc">Gmail, Google Docs, Figma en el navegador — todo es HTML. JavaScript añade interactividad, pero la estructura base es HTML.</p>
+    </div>
+    <div class="tool-card" style="border-color:rgba(224,124,40,.3)">
+      <div class="tool-emoji">📧</div>
+      <div class="tool-name">Emails HTML</div>
+      <div class="tool-cat">Marketing</div>
+      <p class="tool-desc">Los newsletters de tu marca favorita están escritos en HTML (con tablas, imágenes y enlaces). Mailchimp los renderiza.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     BUENAS PRÁCTICAS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="buenas-practicas">
+  <div class="section-kicker">12 · Profesionalismo</div>
+  <h2>Buenas prácticas</h2>
+  <p>Diferencia entre código que funciona y código <strong>profesional</strong>:</p>
+
+  <ul class="checklist" id="bp">
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Siempre usar DOCTYPE y charset UTF-8</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Un solo &lt;h1&gt; por página (el título principal)</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Siempre incluir alt en las imágenes</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Usar etiquetas semánticas en vez de &lt;div&gt; para todo</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Indentar correctamente (Tab = 2 espacios)</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Los ids son únicos, las clases pueden repetirse</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Atributo lang="es" en el &lt;html&gt;</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>No usar style="" en línea — usar clases CSS</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Siempre cerrar las etiquetas que lo requieren</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Validar el código en validator.w3.org</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Usar minúsculas para todos los nombres de etiquetas y atributos</span></li>
+    <li onclick="toggle(this)"><div class="cbox"></div><span>Comentar secciones complejas con &lt;!-- --&gt;</span></li>
+  </ul>
+
+  <div class="callout warn">
+    <div class="warn-icon">⚠️</div>
+    <p><strong>Error más común:</strong> Usar &lt;br&gt;&lt;br&gt; para crear espacio. Eso no es HTML, es CSS. Los márgenes y espacios se controlan siempre con <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">margin</code> y <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem">padding</code>.</p>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     CHEATSHEET
+═══════════════════════════════════════ -->
+<section class="section reveal" id="cheatsheet">
+  <div class="section-kicker">13 · Referencia</div>
+  <h2>Cheatsheet completa</h2>
+  <p>Tu hoja de trucos para tener siempre a mano:</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang">HTML Cheatsheet · Referencia rápida</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copiar todo</button>
+    </div>
+    <pre><span class="cm">/* ─── ESTRUCTURA ─── */</span>
+<span class="ht">&lt;!DOCTYPE html&gt;</span>  <span class="cm">Tipo de documento</span>
+<span class="ht">&lt;html&gt;</span>           <span class="cm">Raíz</span>
+<span class="ht">&lt;head&gt;</span>           <span class="cm">Metadatos (no visible)</span>
+<span class="ht">&lt;body&gt;</span>           <span class="cm">Contenido visible</span>
+
+<span class="cm">/* ─── TEXTO ─── */</span>
+<span class="ht">&lt;h1&gt;</span>...<span class="ht">&lt;h6&gt;</span>     <span class="cm">Títulos (h1 más importante)</span>
+<span class="ht">&lt;p&gt;</span>              <span class="cm">Párrafo</span>
+<span class="ht">&lt;strong&gt;</span>         <span class="cm">Negrita semántica</span>
+<span class="ht">&lt;em&gt;</span>             <span class="cm">Cursiva / énfasis</span>
+<span class="ht">&lt;br&gt;</span>             <span class="cm">Salto de línea</span>
+<span class="ht">&lt;hr&gt;</span>             <span class="cm">Línea divisoria</span>
+<span class="ht">&lt;blockquote&gt;</span>     <span class="cm">Cita</span>
+<span class="ht">&lt;code&gt;</span>           <span class="cm">Código en línea</span>
+<span class="ht">&lt;pre&gt;</span>            <span class="cm">Texto preformateado</span>
+
+<span class="cm">/* ─── LISTAS ─── */</span>
+<span class="ht">&lt;ul&gt;</span>             <span class="cm">Lista sin orden</span>
+<span class="ht">&lt;ol&gt;</span>             <span class="cm">Lista numerada</span>
+<span class="ht">&lt;li&gt;</span>             <span class="cm">Elemento de lista</span>
+
+<span class="cm">/* ─── LINKS Y MEDIA ─── */</span>
+<span class="ht">&lt;a href=""&gt;</span>      <span class="cm">Enlace</span>
+<span class="ht">&lt;img src="" alt=""&gt;</span>  <span class="cm">Imagen</span>
+<span class="ht">&lt;video&gt;</span>          <span class="cm">Video</span>
+<span class="ht">&lt;audio&gt;</span>          <span class="cm">Audio</span>
+
+<span class="cm">/* ─── SEMÁNTICA ─── */</span>
+<span class="ht">&lt;header&gt;</span>         <span class="cm">Cabecera</span>
+<span class="ht">&lt;nav&gt;</span>            <span class="cm">Navegación</span>
+<span class="ht">&lt;main&gt;</span>           <span class="cm">Contenido principal</span>
+<span class="ht">&lt;section&gt;</span>        <span class="cm">Sección</span>
+<span class="ht">&lt;article&gt;</span>        <span class="cm">Artículo independiente</span>
+<span class="ht">&lt;aside&gt;</span>          <span class="cm">Contenido lateral</span>
+<span class="ht">&lt;footer&gt;</span>         <span class="cm">Pie de página</span>
+<span class="ht">&lt;figure&gt;</span>         <span class="cm">Imagen con descripción</span>
+<span class="ht">&lt;figcaption&gt;</span>     <span class="cm">Descripción de figure</span>
+
+<span class="cm">/* ─── FORMULARIOS ─── */</span>
+<span class="ht">&lt;form&gt;</span>           <span class="cm">Contenedor</span>
+<span class="ht">&lt;input type=""&gt;</span>  <span class="cm">Campo de entrada</span>
+<span class="ht">&lt;label&gt;</span>          <span class="cm">Etiqueta del campo</span>
+<span class="ht">&lt;textarea&gt;</span>       <span class="cm">Área de texto grande</span>
+<span class="ht">&lt;select&gt;</span>         <span class="cm">Selector desplegable</span>
+<span class="ht">&lt;option&gt;</span>         <span class="cm">Opción del selector</span>
+<span class="ht">&lt;button&gt;</span>         <span class="cm">Botón</span>
+
+<span class="cm">/* ─── CONTENEDORES ─── */</span>
+<span class="ht">&lt;div&gt;</span>            <span class="cm">Bloque genérico</span>
+<span class="ht">&lt;span&gt;</span>           <span class="cm">Línea genérica</span>
+
+<span class="cm">/* ─── TABLAS ─── */</span>
+<span class="ht">&lt;table&gt;</span>          <span class="cm">Tabla</span>
+<span class="ht">&lt;thead&gt;</span>          <span class="cm">Cabecera de tabla</span>
+<span class="ht">&lt;tbody&gt;</span>          <span class="cm">Cuerpo de tabla</span>
+<span class="ht">&lt;tr&gt;</span>             <span class="cm">Fila</span>
+<span class="ht">&lt;th&gt;</span>             <span class="cm">Celda cabecera (negrita)</span>
+<span class="ht">&lt;td&gt;</span>             <span class="cm">Celda de datos</span></pre>
+  </div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ═══════════════════════════════════════
+     RECURSOS
+═══════════════════════════════════════ -->
+<section class="section reveal" id="recursos">
+  <div class="section-kicker">14 · Seguir aprendiendo</div>
+  <h2>Recursos para ir más lejos</h2>
+
+  <h3 style="margin-bottom:.8rem">📚 Documentación oficial</h3>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="tool-emoji">🦊</div>
+      <div class="tool-name">MDN Web Docs</div>
+      <div class="tool-cat">developer.mozilla.org</div>
+      <p class="tool-desc">La biblia del desarrollo web. Cada etiqueta, atributo y propiedad CSS documentada con ejemplos. Gratuito y en español.</p>
+      <span class="tool-badge">⭐ La mejor fuente</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🐸</div>
+      <div class="tool-name">W3Schools</div>
+      <div class="tool-cat">w3schools.com</div>
+      <p class="tool-desc">Tutoriales interactivos con ejemplos en vivo. Ideal para empezar. Tiene editor integrado.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🏕️</div>
+      <div class="tool-name">freeCodeCamp</div>
+      <div class="tool-cat">freecodecamp.org</div>
+      <p class="tool-desc">Certificaciones gratuitas. El curso de HTML/CSS Responsive es el mejor para comenzar en plataforma.</p>
+      <span class="tool-badge">100% gratis</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🎮</div>
+      <div class="tool-name">CSS Diner / Flexbox Froggy</div>
+      <div class="tool-cat">Juegos educativos</div>
+      <p class="tool-desc">Aprende CSS jugando. cssdiner.com y flexboxfroggy.com son increíbles para aprender selectores y layout.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">📺</div>
+      <div class="tool-name">Kevin Powell (YouTube)</div>
+      <div class="tool-cat">Canal: Kevin Powell</div>
+      <p class="tool-desc">El mejor canal de CSS en YouTube. Explicaciones visuales y proyectos prácticos paso a paso.</p>
+    </div>
+    <div class="tool-card">
+      <div class="tool-emoji">🎯</div>
+      <div class="tool-name">The Odin Project</div>
+      <div class="tool-cat">theodinproject.com</div>
+      <p class="tool-desc">Ruta de aprendizaje completa de desarrollo web. Desde HTML hasta Node.js. Muy bien estructurado.</p>
+    </div>
+  </div>
+
+  <div class="callout tip" style="margin-top:1.5rem">
+    <div class="tip-icon">🚀</div>
+    <p><strong>El mejor consejo:</strong> Lee un concepto, luego cierra el libro y <strong>construye algo</strong>. No importa qué. Una página de tu artista favorito, un menú de restaurante, tu CV en HTML. La práctica real supera 10 horas de tutoriales.</p>
+  </div>
+
+  <div style="background:var(--ink);border-radius:14px;padding:1.5rem 2rem;margin-top:2rem;text-align:center">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.18em;color:var(--amber);margin-bottom:.5rem">BIT · Módulo 1 · Semana 1</div>
+    <div style="font-family:'Lora',serif;font-size:1.4rem;font-weight:700;color:#faf6f0;margin-bottom:.5rem">Ya tienes lo que necesitas</div>
+    <p style="color:#a89080;font-size:.9rem;max-width:500px;margin:0 auto">Ahora abre VS Code, crea un <code style="font-family:'JetBrains Mono',monospace;color:var(--amber2)">index.html</code> y escribe tu primera línea. El resto viene solo.</p>
+  </div>
+</section>
+
+</main>
+</div><!-- /page-wrap -->
+
+<script>
+// ── LIVE PREVIEW ─────────────────────────────────────────
+function updatePreview(edId, prevId) {
+  document.getElementById(prevId).innerHTML = document.getElementById(edId).value;
+}
+// Init previews
+updatePreview('live1','prev1');
+updatePreview('live2','prev2');
+
+// ── COPY CODE ────────────────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+// ── QUIZ ─────────────────────────────────────────────────
+function answer(opt, result, fbId) {
+  const container = opt.closest('.quiz-opts');
+  if (container.dataset.answered) return;
+  container.dataset.answered = '1';
+  opt.classList.add(result);
+  opt.querySelector('.marker').textContent = result === 'correct' ? '✓' : '✗';
+  const fb = document.getElementById(fbId + '-' + (result === 'correct' ? 'ok' : 'er'));
+  fb.style.display = 'block';
+}
+
+// ── CHECKLIST ────────────────────────────────────────────
+function toggle(li) { li.classList.toggle('done'); }
+
+// ── SCROLL PROGRESS ──────────────────────────────────────
+const fill = document.getElementById('progFill');
+const pct  = document.getElementById('progPct');
+window.addEventListener('scroll', () => {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const p = Math.round((window.scrollY / total) * 100);
+  fill.style.width = p + '%';
+  pct.textContent  = p + '%';
+});
+
+// ── ACTIVE NAV LINK ───────────────────────────────────────
+const sections = document.querySelectorAll('.section, .hero');
+const links    = document.querySelectorAll('.sb-link');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      links.forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => obs.observe(s));
+
+// ── SCROLL REVEAL ─────────────────────────────────────────
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ── MOBILE SIDEBAR CLOSE ON LINK ─────────────────────────
+links.forEach(l => l.addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+}));
+</script>
+</body>
+</html>

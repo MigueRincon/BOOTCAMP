@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase CSS: Display, Posicionamiento y Flexbox</title>
+    <style>
+        /* ========== ESTILOS GENERALES DE LA CLASE ========== */
+        :root {
+            --primary: #6C63FF;
+            --primary-light: #8B85FF;
+            --secondary: #FF6584;
+            --accent: #43E97B;
+            --dark: #2D2B55;
+            --darker: #1E1C3A;
+            --light: #F0F0FF;
+            --code-bg: #1E1E2E;
+            --warning: #FFD93D;
+            --info: #6EC6FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: #333;
+            line-height: 1.7;
+        }
+
+        /* ========== NAVEGACIÓN LATERAL ========== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--darker);
+            color: white;
+            padding: 30px 20px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #c0bfff;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar .section-label {
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            padding-left: 12px;
+        }
+
+        /* ========== CONTENIDO PRINCIPAL ========== */
+        .main {
+            margin-left: 260px;
+            padding: 40px 60px;
+            max-width: 1100px;
+        }
+
+        /* ========== HEADER DE CLASE ========== */
+        .class-header {
+            background: linear-gradient(135deg, var(--dark), var(--primary));
+            color: white;
+            padding: 50px 40px;
+            border-radius: 16px;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-header::after {
+            content: '{ }';
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 120px;
+            opacity: 0.08;
+            font-weight: bold;
+        }
+
+        .class-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .class-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .time-badge {
+            display: inline-block;
+            background: var(--secondary);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        /* ========== SECCIONES ========== */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin: 30px 0 12px;
+        }
+
+        .section h4 {
+            font-size: 1.05rem;
+            color: #555;
+            margin: 20px 0 8px;
+        }
+
+        .section p {
+            margin-bottom: 14px;
+            font-size: 1.02rem;
+        }
+
+        /* ========== BLOQUES DE CÓDIGO ========== */
+        pre {
+            background: var(--code-bg);
+            color: #E0E0E0;
+            padding: 20px 24px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 14px 0 20px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            border-left: 4px solid var(--primary);
+        }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+        }
+
+        .inline-code {
+            background: #e8e6ff;
+            color: var(--dark);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .keyword { color: #C792EA; }
+        .property { color: #82AAFF; }
+        .value { color: #C3E88D; }
+        .selector { color: #FFCB6B; }
+        .comment { color: #6A7A8A; font-style: italic; }
+        .tag { color: #F07178; }
+        .attr { color: #FFCB6B; }
+        .string { color: #C3E88D; }
+
+        /* ========== CAJAS DE DEMOSTRACIÓN ========== */
+        .demo-area {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0 24px;
+            position: relative;
+        }
+
+        .demo-area::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -12px;
+            left: 16px;
+            background: var(--primary);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .demo-box {
+            padding: 16px 20px;
+            margin: 6px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: white;
+            text-align: center;
+        }
+
+        .box-a { background: var(--primary); }
+        .box-b { background: var(--secondary); }
+        .box-c { background: #43E97B; color: #1a1a2e; }
+        .box-d { background: #FFD93D; color: #1a1a2e; }
+        .box-e { background: #6EC6FF; color: #1a1a2e; }
+
+        /* ========== NOTAS Y TIPS ========== */
+        .note {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin: 16px 0;
+            font-size: 0.95rem;
+        }
+
+        .note-info {
+            background: #E3F2FD;
+            border-left: 4px solid var(--info);
+        }
+
+        .note-warning {
+            background: #FFF8E1;
+            border-left: 4px solid var(--warning);
+        }
+
+        .note-tip {
+            background: #E8F5E9;
+            border-left: 4px solid var(--accent);
+        }
+
+        .note strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* ========== EJERCICIOS ========== */
+        .exercise {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 14px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .exercise::before {
+            content: '✏️ EJERCICIO';
+            position: absolute;
+            top: -14px;
+            left: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .exercise h3 {
+            color: var(--dark);
+            margin-top: 10px;
+        }
+
+        .exercise .instructions {
+            background: #f8f7ff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .exercise .instructions li {
+            margin-bottom: 8px;
+            margin-left: 20px;
+        }
+
+        .exercise .starter-code {
+            margin-top: 16px;
+        }
+
+        .exercise .starter-code summary {
+            cursor: pointer;
+            background: var(--dark);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .exercise .starter-code summary:hover {
+            background: var(--primary);
+        }
+
+        .solution {
+            margin-top: 16px;
+        }
+
+        .solution summary {
+            cursor: pointer;
+            background: var(--accent);
+            color: var(--darker);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .solution summary:hover {
+            opacity: 0.85;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .diff-easy { background: #C8E6C9; color: #2E7D32; }
+        .diff-medium { background: #FFF9C4; color: #F57F17; }
+        .diff-hard { background: #FFCDD2; color: #C62828; }
+
+        /* ========== TABLAS ========== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        th {
+            background: var(--dark);
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.92rem;
+        }
+
+        tr:hover td {
+            background: #f8f7ff;
+        }
+
+        /* ========== SEPARADORES ========== */
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            border: none;
+            border-radius: 3px;
+            margin: 50px 0;
+        }
+
+        /* ========== DEMOS ESPECÍFICAS ========== */
+
+        /* Display demos */
+        .display-demo-inline span {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            margin: 2px;
+        }
+
+        .display-demo-block div {
+            background: var(--secondary);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin: 6px 0;
+        }
+
+        .display-demo-inlineblock div {
+            display: inline-block;
+            background: #43E97B;
+            color: #1a1a2e;
+            padding: 14px 24px;
+            border-radius: 6px;
+            margin: 4px;
+            width: 140px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .display-demo-none .hidden-element {
+            display: none;
+        }
+
+        /* Position demos */
+        .position-container {
+            position: relative;
+            height: 280px;
+            background: #f0f0ff;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .pos-box {
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        /* Flexbox demos */
+        .flex-demo {
+            display: flex;
+            background: #f0f0ff;
+            border: 2px dashed var(--primary);
+            border-radius: 10px;
+            padding: 16px;
+            min-height: 100px;
+            gap: 10px;
+        }
+
+        .flex-item {
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== NAVEGACIÓN LATERAL ========== -->
+<nav class="sidebar">
+    <h2>📋 Índice de Clase</h2>
+
+    <div class="section-label">Bloque 1 — Display</div>
+    <a href="#display">Display: Teoría</a>
+    <a href="#display-block">Block</a>
+    <a href="#display-inline">Inline</a>
+    <a href="#display-inlineblock">Inline-block</a>
+    <a href="#display-none">None</a>
+    <a href="#ejercicio1">Ejercicio 1</a>
+    <a href="#ejercicio2">Ejercicio 2</a>
+
+    <div class="section-label">Bloque 2 — Position</div>
+    <a href="#position">Position: Teoría</a>
+    <a href="#pos-static">Static</a>
+    <a href="#pos-relative">Relative</a>
+    <a href="#pos-absolute">Absolute</a>
+    <a href="#pos-fixed">Fixed</a>
+    <a href="#pos-sticky">Sticky</a>
+    <a href="#ejercicio3">Ejercicio 3</a>
+    <a href="#ejercicio4">Ejercicio 4</a>
+
+    <div class="section-label">Bloque 3 — Flexbox</div>
+    <a href="#flexbox">Flexbox: Teoría</a>
+    <a href="#flex-direction">Flex-direction</a>
+    <a href="#flex-justify">Justify-content</a>
+    <a href="#flex-align">Align-items</a>
+    <a href="#flex-wrap">Flex-wrap</a>
+    <a href="#flex-gap">Gap</a>
+    <a href="#ejercicio5">Ejercicio 5</a>
+    <a href="#ejercicio6">Ejercicio 6</a>
+
+    <div class="section-label">Proyecto Final</div>
+    <a href="#proyecto">Proyecto integrador</a>
+</nav>
+
+<!-- ========== CONTENIDO PRINCIPAL ========== -->
+<div class="main">
+
+    <!-- HEADER -->
+    <div class="class-header">
+        <h1>CSS: Display, Posicionamiento y Flexbox</h1>
+        <p>Aprende a controlar cómo se colocan y organizan los elementos en una página web.</p>
+        <span class="time-badge">⏱ Duración: 2 horas (sin contar presentación)</span>
+    </div>
+
+
+    <!-- ============================================================ -->
+    <!--              BLOQUE 1: DISPLAY (~40 min)                     -->
+    <!-- ============================================================ -->
+    <section class="section" id="display">
+        <h2>Bloque 1: La propiedad <code class="inline-code">display</code></h2>
+        <p>
+            La propiedad <code class="inline-code">display</code> es una de las más importantes de CSS.
+            Define <strong>cómo se comporta un elemento</strong> en el flujo del documento:
+            ¿ocupa toda la línea? ¿se pone al lado de otros? ¿es invisible?
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Valor</th>
+                    <th>Comportamiento</th>
+                    <th>¿Acepta width/height?</th>
+                    <th>Ejemplos de etiquetas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code class="inline-code">block</code></td>
+                    <td>Ocupa toda la línea disponible</td>
+                    <td>Sí</td>
+                    <td><code>&lt;div&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;h1&gt;</code>-<code>&lt;h6&gt;</code>, <code>&lt;section&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">inline</code></td>
+                    <td>Solo ocupa lo que necesita su contenido</td>
+                    <td>No</td>
+                    <td><code>&lt;span&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;strong&gt;</code>, <code>&lt;em&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">inline-block</code></td>
+                    <td>En línea, pero acepta dimensiones</td>
+                    <td>Sí</td>
+                    <td><code>&lt;img&gt;</code>, <code>&lt;button&gt;</code>, <code>&lt;input&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">none</code></td>
+                    <td>El elemento desaparece completamente</td>
+                    <td>—</td>
+                    <td>Cualquiera (se oculta)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- BLOCK -->
+        <h3 id="display-block">1.1 — <code class="inline-code">display: block</code></h3>
+        <p>
+            Los elementos de bloque siempre empiezan en una <strong>nueva línea</strong> y se expanden
+            para ocupar todo el ancho disponible de su contenedor padre. Piensa en ellos como "ladrillos"
+            que se apilan uno debajo del otro.
+        </p>
+
+        <div class="demo-area" data-label="Demo en vivo">
+            <div class="display-demo-block">
+                <div>Soy un &lt;div&gt; — Bloque 1</div>
+                <div>Soy un &lt;div&gt; — Bloque 2</div>
+                <div>Soy un &lt;div&gt; — Bloque 3</div>
+            </div>
+        </div>
+
+        <pre><code><span class="comment">/* Así se comportan los elementos block por defecto */</span>
+<span class="selector">div</span> {
+    <span class="property">display</span>: <span class="value">block</span>;     <span class="comment">/* Ya es block por defecto */</span>
+    <span class="property">background</span>: <span class="value">#FF6584</span>;
+    <span class="property">padding</span>: <span class="value">10px</span>;
+    <span class="property">margin</span>: <span class="value">6px 0</span>;
+}
+</code></pre>
+
+        <div class="note note-info">
+            <strong>💡 Dato clave:</strong>
+            Aunque un <code class="inline-code">&lt;div&gt;</code> contenga solo una palabra,
+            ocupará toda la línea. Para cambiar esto, necesitas cambiar su <code class="inline-code">display</code>.
+        </div>
+
+        <!-- INLINE -->
+        <h3 id="display-inline">1.2 — <code class="inline-code">display: inline</code></h3>
+        <p>
+            Los elementos inline fluyen <strong>dentro del texto</strong>, uno al lado del otro.
+            No aceptan <code class="inline-code">width</code> ni <code class="inline-code">height</code>,
+            y los márgenes verticales no los afectan.
+        </p>
+
+        <div class="demo-area" data-label="Demo en vivo">
+            <p class="display-demo-inline">
+                Aquí hay texto normal y
+                <span>elemento 1</span>
+                <span>elemento 2</span>
+                <span>elemento 3</span>
+                y el texto sigue fluyendo naturalmente.
+            </p>
+        </div>
+
+        <pre><code><span class="selector">span</span> {
+    <span class="property">display</span>: <span class="value">inline</span>;     <span class="comment">/* Ya es inline por defecto */</span>
+    <span class="property">background</span>: <span class="value">#6C63FF</span>;
+    <span class="property">padding</span>: <span class="value">4px 12px</span>;
+
+    <span class="comment">/* ⚠️ ESTO NO FUNCIONARÁ en elementos inline: */</span>
+    <span class="property">width</span>: <span class="value">200px</span>;       <span class="comment">/* Ignorado */</span>
+    <span class="property">height</span>: <span class="value">100px</span>;      <span class="comment">/* Ignorado */</span>
+    <span class="property">margin-top</span>: <span class="value">50px</span>;   <span class="comment">/* Ignorado */</span>
+}
+</code></pre>
+
+        <div class="note note-warning">
+            <strong>⚠️ Error común de principiante:</strong>
+            Intentar ponerle <code class="inline-code">width</code> o <code class="inline-code">height</code>
+            a un <code class="inline-code">&lt;span&gt;</code> o un <code class="inline-code">&lt;a&gt;</code>
+            y no ver ningún cambio. ¡Recuerda que son inline!
+        </div>
+
+        <!-- INLINE-BLOCK -->
+        <h3 id="display-inlineblock">1.3 — <code class="inline-code">display: inline-block</code></h3>
+        <p>
+            Lo mejor de dos mundos: se comporta <strong>en línea</strong> (al lado de otros),
+            pero <strong>acepta width y height</strong> como un bloque. Es perfecto para crear
+            botones, tarjetas en fila o menús horizontales.
+        </p>
+
+        <div class="demo-area" data-label="Demo en vivo">
+            <div class="display-demo-inlineblock">
+                <div>Caja A</div>
+                <div>Caja B</div>
+                <div>Caja C</div>
+            </div>
+        </div>
+
+        <pre><code><span class="selector">.caja</span> {
+    <span class="property">display</span>: <span class="value">inline-block</span>;
+    <span class="property">width</span>: <span class="value">140px</span>;
+    <span class="property">padding</span>: <span class="value">14px 24px</span>;
+    <span class="property">background</span>: <span class="value">#43E97B</span>;
+    <span class="property">text-align</span>: <span class="value">center</span>;
+}
+</code></pre>
+
+        <!-- NONE -->
+        <h3 id="display-none">1.4 — <code class="inline-code">display: none</code></h3>
+        <p>
+            El elemento <strong>desaparece completamente</strong>: no se ve y no ocupa espacio.
+            Es diferente a <code class="inline-code">visibility: hidden</code>, que oculta el
+            elemento pero conserva su espacio.
+        </p>
+
+        <div class="demo-area" data-label="Demo en vivo">
+            <div style="background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin: 4px 0;">Elemento 1 — Visible</div>
+            <div style="display: none; background: var(--secondary); color: white; padding: 10px; border-radius: 6px; margin: 4px 0;">Elemento 2 — display: none (no me ves)</div>
+            <div style="background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin: 4px 0;">Elemento 3 — Visible (el 2 no ocupa espacio)</div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <p style="margin-bottom: 8px;"><strong>Comparación con <code class="inline-code">visibility: hidden</code>:</strong></p>
+            <div class="demo-area" data-label="Comparación">
+                <div style="background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin: 4px 0;">Elemento 1 — Visible</div>
+                <div style="visibility: hidden; background: var(--secondary); color: white; padding: 10px; border-radius: 6px; margin: 4px 0;">Elemento 2 — visibility: hidden</div>
+                <div style="background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin: 4px 0;">Elemento 3 — Nota el espacio vacío arriba</div>
+            </div>
+        </div>
+
+        <pre><code><span class="comment">/* Desaparece completamente */</span>
+<span class="selector">.oculto</span> {
+    <span class="property">display</span>: <span class="value">none</span>;
+}
+
+<span class="comment">/* Invisible pero ocupa espacio */</span>
+<span class="selector">.invisible</span> {
+    <span class="property">visibility</span>: <span class="value">hidden</span>;
+}
+</code></pre>
+
+        <!-- ===== EJERCICIO 1 ===== -->
+        <div class="exercise" id="ejercicio1">
+            <h3>Ejercicio 1: Menú de navegación horizontal <span class="difficulty diff-easy">Fácil</span></h3>
+            <p>Crea un menú de navegación horizontal usando <code class="inline-code">display: inline-block</code>.</p>
+            <div class="instructions">
+                <strong>Instrucciones:</strong>
+                <ol>
+                    <li>Crea un archivo llamado <code class="inline-code">ejercicio1.html</code></li>
+                    <li>Dentro de un <code class="inline-code">&lt;nav&gt;</code>, coloca una lista <code class="inline-code">&lt;ul&gt;</code> con 5 enlaces: Inicio, Servicios, Portafolio, Blog, Contacto</li>
+                    <li>Quita los puntos de la lista con <code class="inline-code">list-style: none</code></li>
+                    <li>Haz que cada <code class="inline-code">&lt;li&gt;</code> sea <code class="inline-code">inline-block</code></li>
+                    <li>Dale estilo a los enlaces: sin subrayado, padding de 12px 24px, color blanco, fondo oscuro</li>
+                    <li>Agrega un <code class="inline-code">:hover</code> que cambie el color de fondo</li>
+                </ol>
+            </div>
+
+            <details class="starter-code">
+                <summary>📄 Código inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Ejercicio 1 - Menú<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="comment">/* Tu CSS aquí */</span>
+        <span class="selector">nav</span> {
+            <span class="property">background</span>: <span class="value">#2D2B55</span>;
+            <span class="property">padding</span>: <span class="value">0</span>;
+            <span class="property">text-align</span>: <span class="value">center</span>;
+        }
+
+        <span class="selector">ul</span> {
+            <span class="comment">/* 1. Quita los puntos de la lista */</span>
+            <span class="comment">/* 2. Quita el padding por defecto */</span>
+        }
+
+        <span class="selector">li</span> {
+            <span class="comment">/* 3. Haz que se pongan en línea */</span>
+        }
+
+        <span class="selector">a</span> {
+            <span class="comment">/* 4. Quita el subrayado */</span>
+            <span class="comment">/* 5. Agrega padding, color, etc. */</span>
+            <span class="property">display</span>: <span class="value">block</span>;
+        }
+
+        <span class="selector">a:hover</span> {
+            <span class="comment">/* 6. Cambia el color de fondo */</span>
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+        <span class="tag">&lt;ul&gt;</span>
+            <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Inicio<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+            <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Servicios<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+            <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Portafolio<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+            <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Blog<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+            <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Contacto<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;/ul&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+            </details>
+
+            <details class="solution">
+                <summary>✅ Ver solución</summary>
+<pre><code><span class="selector">nav</span> {
+    <span class="property">background</span>: <span class="value">#2D2B55</span>;
+    <span class="property">padding</span>: <span class="value">0</span>;
+    <span class="property">text-align</span>: <span class="value">center</span>;
+}
+
+<span class="selector">ul</span> {
+    <span class="property">list-style</span>: <span class="value">none</span>;
+    <span class="property">padding</span>: <span class="value">0</span>;
+    <span class="property">margin</span>: <span class="value">0</span>;
+}
+
+<span class="selector">li</span> {
+    <span class="property">display</span>: <span class="value">inline-block</span>;
+}
+
+<span class="selector">a</span> {
+    <span class="property">display</span>: <span class="value">block</span>;
+    <span class="property">text-decoration</span>: <span class="value">none</span>;
+    <span class="property">color</span>: <span class="value">white</span>;
+    <span class="property">padding</span>: <span class="value">16px 28px</span>;
+    <span class="property">font-family</span>: <span class="value">sans-serif</span>;
+    <span class="property">font-size</span>: <span class="value">0.95rem</span>;
+    <span class="property">transition</span>: <span class="value">background 0.3s</span>;
+}
+
+<span class="selector">a:hover</span> {
+    <span class="property">background</span>: <span class="value">#6C63FF</span>;
+}
+</code></pre>
+            </details>
+        </div>
+
+        <!-- ===== EJERCICIO 2 ===== -->
+        <div class="exercise" id="ejercicio2">
+            <h3>Ejercicio 2: Galería de tarjetas con toggle <span class="difficulty diff-medium">Medio</span></h3>
+            <p>Crea 4 tarjetas de productos en línea. Cada tarjeta tiene un botón que la oculta/muestra usando una clase CSS.</p>
+            <div class="instructions">
+                <strong>Instrucciones:</strong>
+                <ol>
+                    <li>Crea 4 tarjetas <code class="inline-code">&lt;div class="card"&gt;</code> cada una con: imagen (usa un placeholder como <code class="inline-code">https://picsum.photos/200/150?random=1</code>), título <code class="inline-code">&lt;h3&gt;</code>, precio en un <code class="inline-code">&lt;span&gt;</code>, y un botón "Ocultar"</li>
+                    <li>Haz las tarjetas <code class="inline-code">inline-block</code> con un ancho de 220px</li>
+                    <li>Crea una clase <code class="inline-code">.hidden</code> que aplique <code class="inline-code">display: none</code></li>
+                    <li>Con JavaScript básico (te lo damos), haz que el botón agregue/quite la clase <code class="inline-code">.hidden</code></li>
+                    <li>Dale estilo con bordes redondeados, sombra y un hover que eleve la tarjeta</li>
+                </ol>
+            </div>
+
+            <details class="starter-code">
+                <summary>📄 Código inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Ejercicio 2 - Galería<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="selector">body</span> {
+            <span class="property">font-family</span>: <span class="value">sans-serif</span>;
+            <span class="property">background</span>: <span class="value">#f5f5f5</span>;
+            <span class="property">text-align</span>: <span class="value">center</span>;
+            <span class="property">padding</span>: <span class="value">40px</span>;
+        }
+
+        <span class="selector">.card</span> {
+            <span class="comment">/* Hazla inline-block, ancho 220px */</span>
+            <span class="comment">/* Agrega background, border-radius, sombra */</span>
+            <span class="comment">/* Overflow hidden para que la imagen encaje */</span>
+        }
+
+        <span class="selector">.card:hover</span> {
+            <span class="comment">/* Eleva la tarjeta con transform y sombra */</span>
+        }
+
+        <span class="selector">.card img</span> {
+            <span class="property">width</span>: <span class="value">100%</span>;
+        }
+
+        <span class="selector">.card h3</span> {
+            <span class="property">margin</span>: <span class="value">12px 0 4px</span>;
+        }
+
+        <span class="selector">.precio</span> {
+            <span class="comment">/* Color verde, negrita, tamaño 1.2rem */</span>
+        }
+
+        <span class="selector">.btn-ocultar</span> {
+            <span class="comment">/* Botón con estilo */</span>
+        }
+
+        <span class="selector">.hidden</span> {
+            <span class="comment">/* Clase para ocultar */</span>
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Nuestra Tienda<span class="tag">&lt;/h1&gt;</span>
+
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"card"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"https://picsum.photos/200/150?random=1"</span> <span class="attr">alt</span>=<span class="string">"Producto"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;h3&gt;</span>Producto A<span class="tag">&lt;/h3&gt;</span>
+        <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"precio"</span><span class="tag">&gt;</span>$29.99<span class="tag">&lt;/span&gt;</span>
+        <span class="tag">&lt;br&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="string">"btn-ocultar"</span> <span class="attr">onclick</span>=<span class="string">"toggleCard(this)"</span><span class="tag">&gt;</span>Ocultar<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+
+    <span class="comment">&lt;!-- Repite para productos B, C, D --&gt;</span>
+
+    <span class="tag">&lt;script&gt;</span>
+        <span class="keyword">function</span> <span class="value">toggleCard</span>(btn) {
+            btn.parentElement.classList.toggle(<span class="string">'hidden'</span>);
+        }
+    <span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+            </details>
+
+            <details class="solution">
+                <summary>✅ Ver solución</summary>
+<pre><code><span class="selector">.card</span> {
+    <span class="property">display</span>: <span class="value">inline-block</span>;
+    <span class="property">width</span>: <span class="value">220px</span>;
+    <span class="property">background</span>: <span class="value">white</span>;
+    <span class="property">border-radius</span>: <span class="value">12px</span>;
+    <span class="property">box-shadow</span>: <span class="value">0 2px 10px rgba(0,0,0,0.1)</span>;
+    <span class="property">overflow</span>: <span class="value">hidden</span>;
+    <span class="property">margin</span>: <span class="value">12px</span>;
+    <span class="property">padding-bottom</span>: <span class="value">16px</span>;
+    <span class="property">transition</span>: <span class="value">transform 0.3s, box-shadow 0.3s</span>;
+    <span class="property">vertical-align</span>: <span class="value">top</span>;
+}
+
+<span class="selector">.card:hover</span> {
+    <span class="property">transform</span>: <span class="value">translateY(-6px)</span>;
+    <span class="property">box-shadow</span>: <span class="value">0 8px 24px rgba(0,0,0,0.15)</span>;
+}
+
+<span class="selector">.precio</span> {
+    <span class="property">color</span>: <span class="value">#2E7D32</span>;
+    <span class="property">font-weight</span>: <span class="value">bold</span>;
+    <span class="property">font-size</span>: <span class="value">1.2rem</span>;
+}
+
+<span class="selector">.btn-ocultar</span> {
+    <span class="property">margin-top</span>: <span class="value">10px</span>;
+    <span class="property">padding</span>: <span class="value">8px 20px</span>;
+    <span class="property">border</span>: <span class="value">none</span>;
+    <span class="property">background</span>: <span class="value">#FF6584</span>;
+    <span class="property">color</span>: <span class="value">white</span>;
+    <span class="property">border-radius</span>: <span class="value">6px</span>;
+    <span class="property">cursor</span>: <span class="value">pointer</span>;
+}
+
+<span class="selector">.hidden</span> {
+    <span class="property">display</span>: <span class="value">none</span>;
+}
+</code></pre>
+            </details>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+
+    <!-- ============================================================ -->
+    <!--              BLOQUE 2: POSITION (~40 min)                    -->
+    <!-- ============================================================ -->
+    <section class="section" id="position">
+        <h2>Bloque 2: La propiedad <code class="inline-code">position</code></h2>
+        <p>
+            Por defecto, los elementos siguen el "flujo normal" del documento: de arriba abajo y de izquierda a derecha.
+            La propiedad <code class="inline-code">position</code> nos permite <strong>sacar elementos de ese flujo</strong>
+            y colocarlos donde queramos, usando las propiedades <code class="inline-code">top</code>,
+            <code class="inline-code">right</code>, <code class="inline-code">bottom</code> y <code class="inline-code">left</code>.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Valor</th>
+                    <th>¿Sale del flujo?</th>
+                    <th>¿Se posiciona respecto a...?</th>
+                    <th>Uso típico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code class="inline-code">static</code></td>
+                    <td>No</td>
+                    <td>Nada (es el valor por defecto)</td>
+                    <td>Comportamiento normal</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">relative</code></td>
+                    <td>No</td>
+                    <td>Su posición original</td>
+                    <td>Ajustes pequeños, contenedor para absolute</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">absolute</code></td>
+                    <td>Sí</td>
+                    <td>Primer ancestro con position != static</td>
+                    <td>Badges, tooltips, overlays</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">fixed</code></td>
+                    <td>Sí</td>
+                    <td>La ventana del navegador (viewport)</td>
+                    <td>Headers fijos, botones flotantes</td>
+                </tr>
+                <tr>
+                    <td><code class="inline-code">sticky</code></td>
+                    <td>No (hasta que se "pega")</td>
+                    <td>Su contenedor, al hacer scroll</td>
+                    <td>Menús que se pegan al hacer scroll</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- STATIC -->
+        <h3 id="pos-static">2.1 — <code class="inline-code">position: static</code></h3>
+        <p>
+            Es el valor por defecto. El elemento sigue el flujo normal. Las propiedades
+            <code class="inline-code">top</code>, <code class="inline-code">left</code>, etc. <strong>no tienen efecto</strong>.
+        </p>
+
+        <!-- RELATIVE -->
+        <h3 id="pos-relative">2.2 — <code class="inline-code">position: relative</code></h3>
+        <p>
+            El elemento mantiene su espacio en el flujo, pero puede moverse respecto a su posición original.
+            Es como decir "muévete 20px hacia abajo <strong>desde donde estabas</strong>".
+        </p>
+
+        <div class="demo-area" data-label="Demo: Relative">
+            <div style="background: #ddd; padding: 10px; border-radius: 6px;">
+                <div style="background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin: 4px;">Normal</div>
+                <div style="position: relative; top: 20px; left: 40px; background: var(--secondary); color: white; padding: 10px; border-radius: 6px; margin: 4px;">Relative (top: 20px, left: 40px)</div>
+                <div style="background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin: 4px;">Normal (nota el espacio vacío arriba)</div>
+            </div>
+        </div>
+
+        <pre><code><span class="selector">.movido</span> {
+    <span class="property">position</span>: <span class="value">relative</span>;
+    <span class="property">top</span>: <span class="value">20px</span>;    <span class="comment">/* Se mueve 20px hacia abajo */</span>
+    <span class="property">left</span>: <span class="value">40px</span>;   <span class="comment">/* Se mueve 40px hacia la derecha */</span>
+}
+</code></pre>
+
+        <!-- ABSOLUTE -->
+        <h3 id="pos-absolute">2.3 — <code class="inline-code">position: absolute</code></h3>
+        <p>
+            El elemento <strong>sale del flujo</strong> y se posiciona respecto al ancestro más cercano
+            que tenga <code class="inline-code">position: relative</code> (u otro valor distinto de static).
+            Si no encuentra ninguno, se posiciona respecto al <code class="inline-code">&lt;body&gt;</code>.
+        </p>
+
+        <div class="demo-area" data-label="Demo: Absolute">
+            <div style="position: relative; background: #e8e6ff; border: 2px solid var(--primary); border-radius: 10px; height: 200px; padding: 16px;">
+                <p style="color: var(--dark); font-weight: bold;">Contenedor padre (position: relative)</p>
+                <div style="position: absolute; top: 10px; right: 10px; background: var(--secondary); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;">NUEVO</div>
+                <div style="position: absolute; bottom: 16px; left: 16px; background: var(--primary); color: white; padding: 10px 20px; border-radius: 8px;">Abajo-izquierda</div>
+                <div style="position: absolute; bottom: 16px; right: 16px; background: #43E97B; color: #1a1a2e; padding: 10px 20px; border-radius: 8px; font-weight: bold;">Abajo-derecha</div>
+            </div>
+        </div>
+
+        <pre><code><span class="comment">/* El padre DEBE tener position: relative */</span>
+<span class="selector">.padre</span> {
+    <span class="property">position</span>: <span class="value">relative</span>;
+}
+
+<span class="comment">/* El hijo se posiciona dentro del padre */</span>
+<span class="selector">.badge</span> {
+    <span class="property">position</span>: <span class="value">absolute</span>;
+    <span class="property">top</span>: <span class="value">10px</span>;
+    <span class="property">right</span>: <span class="value">10px</span>;
+}
+</code></pre>
+
+        <div class="note note-tip">
+            <strong>💡 Regla de oro:</strong>
+            Si usas <code class="inline-code">position: absolute</code> en un hijo, el padre
+            necesita <code class="inline-code">position: relative</code>. Si lo olvidas, el
+            elemento se posicionará respecto a toda la página.
+        </div>
+
+        <!-- FIXED -->
+        <h3 id="pos-fixed">2.4 — <code class="inline-code">position: fixed</code></h3>
+        <p>
+            El elemento se posiciona respecto a la <strong>ventana del navegador</strong> y
+            no se mueve aunque hagas scroll. Se usa para headers fijos, botones flotantes
+            y barras de navegación.
+        </p>
+
+        <pre><code><span class="comment">/* Un botón que siempre está abajo a la derecha */</span>
+<span class="selector">.btn-flotante</span> {
+    <span class="property">position</span>: <span class="value">fixed</span>;
+    <span class="property">bottom</span>: <span class="value">20px</span>;
+    <span class="property">right</span>: <span class="value">20px</span>;
+    <span class="property">background</span>: <span class="value">#6C63FF</span>;
+    <span class="property">color</span>: <span class="value">white</span>;
+    <span class="property">padding</span>: <span class="value">16px 24px</span>;
+    <span class="property">border-radius</span>: <span class="value">50px</span>;
+    <span class="property">z-index</span>: <span class="value">999</span>;
+}
+</code></pre>
+
+        <!-- STICKY -->
+        <h3 id="pos-sticky">2.5 — <code class="inline-code">position: sticky</code></h3>
+        <p>
+            Es un híbrido: se comporta como <code class="inline-code">relative</code> hasta que
+            el usuario hace scroll y llega a un punto definido (por ejemplo <code class="inline-code">top: 0</code>),
+            y entonces se "pega" como <code class="inline-code">fixed</code>. Perfecto para encabezados
+            de tabla o menús secundarios.
+        </p>
+
+        <pre><code><span class="selector">.menu-sticky</span> {
+    <span class="property">position</span>: <span class="value">sticky</span>;
+    <span class="property">top</span>: <span class="value">0</span>;     <span class="comment">/* Se pega cuando llega al borde superior */</span>
+    <span class="property">background</span>: <span class="value">white</span>;
+    <span class="property">z-index</span>: <span class="value">10</span>;
+}
+</code></pre>
+
+        <div class="note note-info">
+            <strong>💡 Importante:</strong>
+            Para que <code class="inline-code">sticky</code> funcione, el contenedor padre
+            debe tener suficiente altura para permitir el scroll, y debes especificar al menos
+            una dirección (<code class="inline-code">top</code>, <code class="inline-code">bottom</code>, etc.).
+        </div>
+
+        <!-- ===== EJERCICIO 3 ===== -->
+        <div class="exercise" id="ejercicio3">
+            <h3>Ejercicio 3: Tarjeta de perfil con badge <span class="difficulty diff-easy">Fácil</span></h3>
+            <p>Crea una tarjeta de perfil donde la foto tiene un badge "En línea" posicionado con absolute.</p>
+            <div class="instructions">
+                <strong>Instrucciones:</strong>
+                <ol>
+                    <li>Crea un <code class="inline-code">&lt;div class="profile-card"&gt;</code> centrado en la página con ancho de 320px</li>
+                    <li>Dentro, crea un <code class="inline-code">&lt;div class="avatar-container"&gt;</code> con <code class="inline-code">position: relative</code></li>
+                    <li>Agrega una imagen de avatar (usa <code class="inline-code">https://i.pravatar.cc/120</code>) con bordes redondeados</li>
+                    <li>Crea un <code class="inline-code">&lt;span class="badge-online"&gt;</code> con un circulito verde posicionado con <code class="inline-code">position: absolute</code> abajo a la derecha de la imagen</li>
+                    <li>Debajo del avatar, agrega un nombre con <code class="inline-code">&lt;h2&gt;</code> y un rol con <code class="inline-code">&lt;p&gt;</code></li>
+                    <li>Agrega un botón "Seguir" con estilo</li>
+                </ol>
+            </div>
+
+            <details class="starter-code">
+                <summary>📄 Código inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Ejercicio 3 - Perfil<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="selector">body</span> {
+            <span class="property">font-family</span>: <span class="value">sans-serif</span>;
+            <span class="property">background</span>: <span class="value">#f0f0ff</span>;
+            <span class="property">display</span>: <span class="value">flex</span>;
+            <span class="property">justify-content</span>: <span class="value">center</span>;
+            <span class="property">padding-top</span>: <span class="value">60px</span>;
+        }
+
+        <span class="selector">.profile-card</span> {
+            <span class="property">width</span>: <span class="value">320px</span>;
+            <span class="property">background</span>: <span class="value">white</span>;
+            <span class="property">border-radius</span>: <span class="value">16px</span>;
+            <span class="property">text-align</span>: <span class="value">center</span>;
+            <span class="property">padding</span>: <span class="value">30px</span>;
+            <span class="comment">/* Agrega sombra */</span>
+        }
+
+        <span class="selector">.avatar-container</span> {
+            <span class="comment">/* ¿Qué position necesita el padre? */</span>
+            <span class="property">display</span>: <span class="value">inline-block</span>;
+        }
+
+        <span class="selector">.avatar-container img</span> {
+            <span class="property">width</span>: <span class="value">120px</span>;
+            <span class="property">height</span>: <span class="value">120px</span>;
+            <span class="property">border-radius</span>: <span class="value">50%</span>;
+            <span class="property">object-fit</span>: <span class="value">cover</span>;
+        }
+
+        <span class="selector">.badge-online</span> {
+            <span class="comment">/* Posición absolute */</span>
+            <span class="comment">/* Circulito verde de 20x20px */</span>
+            <span class="comment">/* Borde blanco para que se vea bien */</span>
+            <span class="comment">/* Colocarlo abajo a la derecha */</span>
+        }
+
+        <span class="selector">.btn-seguir</span> {
+            <span class="comment">/* Botón morado, redondeado, ancho completo */</span>
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"profile-card"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"avatar-container"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"https://i.pravatar.cc/120"</span> <span class="attr">alt</span>=<span class="string">"Avatar"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"badge-online"</span><span class="tag">&gt;&lt;/span&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;h2&gt;</span>María López<span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;p</span> <span class="attr">style</span>=<span class="string">"color: #888;"</span><span class="tag">&gt;</span>Diseñadora UX/UI<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="string">"btn-seguir"</span><span class="tag">&gt;</span>Seguir<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+            </details>
+
+            <details class="solution">
+                <summary>✅ Ver solución</summary>
+<pre><code><span class="selector">.profile-card</span> {
+    <span class="property">box-shadow</span>: <span class="value">0 4px 20px rgba(0,0,0,0.1)</span>;
+}
+
+<span class="selector">.avatar-container</span> {
+    <span class="property">position</span>: <span class="value">relative</span>;
+    <span class="property">display</span>: <span class="value">inline-block</span>;
+}
+
+<span class="selector">.badge-online</span> {
+    <span class="property">position</span>: <span class="value">absolute</span>;
+    <span class="property">bottom</span>: <span class="value">8px</span>;
+    <span class="property">right</span>: <span class="value">8px</span>;
+    <span class="property">width</span>: <span class="value">20px</span>;
+    <span class="property">height</span>: <span class="value">20px</span>;
+    <span class="property">background</span>: <span class="value">#43E97B</span>;
+    <span class="property">border-radius</span>: <span class="value">50%</span>;
+    <span class="property">border</span>: <span class="value">3px solid white</span>;
+}
+
+<span class="selector">.btn-seguir</span> {
+    <span class="property">width</span>: <span class="value">100%</span>;
+    <span class="property">padding</span>: <span class="value">12px</span>;
+    <span class="property">background</span>: <span class="value">#6C63FF</span>;
+    <span class="property">color</span>: <span class="value">white</span>;
+    <span class="property">border</span>: <span class="value">none</span>;
+    <span class="property">border-radius</span>: <span class="value">8px</span>;
+    <span class="property">font-size</span>: <span class="value">1rem</span>;
+    <span class="property">cursor</span>: <span class="value">pointer</span>;
+    <span class="property">margin-top</span>: <span class="value">16px</span>;
+    <span class="property">transition</span>: <span class="value">background 0.3s</span>;
+}
+
+<span class="selector">.btn-seguir:hover</span> {
+    <span class="property">background</span>: <span class="value">#8B85FF</span>;
+}
+</code></pre>
+            </details>
+        </div>
+
+        <!-- ===== EJERCICIO 4 ===== -->
+        <div class="exercise" id="ejercicio4">
+            <h3>Ejercicio 4: Página con header sticky y botón flotante <span class="difficulty diff-medium">Medio</span></h3>
+            <p>Construye una página con un header que se pegue al hacer scroll y un botón "Volver arriba" fijo.</p>
+            <div class="instructions">
+                <strong>Instrucciones:</strong>
+                <ol>
+                    <li>Crea un <code class="inline-code">&lt;header&gt;</code> con <code class="inline-code">position: sticky</code> y <code class="inline-code">top: 0</code> que contenga el logo y un menú</li>
+                    <li>Agrega al menos 4 secciones (<code class="inline-code">&lt;section&gt;</code>) con títulos, párrafos e imágenes para que haya suficiente scroll</li>
+                    <li>Crea un botón circular con <code class="inline-code">position: fixed</code> en la esquina inferior derecha con el texto "↑"</li>
+                    <li>Dale <code class="inline-code">z-index</code> al header y al botón para que estén siempre encima</li>
+                    <li>Usa un <code class="inline-code">&lt;a href="#top"&gt;</code> para que el botón suba al inicio</li>
+                    <li>Agrega una sombra al header solo cuando se "pega" (pista: puedes usar <code class="inline-code">box-shadow</code> directamente)</li>
+                </ol>
+            </div>
+
+            <details class="starter-code">
+                <summary>📄 Código inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Ejercicio 4 - Sticky &amp; Fixed<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="selector">*</span> { <span class="property">margin</span>: <span class="value">0</span>; <span class="property">padding</span>: <span class="value">0</span>; <span class="property">box-sizing</span>: <span class="value">border-box</span>; }
+
+        <span class="selector">body</span> {
+            <span class="property">font-family</span>: <span class="value">sans-serif</span>;
+        }
+
+        <span class="selector">header</span> {
+            <span class="comment">/* Hazlo sticky en top: 0 */</span>
+            <span class="property">background</span>: <span class="value">white</span>;
+            <span class="property">padding</span>: <span class="value">16px 30px</span>;
+            <span class="comment">/* Sombra y z-index */</span>
+        }
+
+        <span class="selector">section</span> {
+            <span class="property">padding</span>: <span class="value">60px 30px</span>;
+            <span class="property">min-height</span>: <span class="value">80vh</span>;
+        }
+
+        <span class="selector">section:nth-child(even)</span> {
+            <span class="property">background</span>: <span class="value">#f0f0ff</span>;
+        }
+
+        <span class="selector">.btn-top</span> {
+            <span class="comment">/* Fixed, abajo a la derecha */</span>
+            <span class="comment">/* Circular, 50x50px */</span>
+            <span class="comment">/* Fondo morado, texto blanco */</span>
+            <span class="comment">/* Sin borde, cursor pointer */</span>
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">id</span>=<span class="string">"top"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;header&gt;</span>
+        <span class="tag">&lt;strong&gt;</span>Mi Sitio Web<span class="tag">&lt;/strong&gt;</span>
+    <span class="tag">&lt;/header&gt;</span>
+
+    <span class="tag">&lt;section&gt;</span>
+        <span class="tag">&lt;h2&gt;</span>Sección 1 - Bienvenida<span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;p&gt;</span>Lorem ipsum...<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+    <span class="comment">&lt;!-- Agrega más secciones --&gt;</span>
+
+    <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#top"</span> <span class="attr">class</span>=<span class="string">"btn-top"</span><span class="tag">&gt;</span>↑<span class="tag">&lt;/a&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+            </details>
+
+            <details class="solution">
+                <summary>✅ Ver solución</summary>
+<pre><code><span class="selector">header</span> {
+    <span class="property">position</span>: <span class="value">sticky</span>;
+    <span class="property">top</span>: <span class="value">0</span>;
+    <span class="property">background</span>: <span class="value">white</span>;
+    <span class="property">padding</span>: <span class="value">16px 30px</span>;
+    <span class="property">box-shadow</span>: <span class="value">0 2px 10px rgba(0,0,0,0.1)</span>;
+    <span class="property">z-index</span>: <span class="value">100</span>;
+}
+
+<span class="selector">.btn-top</span> {
+    <span class="property">position</span>: <span class="value">fixed</span>;
+    <span class="property">bottom</span>: <span class="value">24px</span>;
+    <span class="property">right</span>: <span class="value">24px</span>;
+    <span class="property">width</span>: <span class="value">50px</span>;
+    <span class="property">height</span>: <span class="value">50px</span>;
+    <span class="property">background</span>: <span class="value">#6C63FF</span>;
+    <span class="property">color</span>: <span class="value">white</span>;
+    <span class="property">border-radius</span>: <span class="value">50%</span>;
+    <span class="property">border</span>: <span class="value">none</span>;
+    <span class="property">font-size</span>: <span class="value">1.4rem</span>;
+    <span class="property">cursor</span>: <span class="value">pointer</span>;
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">align-items</span>: <span class="value">center</span>;
+    <span class="property">justify-content</span>: <span class="value">center</span>;
+    <span class="property">text-decoration</span>: <span class="value">none</span>;
+    <span class="property">box-shadow</span>: <span class="value">0 4px 12px rgba(0,0,0,0.2)</span>;
+    <span class="property">z-index</span>: <span class="value">100</span>;
+    <span class="property">transition</span>: <span class="value">transform 0.3s</span>;
+}
+
+<span class="selector">.btn-top:hover</span> {
+    <span class="property">transform</span>: <span class="value">scale(1.1)</span>;
+}
+</code></pre>
+            </details>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+
+    <!-- ============================================================ -->
+    <!--              BLOQUE 3: FLEXBOX (~40 min)                     -->
+    <!-- ============================================================ -->
+    <section class="section" id="flexbox">
+        <h2>Bloque 3: Flexbox</h2>
+        <p>
+            Flexbox es un modelo de layout unidimensional que facilita alinear, distribuir y ordenar
+            elementos en una fila o columna. Olvídate de los hacks con <code class="inline-code">float</code>
+            y <code class="inline-code">margin: auto</code>: Flexbox resuelve todo eso de forma elegante.
+        </p>
+
+        <div class="note note-tip">
+            <strong>💡 Concepto clave:</strong>
+            En Flexbox hay dos roles: el <strong>contenedor</strong> (padre, con <code class="inline-code">display: flex</code>)
+            y los <strong>items</strong> (hijos directos). Las propiedades se dividen entre ambos.
+        </div>
+
+        <pre><code><span class="comment">/* Activar Flexbox: solo necesitas esto en el padre */</span>
+<span class="selector">.contenedor</span> {
+    <span class="property">display</span>: <span class="value">flex</span>;
+}
+</code></pre>
+
+        <!-- FLEX-DIRECTION -->
+        <h3 id="flex-direction">3.1 — <code class="inline-code">flex-direction</code></h3>
+        <p>Define la <strong>dirección del eje principal</strong>: ¿los items van en fila o en columna?</p>
+
+        <h4><code class="inline-code">flex-direction: row</code> (por defecto)</h4>
+        <div class="demo-area" data-label="row (horizontal)">
+            <div class="flex-demo" style="flex-direction: row;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <h4><code class="inline-code">flex-direction: column</code></h4>
+        <div class="demo-area" data-label="column (vertical)">
+            <div class="flex-demo" style="flex-direction: column; width: 200px;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <pre><code><span class="selector">.fila</span> { <span class="property">display</span>: <span class="value">flex</span>; <span class="property">flex-direction</span>: <span class="value">row</span>; }
+<span class="selector">.columna</span> { <span class="property">display</span>: <span class="value">flex</span>; <span class="property">flex-direction</span>: <span class="value">column</span>; }
+<span class="selector">.fila-inversa</span> { <span class="property">display</span>: <span class="value">flex</span>; <span class="property">flex-direction</span>: <span class="value">row-reverse</span>; }
+<span class="selector">.columna-inversa</span> { <span class="property">display</span>: <span class="value">flex</span>; <span class="property">flex-direction</span>: <span class="value">column-reverse</span>; }
+</code></pre>
+
+        <!-- JUSTIFY-CONTENT -->
+        <h3 id="flex-justify">3.2 — <code class="inline-code">justify-content</code></h3>
+        <p>
+            Controla cómo se distribuyen los items a lo largo del <strong>eje principal</strong> (horizontal en row).
+        </p>
+
+        <h4><code class="inline-code">flex-start</code> (por defecto)</h4>
+        <div class="demo-area" data-label="flex-start">
+            <div class="flex-demo" style="justify-content: flex-start;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <h4><code class="inline-code">center</code></h4>
+        <div class="demo-area" data-label="center">
+            <div class="flex-demo" style="justify-content: center;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <h4><code class="inline-code">space-between</code></h4>
+        <div class="demo-area" data-label="space-between">
+            <div class="flex-demo" style="justify-content: space-between;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <h4><code class="inline-code">space-around</code></h4>
+        <div class="demo-area" data-label="space-around">
+            <div class="flex-demo" style="justify-content: space-around;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <h4><code class="inline-code">space-evenly</code></h4>
+        <div class="demo-area" data-label="space-evenly">
+            <div class="flex-demo" style="justify-content: space-evenly;">
+                <div class="flex-item box-a">1</div>
+                <div class="flex-item box-b">2</div>
+                <div class="flex-item box-c">3</div>
+            </div>
+        </div>
+
+        <!-- ALIGN-ITEMS -->
+        <h3 id="flex-align">3.3 — <code class="inline-code">align-items</code></h3>
+        <p>
+            Controla la alineación en el <strong>eje cruzado</strong> (vertical en row).
+            Es la propiedad que te permite centrar verticalmente.
+        </p>
+
+        <h4><code class="inline-code">stretch</code> (por defecto), <code class="inline-code">center</code>, <code class="inline-code">flex-start</code>, <code class="inline-code">flex-end</code></h4>
+        <div class="demo-area" data-label="align-items: center">
+            <div class="flex-demo" style="align-items: center; height: 160px; justify-content: space-evenly;">
+                <div class="flex-item box-a" style="padding: 10px 20px;">Corto</div>
+                <div class="flex-item box-b" style="padding: 30px 20px;">Más<br>alto</div>
+                <div class="flex-item box-c" style="padding: 10px 20px;">Corto</div>
+            </div>
+        </div>
+
+        <div class="note note-tip">
+            <strong>💡 El truco más usado en CSS:</strong>
+            Para centrar algo perfecta y completamente (horizontal y vertical):
+        </div>
+
+        <pre><code><span class="selector">.centrado-perfecto</span> {
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">justify-content</span>: <span class="value">center</span>;   <span class="comment">/* Centra horizontalmente */</span>
+    <span class="property">align-items</span>: <span class="value">center</span>;       <span class="comment">/* Centra verticalmente */</span>
+    <span class="property">height</span>: <span class="value">100vh</span>;             <span class="comment">/* Necesitas una altura definida */</span>
+}
+</code></pre>
+
+        <!-- FLEX-WRAP -->
+        <h3 id="flex-wrap">3.4 — <code class="inline-code">flex-wrap</code></h3>
+        <p>
+            Por defecto, todos los items se comprimen en una sola línea.
+            Con <code class="inline-code">flex-wrap: wrap</code>, los items saltan a la siguiente
+            línea si no caben.
+        </p>
+
+        <div class="demo-area" data-label="flex-wrap: wrap">
+            <div class="flex-demo" style="flex-wrap: wrap; justify-content: center;">
+                <div class="flex-item box-a" style="min-width: 120px;">Item 1</div>
+                <div class="flex-item box-b" style="min-width: 120px;">Item 2</div>
+                <div class="flex-item box-c" style="min-width: 120px;">Item 3</div>
+                <div class="flex-item box-d" style="min-width: 120px;">Item 4</div>
+                <div class="flex-item box-e" style="min-width: 120px;">Item 5</div>
+                <div class="flex-item box-a" style="min-width: 120px;">Item 6</div>
+                <div class="flex-item box-b" style="min-width: 120px;">Item 7</div>
+            </div>
+        </div>
+
+        <pre><code><span class="selector">.contenedor-wrap</span> {
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">flex-wrap</span>: <span class="value">wrap</span>;
+    <span class="property">gap</span>: <span class="value">10px</span>;
+}
+</code></pre>
+
+        <!-- GAP -->
+        <h3 id="flex-gap">3.5 — <code class="inline-code">gap</code></h3>
+        <p>
+            Define el espacio entre items sin usar márgenes. Es más limpio y predecible.
+        </p>
+
+        <div class="demo-area" data-label="gap: 20px">
+            <div class="flex-demo" style="gap: 20px;">
+                <div class="flex-item box-a">A</div>
+                <div class="flex-item box-b">B</div>
+                <div class="flex-item box-c">C</div>
+                <div class="flex-item box-d">D</div>
+            </div>
+        </div>
+
+        <pre><code><span class="selector">.contenedor</span> {
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">gap</span>: <span class="value">20px</span>;          <span class="comment">/* Espacio uniforme */</span>
+    <span class="comment">/* O también: */</span>
+    <span class="property">row-gap</span>: <span class="value">20px</span>;      <span class="comment">/* Solo entre filas */</span>
+    <span class="property">column-gap</span>: <span class="value">10px</span>;   <span class="comment">/* Solo entre columnas */</span>
+}
+</code></pre>
+
+        <!-- ===== EJERCICIO 5 ===== -->
+        <div class="exercise" id="ejercicio5">
+            <h3>Ejercicio 5: Footer de tres columnas <span class="difficulty diff-easy">Fácil</span></h3>
+            <p>Crea un footer de página web con 3 columnas distribuidas uniformemente usando Flexbox.</p>
+            <div class="instructions">
+                <strong>Instrucciones:</strong>
+                <ol>
+                    <li>Crea un <code class="inline-code">&lt;footer&gt;</code> con fondo oscuro y <code class="inline-code">display: flex</code></li>
+                    <li>Dentro, 3 divs: "Sobre nosotros" (con un párrafo), "Enlaces rápidos" (con una lista de 4 enlaces), "Contacto" (email, teléfono, dirección)</li>
+                    <li>Usa <code class="inline-code">justify-content: space-around</code> o <code class="inline-code">space-between</code></li>
+                    <li>Dale a cada columna <code class="inline-code">flex: 1</code> para que tengan el mismo ancho</li>
+                    <li>Todos los textos en color claro, los enlaces sin subrayado</li>
+                    <li>Agrega una línea final al fondo con el copyright centrado</li>
+                </ol>
+            </div>
+
+            <details class="starter-code">
+                <summary>📄 Código inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Ejercicio 5 - Footer<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="selector">*</span> { <span class="property">margin</span>: <span class="value">0</span>; <span class="property">box-sizing</span>: <span class="value">border-box</span>; }
+
+        <span class="selector">footer</span> {
+            <span class="property">background</span>: <span class="value">#1E1C3A</span>;
+            <span class="property">color</span>: <span class="value">#ccc</span>;
+            <span class="property">padding</span>: <span class="value">40px 30px 20px</span>;
+            <span class="comment">/* Activa Flexbox */</span>
+            <span class="comment">/* Distribuye las columnas */</span>
+            <span class="comment">/* Agrega gap */</span>
+        }
+
+        <span class="selector">.footer-col</span> {
+            <span class="comment">/* Haz que cada columna ocupe el mismo espacio */</span>
+        }
+
+        <span class="selector">.footer-col h3</span> {
+            <span class="property">color</span>: <span class="value">white</span>;
+            <span class="property">margin-bottom</span>: <span class="value">16px</span>;
+        }
+
+        <span class="selector">.footer-col a</span> {
+            <span class="property">color</span>: <span class="value">#8B85FF</span>;
+            <span class="comment">/* Quita subrayado, display block, margin */</span>
+        }
+
+        <span class="selector">.copyright</span> {
+            <span class="comment">/* Texto centrado, borde superior, padding top */</span>
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;footer&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"footer-col"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Sobre Nosotros<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Somos una empresa dedicada a crear experiencias digitales increíbles.<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"footer-col"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Enlaces Rápidos<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Inicio<span class="tag">&lt;/a&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Servicios<span class="tag">&lt;/a&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Blog<span class="tag">&lt;/a&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Contacto<span class="tag">&lt;/a&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"footer-col"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Contacto<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;p&gt;</span>info@miempresa.com<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;p&gt;</span>+57 300 123 4567<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Bogotá, Colombia<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/footer&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"copyright"</span><span class="tag">&gt;</span>
+        &amp;copy; 2026 Mi Empresa. Todos los derechos reservados.
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+            </details>
+
+            <details class="solution">
+                <summary>✅ Ver solución</summary>
+<pre><code><span class="selector">footer</span> {
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">justify-content</span>: <span class="value">space-between</span>;
+    <span class="property">gap</span>: <span class="value">30px</span>;
+    <span class="property">flex-wrap</span>: <span class="value">wrap</span>;
+}
+
+<span class="selector">.footer-col</span> {
+    <span class="property">flex</span>: <span class="value">1</span>;
+    <span class="property">min-width</span>: <span class="value">200px</span>;
+}
+
+<span class="selector">.footer-col a</span> {
+    <span class="property">text-decoration</span>: <span class="value">none</span>;
+    <span class="property">display</span>: <span class="value">block</span>;
+    <span class="property">margin-bottom</span>: <span class="value">8px</span>;
+    <span class="property">transition</span>: <span class="value">color 0.3s</span>;
+}
+
+<span class="selector">.footer-col a:hover</span> {
+    <span class="property">color</span>: <span class="value">white</span>;
+}
+
+<span class="selector">.copyright</span> {
+    <span class="property">text-align</span>: <span class="value">center</span>;
+    <span class="property">padding</span>: <span class="value">20px</span>;
+    <span class="property">background</span>: <span class="value">#15132d</span>;
+    <span class="property">color</span>: <span class="value">#888</span>;
+    <span class="property">font-size</span>: <span class="value">0.85rem</span>;
+}
+</code></pre>
+            </details>
+        </div>
+
+        <!-- ===== EJERCICIO 6 ===== -->
+        <div class="exercise" id="ejercicio6">
+            <h3>Ejercicio 6: Galería de fotos responsiva <span class="difficulty diff-medium">Medio</span></h3>
+            <p>Crea una galería de fotos que se adapte al tamaño de la pantalla usando Flexbox, wrap y media queries básicas.</p>
+            <div class="instructions">
+                <strong>Instrucciones:</strong>
+                <ol>
+                    <li>Crea un contenedor <code class="inline-code">&lt;div class="gallery"&gt;</code> con <code class="inline-code">display: flex</code>, <code class="inline-code">flex-wrap: wrap</code> y <code class="inline-code">gap: 16px</code></li>
+                    <li>Dentro, 8 tarjetas <code class="inline-code">&lt;div class="photo-card"&gt;</code> cada una con una imagen (usa <code class="inline-code">https://picsum.photos/400/300?random=N</code>), un título y una categoría</li>
+                    <li>Cada tarjeta debe ocupar <code class="inline-code">calc(25% - 12px)</code> de ancho (4 por fila)</li>
+                    <li>Dentro de cada tarjeta, usa Flexbox en columna para organizar imagen, título y categoría</li>
+                    <li>La categoría debe ir al fondo de la tarjeta (pista: <code class="inline-code">margin-top: auto</code> en Flexbox)</li>
+                    <li>Agrega un hover que haga zoom a la imagen con <code class="inline-code">transform: scale(1.05)</code> y <code class="inline-code">overflow: hidden</code></li>
+                    <li><strong>Bonus:</strong> Agrega una media query para que en pantallas menores a 768px sean 2 por fila</li>
+                </ol>
+            </div>
+
+            <details class="starter-code">
+                <summary>📄 Código inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Ejercicio 6 - Galería<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="selector">*</span> { <span class="property">margin</span>: <span class="value">0</span>; <span class="property">padding</span>: <span class="value">0</span>; <span class="property">box-sizing</span>: <span class="value">border-box</span>; }
+
+        <span class="selector">body</span> {
+            <span class="property">font-family</span>: <span class="value">sans-serif</span>;
+            <span class="property">background</span>: <span class="value">#f5f5f5</span>;
+            <span class="property">padding</span>: <span class="value">30px</span>;
+        }
+
+        <span class="selector">h1</span> { <span class="property">text-align</span>: <span class="value">center</span>; <span class="property">margin-bottom</span>: <span class="value">30px</span>; }
+
+        <span class="selector">.gallery</span> {
+            <span class="comment">/* Flex, wrap, gap, justify-content */</span>
+        }
+
+        <span class="selector">.photo-card</span> {
+            <span class="comment">/* Ancho: calc(25% - 12px) */</span>
+            <span class="comment">/* Flex en columna para organizar contenido */</span>
+            <span class="comment">/* Background blanco, border-radius, overflow hidden */</span>
+            <span class="comment">/* Sombra */</span>
+        }
+
+        <span class="selector">.photo-card .img-container</span> {
+            <span class="property">overflow</span>: <span class="value">hidden</span>;
+        }
+
+        <span class="selector">.photo-card img</span> {
+            <span class="property">width</span>: <span class="value">100%</span>;
+            <span class="property">display</span>: <span class="value">block</span>;
+            <span class="comment">/* Transición para el zoom en hover */</span>
+        }
+
+        <span class="selector">.photo-card:hover img</span> {
+            <span class="comment">/* Scale 1.05 */</span>
+        }
+
+        <span class="selector">.photo-card .info</span> {
+            <span class="property">padding</span>: <span class="value">14px</span>;
+        }
+
+        <span class="selector">.category</span> {
+            <span class="comment">/* Margin-top auto para empujar al fondo */</span>
+            <span class="comment">/* Color, tamaño pequeño */</span>
+        }
+
+        <span class="comment">/* Bonus: media query para pantallas pequeñas */</span>
+        <span class="keyword">@media</span> (<span class="property">max-width</span>: <span class="value">768px</span>) {
+            <span class="selector">.photo-card</span> {
+                <span class="comment">/* 2 por fila: calc(50% - 8px) */</span>
+            }
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Galería de Fotos<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"gallery"</span><span class="tag">&gt;</span>
+
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"photo-card"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"img-container"</span><span class="tag">&gt;</span>
+                <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"https://picsum.photos/400/300?random=1"</span> <span class="attr">alt</span>=<span class="string">"Foto"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;/div&gt;</span>
+            <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"info"</span><span class="tag">&gt;</span>
+                <span class="tag">&lt;h3&gt;</span>Atardecer dorado<span class="tag">&lt;/h3&gt;</span>
+                <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"category"</span><span class="tag">&gt;</span>Naturaleza<span class="tag">&lt;/span&gt;</span>
+            <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+
+        <span class="comment">&lt;!-- Repite para las demás fotos (cambia random=2, 3, etc.) --&gt;</span>
+        <span class="comment">&lt;!-- Títulos sugeridos: Montaña nevada, Ciudad nocturna, --&gt;</span>
+        <span class="comment">&lt;!-- Bosque tropical, Playa caribeña, Café artesanal, --&gt;</span>
+        <span class="comment">&lt;!-- Arquitectura moderna, Retrato urbano --&gt;</span>
+        <span class="comment">&lt;!-- Categorías: Naturaleza, Urbano, Gastronomía, Retratos --&gt;</span>
+
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+            </details>
+
+            <details class="solution">
+                <summary>✅ Ver solución</summary>
+<pre><code><span class="selector">.gallery</span> {
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">flex-wrap</span>: <span class="value">wrap</span>;
+    <span class="property">gap</span>: <span class="value">16px</span>;
+    <span class="property">justify-content</span>: <span class="value">center</span>;
+}
+
+<span class="selector">.photo-card</span> {
+    <span class="property">width</span>: <span class="value">calc(25% - 12px)</span>;
+    <span class="property">display</span>: <span class="value">flex</span>;
+    <span class="property">flex-direction</span>: <span class="value">column</span>;
+    <span class="property">background</span>: <span class="value">white</span>;
+    <span class="property">border-radius</span>: <span class="value">12px</span>;
+    <span class="property">overflow</span>: <span class="value">hidden</span>;
+    <span class="property">box-shadow</span>: <span class="value">0 2px 10px rgba(0,0,0,0.08)</span>;
+    <span class="property">transition</span>: <span class="value">transform 0.3s</span>;
+}
+
+<span class="selector">.photo-card:hover</span> {
+    <span class="property">transform</span>: <span class="value">translateY(-4px)</span>;
+}
+
+<span class="selector">.photo-card img</span> {
+    <span class="property">transition</span>: <span class="value">transform 0.4s</span>;
+}
+
+<span class="selector">.photo-card:hover img</span> {
+    <span class="property">transform</span>: <span class="value">scale(1.05)</span>;
+}
+
+<span class="selector">.category</span> {
+    <span class="property">margin-top</span>: <span class="value">auto</span>;
+    <span class="property">color</span>: <span class="value">#6C63FF</span>;
+    <span class="property">font-size</span>: <span class="value">0.85rem</span>;
+    <span class="property">font-weight</span>: <span class="value">bold</span>;
+}
+
+<span class="keyword">@media</span> (<span class="property">max-width</span>: <span class="value">768px</span>) {
+    <span class="selector">.photo-card</span> {
+        <span class="property">width</span>: <span class="value">calc(50% - 8px)</span>;
+    }
+}
+</code></pre>
+            </details>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+
+    <!-- ============================================================ -->
+    <!--              PROYECTO FINAL INTEGRADOR                       -->
+    <!-- ============================================================ -->
+    <section class="section" id="proyecto">
+        <h2>Proyecto Integrador: Landing Page de una App</h2>
+        <span class="difficulty diff-hard">Desafiante</span>
+
+        <p style="margin-top: 16px;">
+            Pon en práctica todo lo que aprendiste creando una landing page completa.
+            Este proyecto combina <strong>display, position y flexbox</strong> en un escenario real.
+        </p>
+
+        <div class="demo-area" data-label="Resultado esperado" style="padding: 30px;">
+            <div style="font-family: sans-serif; max-width: 100%;">
+                <!-- Mini mockup -->
+                <div style="background: #2D2B55; color: white; padding: 12px 20px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <strong>AppName</strong>
+                    <div>
+                        <span style="margin: 0 10px; font-size: 0.85rem;">Inicio</span>
+                        <span style="margin: 0 10px; font-size: 0.85rem;">Features</span>
+                        <span style="margin: 0 10px; font-size: 0.85rem;">Precios</span>
+                        <span style="background: #6C63FF; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem;">Descargar</span>
+                    </div>
+                </div>
+                <div style="background: linear-gradient(135deg, #1E1C3A, #6C63FF); color: white; padding: 40px 20px; display: flex; align-items: center; justify-content: space-around;">
+                    <div>
+                        <div style="font-size: 1.3rem; font-weight: bold;">Tu productividad,<br>reinventada</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 8px;">La herramienta que necesitas</div>
+                        <div style="margin-top: 14px; background: #FF6584; display: inline-block; padding: 8px 20px; border-radius: 8px; font-size: 0.85rem;">Empezar gratis</div>
+                    </div>
+                    <div style="width: 120px; height: 80px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; opacity: 0.6;">[mockup app]</div>
+                </div>
+                <div style="background: #f8f7ff; padding: 20px; display: flex; gap: 12px; justify-content: center;">
+                    <div style="flex: 1; background: white; padding: 14px; border-radius: 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+                        <div style="font-size: 1.5rem;">⚡</div>
+                        <div style="font-size: 0.8rem; font-weight: bold; margin-top: 4px;">Rápido</div>
+                    </div>
+                    <div style="flex: 1; background: white; padding: 14px; border-radius: 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+                        <div style="font-size: 1.5rem;">🔒</div>
+                        <div style="font-size: 0.8rem; font-weight: bold; margin-top: 4px;">Seguro</div>
+                    </div>
+                    <div style="flex: 1; background: white; padding: 14px; border-radius: 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+                        <div style="font-size: 1.5rem;">🎨</div>
+                        <div style="font-size: 0.8rem; font-weight: bold; margin-top: 4px;">Diseño</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions" style="background: #f8f7ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <strong>Requisitos:</strong>
+            <ol>
+                <li style="margin: 10px 0;">
+                    <strong>Navbar (sticky)</strong> — Logo a la izquierda, enlaces a la derecha.
+                    Usa <code class="inline-code">display: flex</code>, <code class="inline-code">justify-content: space-between</code>, <code class="inline-code">align-items: center</code>.
+                    Hazlo <code class="inline-code">position: sticky</code> con <code class="inline-code">top: 0</code>.
+                </li>
+                <li style="margin: 10px 0;">
+                    <strong>Hero section</strong> — Dos columnas con Flexbox: texto a la izquierda (título, subtítulo, botón CTA) e imagen/mockup a la derecha.
+                    Centra verticalmente con <code class="inline-code">align-items: center</code>.
+                </li>
+                <li style="margin: 10px 0;">
+                    <strong>Sección Features</strong> — 3 tarjetas en fila con Flexbox. Cada tarjeta tiene un icono (usa emojis), título y descripción.
+                    Las tarjetas deben hacer wrap en pantallas pequeñas.
+                </li>
+                <li style="margin: 10px 0;">
+                    <strong>Sección Precios</strong> — 3 tarjetas de precio en fila. La del medio es "destacada" y tiene un badge "Popular" con <code class="inline-code">position: absolute</code>.
+                </li>
+                <li style="margin: 10px 0;">
+                    <strong>Footer</strong> — 3 columnas con Flexbox (reutiliza lo del ejercicio 5).
+                </li>
+                <li style="margin: 10px 0;">
+                    <strong>Botón flotante</strong> — Un botón "Volver arriba" con <code class="inline-code">position: fixed</code> en la esquina inferior derecha.
+                </li>
+            </ol>
+        </div>
+
+        <div class="note note-tip">
+            <strong>💡 Consejos:</strong>
+            No intentes hacerlo todo perfecto de una vez. Primero crea la estructura HTML completa,
+            luego ve agregando CSS sección por sección. Empieza por el navbar, luego el hero,
+            y así sucesivamente.
+        </div>
+
+        <details class="starter-code">
+            <summary>📄 Estructura HTML inicial (clic para ver)</summary>
+<pre><code><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"es"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Proyecto Final - Landing Page<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style&gt;</span>
+        <span class="comment">/* ===== RESET ===== */</span>
+        <span class="selector">*</span> { <span class="property">margin</span>: <span class="value">0</span>; <span class="property">padding</span>: <span class="value">0</span>; <span class="property">box-sizing</span>: <span class="value">border-box</span>; }
+        <span class="selector">body</span> { <span class="property">font-family</span>: <span class="value">'Segoe UI', sans-serif</span>; }
+
+        <span class="comment">/* ===== NAVBAR ===== */</span>
+        <span class="selector">nav</span> {
+            <span class="comment">/* sticky, flex, space-between, center, z-index */</span>
+            <span class="property">background</span>: <span class="value">#1E1C3A</span>;
+            <span class="property">color</span>: <span class="value">white</span>;
+            <span class="property">padding</span>: <span class="value">14px 30px</span>;
+        }
+
+        <span class="selector">.nav-links</span> {
+            <span class="comment">/* flex, gap, align-items center */</span>
+        }
+
+        <span class="selector">.nav-links a</span> {
+            <span class="property">color</span>: <span class="value">#ccc</span>;
+            <span class="property">text-decoration</span>: <span class="value">none</span>;
+        }
+
+        <span class="selector">.btn-cta</span> {
+            <span class="property">background</span>: <span class="value">#6C63FF</span>;
+            <span class="property">color</span>: <span class="value">white</span>;
+            <span class="property">padding</span>: <span class="value">8px 20px</span>;
+            <span class="property">border-radius</span>: <span class="value">8px</span>;
+            <span class="property">text-decoration</span>: <span class="value">none</span>;
+        }
+
+        <span class="comment">/* ===== HERO ===== */</span>
+        <span class="selector">.hero</span> {
+            <span class="comment">/* flex, align-items center, gap */</span>
+            <span class="property">background</span>: <span class="value">linear-gradient(135deg, #1E1C3A, #6C63FF)</span>;
+            <span class="property">color</span>: <span class="value">white</span>;
+            <span class="property">padding</span>: <span class="value">80px 40px</span>;
+        }
+
+        <span class="comment">/* ===== FEATURES ===== */</span>
+        <span class="selector">.features</span> {
+            <span class="comment">/* flex, wrap, gap, center, padding */</span>
+        }
+
+        <span class="selector">.feature-card</span> {
+            <span class="comment">/* flex: 1, min-width, background, border-radius */</span>
+            <span class="comment">/* Sombra y padding */</span>
+        }
+
+        <span class="comment">/* ===== PRECIOS ===== */</span>
+        <span class="selector">.pricing</span> {
+            <span class="comment">/* flex, gap, center, padding */</span>
+        }
+
+        <span class="selector">.price-card</span> {
+            <span class="comment">/* position relative (para el badge) */</span>
+            <span class="comment">/* flex: 1, text-align center, padding */</span>
+        }
+
+        <span class="selector">.price-card.popular</span> {
+            <span class="comment">/* Borde o fondo diferente para destacar */</span>
+        }
+
+        <span class="selector">.badge-popular</span> {
+            <span class="comment">/* position absolute, top: -12px, centrado */</span>
+        }
+
+        <span class="comment">/* ===== FOOTER ===== */</span>
+        <span class="selector">footer</span> {
+            <span class="comment">/* flex, gap, padding, background oscuro */</span>
+        }
+
+        <span class="comment">/* ===== BOTÓN FLOTANTE ===== */</span>
+        <span class="selector">.btn-float</span> {
+            <span class="comment">/* fixed, bottom right */</span>
+        }
+    <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body</span> <span class="attr">id</span>=<span class="string">"top"</span><span class="tag">&gt;</span>
+
+    <span class="comment">&lt;!-- NAVBAR --&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+        <span class="tag">&lt;strong&gt;</span>AppName<span class="tag">&lt;/strong&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"nav-links"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#features"</span><span class="tag">&gt;</span>Features<span class="tag">&lt;/a&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#pricing"</span><span class="tag">&gt;</span>Precios<span class="tag">&lt;/a&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">class</span>=<span class="string">"btn-cta"</span><span class="tag">&gt;</span>Descargar<span class="tag">&lt;/a&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+
+    <span class="comment">&lt;!-- HERO --&gt;</span>
+    <span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="string">"hero"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"hero-text"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;h1&gt;</span>Tu productividad, reinventada<span class="tag">&lt;/h1&gt;</span>
+            <span class="tag">&lt;p&gt;</span>La herramienta todo-en-uno para organizar tu vida<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">class</span>=<span class="string">"btn-hero"</span><span class="tag">&gt;</span>Empezar gratis<span class="tag">&lt;/a&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"hero-image"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"https://picsum.photos/400/280?random=99"</span> <span class="attr">alt</span>=<span class="string">"App"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+
+    <span class="comment">&lt;!-- FEATURES --&gt;</span>
+    <span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="string">"features"</span> <span class="attr">id</span>=<span class="string">"features"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"feature-card"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"icon"</span><span class="tag">&gt;</span>⚡<span class="tag">&lt;/span&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Ultra Rápido<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Carga en menos de 1 segundo<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"feature-card"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"icon"</span><span class="tag">&gt;</span>🔒<span class="tag">&lt;/span&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Seguro<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Encriptación de extremo a extremo<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"feature-card"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"icon"</span><span class="tag">&gt;</span>🎨<span class="tag">&lt;/span&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Hermoso diseño<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Interfaz intuitiva y moderna<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+
+    <span class="comment">&lt;!-- PRECIOS --&gt;</span>
+    <span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="string">"pricing"</span> <span class="attr">id</span>=<span class="string">"pricing"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"price-card"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Básico<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"price"</span><span class="tag">&gt;</span>$0<span class="tag">&lt;/div&gt;</span>
+            <span class="tag">&lt;p&gt;</span>5 proyectos<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;p&gt;</span>1GB almacenamiento<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Elegir plan<span class="tag">&lt;/a&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"price-card popular"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="string">"badge-popular"</span><span class="tag">&gt;</span>Popular<span class="tag">&lt;/span&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Pro<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"price"</span><span class="tag">&gt;</span>$12/mes<span class="tag">&lt;/div&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Proyectos ilimitados<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;p&gt;</span>50GB almacenamiento<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Elegir plan<span class="tag">&lt;/a&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+        <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"price-card"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;h3&gt;</span>Enterprise<span class="tag">&lt;/h3&gt;</span>
+            <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"price"</span><span class="tag">&gt;</span>$49/mes<span class="tag">&lt;/div&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Todo ilimitado<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Soporte 24/7<span class="tag">&lt;/p&gt;</span>
+            <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#"</span><span class="tag">&gt;</span>Elegir plan<span class="tag">&lt;/a&gt;</span>
+        <span class="tag">&lt;/div&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+
+    <span class="comment">&lt;!-- FOOTER --&gt;</span>
+    <span class="tag">&lt;footer&gt;</span>
+        <span class="comment">&lt;!-- 3 columnas como en el ejercicio 5 --&gt;</span>
+    <span class="tag">&lt;/footer&gt;</span>
+
+    <span class="comment">&lt;!-- BOTÓN FLOTANTE --&gt;</span>
+    <span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#top"</span> <span class="attr">class</span>=<span class="string">"btn-float"</span><span class="tag">&gt;</span>↑<span class="tag">&lt;/a&gt;</span>
+
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+</code></pre>
+        </details>
+    </section>
+
+    <!-- ============================================================ -->
+    <!--              CHEAT SHEET FINAL                               -->
+    <!-- ============================================================ -->
+    <section class="section" id="cheatsheet" style="margin-top: 20px;">
+        <h2>Cheat Sheet: Resumen rápido</h2>
+
+        <h3 style="margin-top: 20px;">Display</h3>
+        <table>
+            <tr><th>Propiedad</th><th>Efecto</th></tr>
+            <tr><td><code class="inline-code">display: block</code></td><td>Ocupa toda la línea, acepta width/height</td></tr>
+            <tr><td><code class="inline-code">display: inline</code></td><td>Fluye con el texto, NO acepta width/height</td></tr>
+            <tr><td><code class="inline-code">display: inline-block</code></td><td>En línea pero acepta width/height</td></tr>
+            <tr><td><code class="inline-code">display: none</code></td><td>Desaparece completamente</td></tr>
+            <tr><td><code class="inline-code">display: flex</code></td><td>Activa Flexbox en el contenedor</td></tr>
+        </table>
+
+        <h3>Position</h3>
+        <table>
+            <tr><th>Propiedad</th><th>Efecto</th></tr>
+            <tr><td><code class="inline-code">position: static</code></td><td>Valor por defecto, flujo normal</td></tr>
+            <tr><td><code class="inline-code">position: relative</code></td><td>Se mueve respecto a sí mismo, mantiene espacio</td></tr>
+            <tr><td><code class="inline-code">position: absolute</code></td><td>Sale del flujo, se posiciona respecto al padre relative</td></tr>
+            <tr><td><code class="inline-code">position: fixed</code></td><td>Fijo en la ventana, no se mueve con scroll</td></tr>
+            <tr><td><code class="inline-code">position: sticky</code></td><td>Se pega al hacer scroll</td></tr>
+        </table>
+
+        <h3>Flexbox</h3>
+        <table>
+            <tr><th>Propiedad</th><th>Efecto</th></tr>
+            <tr><td><code class="inline-code">flex-direction</code></td><td>row | column | row-reverse | column-reverse</td></tr>
+            <tr><td><code class="inline-code">justify-content</code></td><td>Alinea en el eje principal</td></tr>
+            <tr><td><code class="inline-code">align-items</code></td><td>Alinea en el eje cruzado</td></tr>
+            <tr><td><code class="inline-code">flex-wrap</code></td><td>Permite saltar de línea</td></tr>
+            <tr><td><code class="inline-code">gap</code></td><td>Espacio entre items</td></tr>
+            <tr><td><code class="inline-code">flex: 1</code></td><td>El item crece para llenar espacio disponible</td></tr>
+        </table>
+    </section>
+
+    <div style="text-align: center; padding: 40px; color: #888; font-size: 0.9rem;">
+        Clase creada para principiantes en CSS &bull; 2026
+    </div>
+
+</div><!-- fin .main -->
+
+</body>
+</html>

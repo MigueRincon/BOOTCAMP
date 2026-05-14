@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guía HTML — De Principiante a Intermedio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #13161e;
+      --card: #191d28;
+      --border: #252a38;
+      --accent: #5dfdcb;
+      --accent2: #f7b731;
+      --accent3: #ff6b6b;
+      --accent4: #74b9ff;
+      --text: #e8ecf4;
+      --muted: #7a8499;
+      --code-bg: #0a0c10;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* NOISE TEXTURE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.4;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(93,253,203,0.07) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      pointer-events: none;
+    }
+
+    .hero-glow2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(116,185,255,0.05) 0%, transparent 70%);
+      bottom: 0; left: -50px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(93,253,203,0.1);
+      border: 1px solid rgba(93,253,203,0.3);
+      color: var(--accent);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.9rem;
+      border-radius: 2px;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 span.hl { color: var(--accent); }
+    h1 span.hl2 { color: var(--accent2); }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 3rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .toc-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.9rem 1.1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.78rem;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+
+    .toc-item:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(93,253,203,0.05);
+      transform: translateX(4px);
+    }
+
+    .toc-num {
+      color: var(--accent);
+      font-weight: 600;
+      min-width: 1.5rem;
+    }
+
+    /* MAIN CONTENT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    /* LEVEL SECTION */
+    .level-header {
+      display: flex; align-items: center; gap: 1.5rem;
+      padding: 3rem 0 1.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .level-tag {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border-radius: 2px;
+    }
+
+    .level-tag.basico   { background: rgba(93,253,203,0.15); color: var(--accent); border: 1px solid rgba(93,253,203,0.3); }
+    .level-tag.medio    { background: rgba(247,183,49,0.15);  color: var(--accent2); border: 1px solid rgba(247,183,49,0.3); }
+    .level-tag.intermedio { background: rgba(116,185,255,0.15); color: var(--accent4); border: 1px solid rgba(116,185,255,0.3); }
+
+    .level-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* EXERCISE CARD */
+    .exercise {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .exercise-head {
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: flex-start; gap: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ex-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 2rem;
+      padding-top: 0.1rem;
+    }
+
+    .ex-info { flex: 1; }
+
+    .ex-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .ex-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .diff-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 0.35rem;
+      flex-shrink: 0;
+    }
+    .diff-dot.easy   { background: var(--accent); }
+    .diff-dot.medium { background: var(--accent2); }
+    .diff-dot.hard   { background: var(--accent3); }
+
+    .exercise-body { padding: 1.5rem; }
+
+    .section-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .objective-box {
+      background: rgba(93,253,203,0.06);
+      border-left: 2px solid var(--accent);
+      padding: 0.9rem 1.1rem;
+      font-size: 0.82rem;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .objective-box.yellow { background: rgba(247,183,49,0.06); border-color: var(--accent2); }
+    .objective-box.blue   { background: rgba(116,185,255,0.06); border-color: var(--accent4); }
+
+    /* CODE BLOCK */
+    .code-wrap {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+    }
+
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1rem;
+      background: #111318;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-dots { display: flex; gap: 6px; }
+    .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+    .code-dots span:nth-child(1) { background: #ff5f57; }
+    .code-dots span:nth-child(2) { background: #febc2e; }
+    .code-dots span:nth-child(3) { background: #28c840; }
+
+    .code-lang {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    pre {
+      padding: 1.2rem;
+      font-size: 0.8rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .kw  { color: #c792ea; }
+    .tag { color: #89ddff; }
+    .at  { color: #f07178; }
+    .str { color: #c3e88d; }
+    .cm  { color: #546e7a; font-style: italic; }
+    .tx  { color: var(--text); }
+    .pu  { color: var(--accent); }
+
+    /* TIPS */
+    .tips {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      margin-top: 0.8rem;
+    }
+
+    .tips-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 0.6rem;
+    }
+
+    .tips ul {
+      list-style: none;
+      font-size: 0.79rem;
+      color: var(--muted);
+    }
+
+    .tips ul li::before {
+      content: '→ ';
+      color: var(--accent2);
+    }
+
+    .tips ul li { margin-bottom: 0.3rem; }
+
+    /* CHALLENGE */
+    .challenge {
+      background: rgba(255,107,107,0.07);
+      border: 1px solid rgba(255,107,107,0.2);
+      border-radius: 4px;
+      padding: 0.9rem 1.1rem;
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    .challenge-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent3);
+      margin-bottom: 0.4rem;
+    }
+
+    .challenge p { color: var(--muted); }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 1rem 0;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 3rem 2rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    footer span { color: var(--accent); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 3rem 1.2rem; }
+      .container { padding: 0 1.2rem 4rem; }
+      pre { font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div class="badge">✦ Guía de ejercicios · 2025</div>
+    <h1>Aprende <span class="hl">HTML</span><br/>desde <span class="hl2">cero</span></h1>
+    <p class="hero-desc">
+      12 ejercicios progresivos que te llevan desde la estructura básica hasta formularios y semántica intermedia. Cada ejercicio incluye código de ejemplo y retos extra.
+    </p>
+    <div class="toc-grid">
+      <a href="#nivel-basico" class="toc-item"><span class="toc-num">01–04</span> Nivel Básico</a>
+      <a href="#nivel-medio" class="toc-item"><span class="toc-num">05–08</span> Nivel Medio</a>
+      <a href="#nivel-intermedio" class="toc-item"><span class="toc-num">09–12</span> Nivel Intermedio</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<div class="container">
+
+  <!-- ══════════════════════════════════════════ BÁSICO -->
+  <div id="nivel-basico" class="level-header">
+    <span class="level-tag basico">Nivel 1</span>
+    <h2 class="level-title">Básico</h2>
+  </div>
+
+  <!-- EJ 01 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">01</div>
+      <div class="ex-info">
+        <div class="ex-title">Estructura base de un documento HTML</div>
+        <div class="ex-desc">Aprende los huesos de cualquier página web: DOCTYPE, html, head y body.</div>
+      </div>
+      <div class="diff-dot easy"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box">Crea tu primer archivo HTML válido con todos los elementos obligatorios. Ábrelo en el navegador y verifica que se muestra correctamente.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="cm">&lt;!-- Todo documento HTML empieza aquí --&gt;</span>
+<span class="pu">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="at">lang</span><span class="tx">=</span><span class="str">"es"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="at">charset</span><span class="tx">=</span><span class="str">"UTF-8"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="at">name</span><span class="tx">=</span><span class="str">"viewport"</span> <span class="at">content</span><span class="tx">=</span><span class="str">"width=device-width, initial-scale=1.0"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;title&gt;</span><span class="tx">Mi primera página</span><span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;/head&gt;</span>
+
+  <span class="tag">&lt;body&gt;</span>
+    <span class="tx">¡Hola, mundo!</span>
+  <span class="tag">&lt;/body&gt;</span>
+
+<span class="tag">&lt;/html&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Conceptos clave</div>
+        <ul>
+          <li><code>&lt;!DOCTYPE html&gt;</code> le dice al navegador qué versión de HTML usar (HTML5).</li>
+          <li><code>&lt;head&gt;</code> contiene metadatos: no es visible para el usuario.</li>
+          <li><code>&lt;body&gt;</code> contiene todo lo que el usuario ve.</li>
+          <li>El atributo <code>lang</code> mejora la accesibilidad y el SEO.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 02 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">02</div>
+      <div class="ex-info">
+        <div class="ex-title">Títulos y párrafos</div>
+        <div class="ex-desc">Usa las etiquetas h1–h6 y p para organizar texto con jerarquía visual.</div>
+      </div>
+      <div class="diff-dot easy"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box">Crea una página sobre tu tema favorito usando al menos 3 niveles de título y 2 párrafos con texto real.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="tag">&lt;body&gt;</span>
+
+  <span class="tag">&lt;h1&gt;</span><span class="tx">El Sistema Solar</span><span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="tx">El sistema solar se formó hace unos 4,600 millones de años.</span><span class="tag">&lt;/p&gt;</span>
+
+  <span class="tag">&lt;h2&gt;</span><span class="tx">Los planetas interiores</span><span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="tx">Mercurio, Venus, Tierra y Marte son los más cercanos al Sol.</span><span class="tag">&lt;/p&gt;</span>
+
+  <span class="tag">&lt;h3&gt;</span><span class="tx">La Tierra</span><span class="tag">&lt;/h3&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="tx">Es el único planeta conocido con vida.</span><span class="tag">&lt;/p&gt;</span>
+
+<span class="tag">&lt;/body&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Reglas importantes</div>
+        <ul>
+          <li>Solo debe haber <strong>un</strong> <code>&lt;h1&gt;</code> por página (título principal).</li>
+          <li>No saltes niveles: no pongas un <code>&lt;h3&gt;</code> después de un <code>&lt;h1&gt;</code> sin <code>&lt;h2&gt;</code>.</li>
+          <li><code>&lt;p&gt;</code> crea espaciado automático entre párrafos.</li>
+        </ul>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">🔥 Reto extra</div>
+        <p>Añade un párrafo con la etiqueta <code>&lt;strong&gt;</code> para texto en negrita y <code>&lt;em&gt;</code> para cursiva. Experimenta combinándolos.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 03 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">03</div>
+      <div class="ex-info">
+        <div class="ex-title">Listas ordenadas y no ordenadas</div>
+        <div class="ex-desc">Organiza información con &lt;ul&gt;, &lt;ol&gt; y elementos &lt;li&gt;.</div>
+      </div>
+      <div class="diff-dot easy"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box">Crea una receta de cocina: los ingredientes como lista no ordenada y los pasos como lista ordenada.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="tag">&lt;h2&gt;</span><span class="tx">Ingredientes</span><span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">2 tazas de harina</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">1 taza de leche</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">3 huevos</span><span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+
+<span class="tag">&lt;h2&gt;</span><span class="tx">Preparación</span><span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;ol&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">Mezcla la harina y la leche.</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">Agrega los huevos uno a uno.</span><span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">Hornea por 30 minutos a 180°C.</span><span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ol&gt;</span>
+
+<span class="cm">&lt;!-- Lista anidada --&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+  <span class="tag">&lt;li&gt;</span><span class="tx">Frutas
+    </span><span class="tag">&lt;ul&gt;</span>
+      <span class="tag">&lt;li&gt;</span><span class="tx">Manzana</span><span class="tag">&lt;/li&gt;</span>
+      <span class="tag">&lt;li&gt;</span><span class="tx">Naranja</span><span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+  <span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Diferencias clave</div>
+        <ul>
+          <li><code>&lt;ul&gt;</code> = Unordered List → muestra viñetas (bullets).</li>
+          <li><code>&lt;ol&gt;</code> = Ordered List → muestra números automáticos.</li>
+          <li>Puedes anidar listas dentro de otras listas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 04 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">04</div>
+      <div class="ex-info">
+        <div class="ex-title">Enlaces e imágenes</div>
+        <div class="ex-desc">Conecta páginas con &lt;a&gt; e inserta imágenes con &lt;img&gt;.</div>
+      </div>
+      <div class="diff-dot easy"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box">Crea una página con un enlace a Google que abra en una pestaña nueva y una imagen con su descripción alternativa.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="cm">&lt;!-- ENLACES --&gt;</span>
+<span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"https://www.google.com"</span><span class="tag">&gt;</span><span class="tx">Ir a Google</span><span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Abre en pestaña nueva --&gt;</span>
+<span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"https://www.wikipedia.org"</span>
+   <span class="at">target</span><span class="tx">=</span><span class="str">"_blank"</span>
+   <span class="at">rel</span><span class="tx">=</span><span class="str">"noopener noreferrer"</span><span class="tag">&gt;</span>
+  <span class="tx">Abrir Wikipedia</span>
+<span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- Enlace interno (a otra sección) --&gt;</span>
+<span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"#contacto"</span><span class="tag">&gt;</span><span class="tx">Ir a Contacto</span><span class="tag">&lt;/a&gt;</span>
+
+<span class="cm">&lt;!-- IMÁGENES --&gt;</span>
+<span class="tag">&lt;img</span>
+  <span class="at">src</span><span class="tx">=</span><span class="str">"https://picsum.photos/400/200"</span>
+  <span class="at">alt</span><span class="tx">=</span><span class="str">"Imagen aleatoria de ejemplo"</span>
+  <span class="at">width</span><span class="tx">=</span><span class="str">"400"</span>
+  <span class="at">height</span><span class="tx">=</span><span class="str">"200"</span>
+<span class="tag">/&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Atributos esenciales</div>
+        <ul>
+          <li><code>href</code> en &lt;a&gt; = la URL de destino. Puede ser absoluta o relativa.</li>
+          <li><code>target="_blank"</code> abre en pestaña nueva. Siempre acompáñalo de <code>rel="noopener"</code>.</li>
+          <li><code>alt</code> en &lt;img&gt; es obligatorio: describe la imagen para lectores de pantalla y SEO.</li>
+          <li>Especificar <code>width</code> y <code>height</code> evita saltos de layout al cargar.</li>
+        </ul>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">🔥 Reto extra</div>
+        <p>Convierte una imagen en un enlace: envuelve &lt;img&gt; dentro de &lt;a&gt;. Haz clic en la imagen para navegar a otro sitio.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ MEDIO -->
+  <div id="nivel-medio" class="level-header">
+    <span class="level-tag medio">Nivel 2</span>
+    <h2 class="level-title">Medio</h2>
+  </div>
+
+  <!-- EJ 05 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">05</div>
+      <div class="ex-info">
+        <div class="ex-title">Tablas HTML</div>
+        <div class="ex-desc">Muestra datos tabulares con &lt;table&gt;, thead, tbody y las celdas th / td.</div>
+      </div>
+      <div class="diff-dot medium"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box yellow">Crea una tabla con el horario de tu semana: días en las columnas y materias/actividades en las filas.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="tag">&lt;table</span> <span class="at">border</span><span class="tx">=</span><span class="str">"1"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;thead&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>
+      <span class="tag">&lt;th&gt;</span><span class="tx">Día</span><span class="tag">&lt;/th&gt;</span>
+      <span class="tag">&lt;th&gt;</span><span class="tx">Actividad</span><span class="tag">&lt;/th&gt;</span>
+      <span class="tag">&lt;th&gt;</span><span class="tx">Hora</span><span class="tag">&lt;/th&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+  <span class="tag">&lt;/thead&gt;</span>
+
+  <span class="tag">&lt;tbody&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="tx">Lunes</span><span class="tag">&lt;/td&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="tx">Programación</span><span class="tag">&lt;/td&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="tx">9:00 AM</span><span class="tag">&lt;/td&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>
+      <span class="tag">&lt;td&gt;</span><span class="tx">Martes</span><span class="tag">&lt;/td&gt;</span>
+      <span class="tag">&lt;td</span> <span class="at">colspan</span><span class="tx">=</span><span class="str">"2"</span><span class="tag">&gt;</span><span class="tx">Libre (celda combinada)</span><span class="tag">&lt;/td&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+  <span class="tag">&lt;/tbody&gt;</span>
+
+  <span class="tag">&lt;tfoot&gt;</span>
+    <span class="tag">&lt;tr&gt;</span>
+      <span class="tag">&lt;td</span> <span class="at">colspan</span><span class="tx">=</span><span class="str">"3"</span><span class="tag">&gt;</span><span class="tx">Total: 5 días</span><span class="tag">&lt;/td&gt;</span>
+    <span class="tag">&lt;/tr&gt;</span>
+  <span class="tag">&lt;/tfoot&gt;</span>
+
+<span class="tag">&lt;/table&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Anatomía de una tabla</div>
+        <ul>
+          <li><code>&lt;tr&gt;</code> = Table Row (fila).</li>
+          <li><code>&lt;th&gt;</code> = Table Header (celda encabezado, en negrita).</li>
+          <li><code>&lt;td&gt;</code> = Table Data (celda de datos).</li>
+          <li><code>colspan</code> y <code>rowspan</code> combinan celdas horizontal y verticalmente.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 06 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">06</div>
+      <div class="ex-info">
+        <div class="ex-title">Divs, Spans y clases</div>
+        <div class="ex-desc">Agrupa y selecciona elementos con contenedores genéricos y atributos de clase.</div>
+      </div>
+      <div class="diff-dot medium"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box yellow">Crea una tarjeta de perfil usando &lt;div&gt; como contenedor y &lt;span&gt; para resaltar partes del texto. Asigna clases descriptivas.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="cm">&lt;!-- div es bloque, span es en línea --&gt;</span>
+<span class="tag">&lt;div</span> <span class="at">class</span><span class="tx">=</span><span class="str">"tarjeta"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;div</span> <span class="at">class</span><span class="tx">=</span><span class="str">"tarjeta-header"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;img</span> <span class="at">src</span><span class="tx">=</span><span class="str">"foto.jpg"</span> <span class="at">alt</span><span class="tx">=</span><span class="str">"Avatar"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;h2&gt;</span><span class="tx">Ana García</span><span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+  <span class="tag">&lt;div</span> <span class="at">class</span><span class="tx">=</span><span class="str">"tarjeta-body"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;p&gt;</span>
+      <span class="tx">Desarrolladora con </span>
+      <span class="tag">&lt;span</span> <span class="at">class</span><span class="tx">=</span><span class="str">"destacado"</span><span class="tag">&gt;</span><span class="tx">5 años de experiencia</span><span class="tag">&lt;/span&gt;</span>
+      <span class="tx"> en HTML y CSS.</span>
+    <span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Múltiples clases --&gt;</span>
+<span class="tag">&lt;div</span> <span class="at">class</span><span class="tx">=</span><span class="str">"caja grande activa"</span><span class="tag">&gt;</span><span class="tx">...</span><span class="tag">&lt;/div&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 div vs span</div>
+        <ul>
+          <li><code>&lt;div&gt;</code> es un <strong>bloque</strong>: ocupa toda la línea.</li>
+          <li><code>&lt;span&gt;</code> es <strong>en línea</strong>: solo ocupa su contenido.</li>
+          <li>Las clases son el puente entre HTML y CSS/JavaScript.</li>
+          <li>Un elemento puede tener múltiples clases separadas por espacios.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 07 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">07</div>
+      <div class="ex-info">
+        <div class="ex-title">Formulario básico</div>
+        <div class="ex-desc">Recopila datos del usuario con &lt;form&gt;, &lt;input&gt;, &lt;label&gt; y &lt;button&gt;.</div>
+      </div>
+      <div class="diff-dot medium"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box yellow">Crea un formulario de registro con nombre, email, contraseña y un botón de envío. Usa labels correctamente.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="tag">&lt;form</span> <span class="at">action</span><span class="tx">=</span><span class="str">"/registro"</span> <span class="at">method</span><span class="tx">=</span><span class="str">"post"</span><span class="tag">&gt;</span>
+
+  <span class="cm">&lt;!-- label for="id" conecta con input id="id" --&gt;</span>
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"nombre"</span><span class="tag">&gt;</span><span class="tx">Nombre completo</span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span>
+    <span class="at">type</span><span class="tx">=</span><span class="str">"text"</span>
+    <span class="at">id</span><span class="tx">=</span><span class="str">"nombre"</span>
+    <span class="at">name</span><span class="tx">=</span><span class="str">"nombre"</span>
+    <span class="at">placeholder</span><span class="tx">=</span><span class="str">"Ej: María López"</span>
+    <span class="at">required</span>
+  <span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"email"</span><span class="tag">&gt;</span><span class="tx">Correo electrónico</span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span><span class="tx">=</span><span class="str">"email"</span> <span class="at">id</span><span class="tx">=</span><span class="str">"email"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"email"</span> <span class="at">required</span><span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"pass"</span><span class="tag">&gt;</span><span class="tx">Contraseña</span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span><span class="tx">=</span><span class="str">"password"</span> <span class="at">id</span><span class="tx">=</span><span class="str">"pass"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"pass"</span>
+         <span class="at">minlength</span><span class="tx">=</span><span class="str">"8"</span> <span class="at">required</span><span class="tag">/&gt;</span>
+
+  <span class="tag">&lt;button</span> <span class="at">type</span><span class="tx">=</span><span class="str">"submit"</span><span class="tag">&gt;</span><span class="tx">Registrarse</span><span class="tag">&lt;/button&gt;</span>
+
+<span class="tag">&lt;/form&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Tipos de input más usados</div>
+        <ul>
+          <li><code>type="text"</code> — texto libre.</li>
+          <li><code>type="email"</code> — valida formato de email automáticamente.</li>
+          <li><code>type="number"</code> — solo números.</li>
+          <li><code>type="checkbox"</code> / <code>type="radio"</code> — opciones.</li>
+          <li><code>required</code> hace el campo obligatorio sin JavaScript.</li>
+        </ul>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">🔥 Reto extra</div>
+        <p>Agrega un campo <code>select</code> (desplegable) con opciones de país, y un <code>textarea</code> para una biografía corta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 08 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">08</div>
+      <div class="ex-info">
+        <div class="ex-title">Select, Checkbox y Radio</div>
+        <div class="ex-desc">Implementa los controles de selección más comunes en formularios web.</div>
+      </div>
+      <div class="diff-dot medium"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box yellow">Crea una encuesta de preferencias con un desplegable, checkboxes para intereses y radios para nivel de experiencia.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="cm">&lt;!-- SELECT (una sola opción) --&gt;</span>
+<span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"pais"</span><span class="tag">&gt;</span><span class="tx">País</span><span class="tag">&lt;/label&gt;</span>
+<span class="tag">&lt;select</span> <span class="at">id</span><span class="tx">=</span><span class="str">"pais"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"pais"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;option</span> <span class="at">value</span><span class="tx">=</span><span class="str">""</span><span class="tag">&gt;</span><span class="tx">— Selecciona —</span><span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;option</span> <span class="at">value</span><span class="tx">=</span><span class="str">"mx"</span><span class="tag">&gt;</span><span class="tx">México</span><span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;option</span> <span class="at">value</span><span class="tx">=</span><span class="str">"co"</span><span class="tag">&gt;</span><span class="tx">Colombia</span><span class="tag">&lt;/option&gt;</span>
+  <span class="tag">&lt;option</span> <span class="at">value</span><span class="tx">=</span><span class="str">"ar"</span><span class="tag">&gt;</span><span class="tx">Argentina</span><span class="tag">&lt;/option&gt;</span>
+<span class="tag">&lt;/select&gt;</span>
+
+<span class="cm">&lt;!-- CHECKBOXES (múltiple selección) --&gt;</span>
+<span class="tag">&lt;fieldset&gt;</span>
+  <span class="tag">&lt;legend&gt;</span><span class="tx">¿Qué tecnologías conoces?</span><span class="tag">&lt;/legend&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span><span class="tx">=</span><span class="str">"checkbox"</span> <span class="at">id</span><span class="tx">=</span><span class="str">"html"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"tech"</span> <span class="at">value</span><span class="tx">=</span><span class="str">"html"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"html"</span><span class="tag">&gt;</span><span class="tx">HTML</span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span><span class="tx">=</span><span class="str">"checkbox"</span> <span class="at">id</span><span class="tx">=</span><span class="str">"css"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"tech"</span> <span class="at">value</span><span class="tx">=</span><span class="str">"css"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"css"</span><span class="tag">&gt;</span><span class="tx">CSS</span><span class="tag">&lt;/label&gt;</span>
+<span class="tag">&lt;/fieldset&gt;</span>
+
+<span class="cm">&lt;!-- RADIO (una sola opción del grupo) --&gt;</span>
+<span class="tag">&lt;fieldset&gt;</span>
+  <span class="tag">&lt;legend&gt;</span><span class="tx">Nivel</span><span class="tag">&lt;/legend&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span><span class="tx">=</span><span class="str">"radio"</span> <span class="at">id</span><span class="tx">=</span><span class="str">"basico"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"nivel"</span> <span class="at">value</span><span class="tx">=</span><span class="str">"basico"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"basico"</span><span class="tag">&gt;</span><span class="tx">Principiante</span><span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input</span> <span class="at">type</span><span class="tx">=</span><span class="str">"radio"</span> <span class="at">id</span><span class="tx">=</span><span class="str">"avanzado"</span> <span class="at">name</span><span class="tx">=</span><span class="str">"nivel"</span> <span class="at">value</span><span class="tx">=</span><span class="str">"avanzado"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;label</span> <span class="at">for</span><span class="tx">=</span><span class="str">"avanzado"</span><span class="tag">&gt;</span><span class="tx">Avanzado</span><span class="tag">&lt;/label&gt;</span>
+<span class="tag">&lt;/fieldset&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Nota importante</div>
+        <ul>
+          <li>Los <code>radio</code> del mismo grupo deben tener el mismo atributo <code>name</code>.</li>
+          <li><code>&lt;fieldset&gt;</code> agrupa controles relacionados y <code>&lt;legend&gt;</code> los etiqueta.</li>
+          <li>El atributo <code>value</code> es lo que se envía al servidor, no el texto del label.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ INTERMEDIO -->
+  <div id="nivel-intermedio" class="level-header">
+    <span class="level-tag intermedio">Nivel 3</span>
+    <h2 class="level-title">Intermedio</h2>
+  </div>
+
+  <!-- EJ 09 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">09</div>
+      <div class="ex-info">
+        <div class="ex-title">HTML Semántico</div>
+        <div class="ex-desc">Reemplaza divs genéricos con elementos que describen su significado.</div>
+      </div>
+      <div class="diff-dot hard"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box blue">Reestructura una página de blog usando solo etiquetas semánticas: header, nav, main, article, aside y footer.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="tag">&lt;header&gt;</span>
+  <span class="tag">&lt;h1&gt;</span><span class="tx">Mi Blog de Tecnología</span><span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;nav&gt;</span>
+    <span class="tag">&lt;ul&gt;</span>
+      <span class="tag">&lt;li&gt;&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"/"</span><span class="tag">&gt;</span><span class="tx">Inicio</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tag">&lt;li&gt;&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"/blog"</span><span class="tag">&gt;</span><span class="tx">Blog</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+  <span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/header&gt;</span>
+
+<span class="tag">&lt;main&gt;</span>
+  <span class="tag">&lt;article&gt;</span>
+    <span class="tag">&lt;header&gt;</span>
+      <span class="tag">&lt;h2&gt;</span><span class="tx">¿Qué es HTML semántico?</span><span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;time</span> <span class="at">datetime</span><span class="tx">=</span><span class="str">"2025-01-15"</span><span class="tag">&gt;</span><span class="tx">15 de enero 2025</span><span class="tag">&lt;/time&gt;</span>
+    <span class="tag">&lt;/header&gt;</span>
+    <span class="tag">&lt;section&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="tx">El HTML semántico usa etiquetas con significado...</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+    <span class="tag">&lt;footer&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="tx">Autor: Ana García</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/footer&gt;</span>
+  <span class="tag">&lt;/article&gt;</span>
+
+  <span class="tag">&lt;aside&gt;</span>
+    <span class="tag">&lt;h3&gt;</span><span class="tx">Artículos relacionados</span><span class="tag">&lt;/h3&gt;</span>
+  <span class="tag">&lt;/aside&gt;</span>
+<span class="tag">&lt;/main&gt;</span>
+
+<span class="tag">&lt;footer&gt;</span>
+  <span class="tag">&lt;p&gt;</span><span class="tx">&amp;copy; 2025 Mi Blog</span><span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/footer&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 ¿Por qué importa?</div>
+        <ul>
+          <li><strong>SEO:</strong> los buscadores entienden mejor tu contenido.</li>
+          <li><strong>Accesibilidad:</strong> los lectores de pantalla navegan por landmarks semánticos.</li>
+          <li><code>&lt;article&gt;</code> = contenido autónomo (podría existir solo).</li>
+          <li><code>&lt;section&gt;</code> = sección temática dentro de otro elemento.</li>
+          <li><code>&lt;aside&gt;</code> = contenido tangencial (barras laterales, notas).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 10 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">10</div>
+      <div class="ex-info">
+        <div class="ex-title">Atributos de datos y accesibilidad</div>
+        <div class="ex-desc">Usa data-*, aria-label y role para páginas más robustas e inclusivas.</div>
+      </div>
+      <div class="diff-dot hard"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box blue">Crea un botón de "Me gusta" con un atributo data-id, y un menú de navegación con atributos aria correctos.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="cm">&lt;!-- data-* guarda datos personalizados para JS --&gt;</span>
+<span class="tag">&lt;button</span>
+  <span class="at">data-id</span><span class="tx">=</span><span class="str">"post-42"</span>
+  <span class="at">data-accion</span><span class="tx">=</span><span class="str">"like"</span>
+  <span class="at">aria-label</span><span class="tx">=</span><span class="str">"Me gusta este artículo"</span>
+  <span class="at">aria-pressed</span><span class="tx">=</span><span class="str">"false"</span>
+<span class="tag">&gt;</span>
+  <span class="tx">❤️ Me gusta</span>
+<span class="tag">&lt;/button&gt;</span>
+
+<span class="cm">&lt;!-- Navegación accesible --&gt;</span>
+<span class="tag">&lt;nav</span> <span class="at">aria-label</span><span class="tx">=</span><span class="str">"Menú principal"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;ul</span> <span class="at">role</span><span class="tx">=</span><span class="str">"menubar"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;li</span> <span class="at">role</span><span class="tx">=</span><span class="str">"menuitem"</span><span class="tag">&gt;&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"/"</span><span class="tag">&gt;</span><span class="tx">Inicio</span><span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/nav&gt;</span>
+
+<span class="cm">&lt;!-- img decorativa (ocultar del lector) --&gt;</span>
+<span class="tag">&lt;img</span> <span class="at">src</span><span class="tx">=</span><span class="str">"decoracion.png"</span> <span class="at">alt</span><span class="tx">=</span><span class="str">""</span> <span class="at">role</span><span class="tx">=</span><span class="str">"presentation"</span><span class="tag">/&gt;</span>
+
+<span class="cm">&lt;!-- Leer con JS: --&gt;</span>
+<span class="cm">&lt;!-- const btn = document.querySelector('[data-id="post-42"]') --&gt;</span>
+<span class="cm">&lt;!-- console.log(btn.dataset.id) // "post-42" --&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 data-* y ARIA</div>
+        <ul>
+          <li><code>data-*</code> almacena cualquier dato en el HTML, accesible desde JavaScript con <code>element.dataset</code>.</li>
+          <li><code>aria-label</code> da nombre a elementos sin texto visible.</li>
+          <li><code>aria-pressed</code> indica si un botón toggle está activo.</li>
+          <li><code>alt=""</code> en imágenes decorativas las oculta de lectores de pantalla.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 11 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">11</div>
+      <div class="ex-info">
+        <div class="ex-title">Audio, Video e iframes</div>
+        <div class="ex-desc">Integra multimedia e iframes de manera accesible con atributos correctos.</div>
+      </div>
+      <div class="diff-dot hard"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box blue">Crea una página multimedia que incluya audio con controles, video con subtítulos y un mapa de Google embebido.</div>
+
+      <div class="section-label">Código de ejemplo</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html</span>
+        </div>
+        <pre><span class="cm">&lt;!-- AUDIO --&gt;</span>
+<span class="tag">&lt;audio</span> <span class="at">controls</span> <span class="at">preload</span><span class="tx">=</span><span class="str">"metadata"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;source</span> <span class="at">src</span><span class="tx">=</span><span class="str">"musica.mp3"</span> <span class="at">type</span><span class="tx">=</span><span class="str">"audio/mpeg"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;source</span> <span class="at">src</span><span class="tx">=</span><span class="str">"musica.ogg"</span> <span class="at">type</span><span class="tx">=</span><span class="str">"audio/ogg"</span><span class="tag">/&gt;</span>
+  <span class="tx">Tu navegador no soporta audio.</span>
+<span class="tag">&lt;/audio&gt;</span>
+
+<span class="cm">&lt;!-- VIDEO con subtítulos --&gt;</span>
+<span class="tag">&lt;video</span> <span class="at">controls</span> <span class="at">width</span><span class="tx">=</span><span class="str">"640"</span> <span class="at">poster</span><span class="tx">=</span><span class="str">"miniatura.jpg"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;source</span> <span class="at">src</span><span class="tx">=</span><span class="str">"video.mp4"</span> <span class="at">type</span><span class="tx">=</span><span class="str">"video/mp4"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;track</span>
+    <span class="at">kind</span><span class="tx">=</span><span class="str">"subtitles"</span>
+    <span class="at">src</span><span class="tx">=</span><span class="str">"subtitulos-es.vtt"</span>
+    <span class="at">srclang</span><span class="tx">=</span><span class="str">"es"</span>
+    <span class="at">label</span><span class="tx">=</span><span class="str">"Español"</span>
+    <span class="at">default</span>
+  <span class="tag">/&gt;</span>
+<span class="tag">&lt;/video&gt;</span>
+
+<span class="cm">&lt;!-- IFRAME (ej. YouTube) --&gt;</span>
+<span class="tag">&lt;iframe</span>
+  <span class="at">src</span><span class="tx">=</span><span class="str">"https://www.youtube.com/embed/TU_VIDEO_ID"</span>
+  <span class="at">title</span><span class="tx">=</span><span class="str">"Título del video para accesibilidad"</span>
+  <span class="at">width</span><span class="tx">=</span><span class="str">"560"</span>
+  <span class="at">height</span><span class="tx">=</span><span class="str">"315"</span>
+  <span class="at">allowfullscreen</span>
+  <span class="at">loading</span><span class="tx">=</span><span class="str">"lazy"</span>
+<span class="tag">&gt;&lt;/iframe&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">💡 Buenas prácticas multimedia</div>
+        <ul>
+          <li>Siempre ofrece múltiples formatos con &lt;source&gt; por compatibilidad.</li>
+          <li><code>poster</code> muestra una imagen antes de reproducir el video.</li>
+          <li><code>&lt;track&gt;</code> con subtítulos es esencial para accesibilidad.</li>
+          <li><code>loading="lazy"</code> en iframes mejora la velocidad de carga.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EJ 12 -->
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="ex-num">12</div>
+      <div class="ex-info">
+        <div class="ex-title">Proyecto final: Página personal completa</div>
+        <div class="ex-desc">Integra todo lo aprendido en una página de portafolio personal bien estructurada.</div>
+      </div>
+      <div class="diff-dot hard"></div>
+    </div>
+    <div class="exercise-body">
+      <div class="section-label">Objetivo</div>
+      <div class="objective-box blue">
+        Construye una página de portafolio personal que incluya: navegación con anclas, sección "sobre mí", lista de habilidades, tabla de proyectos, galería de imágenes, formulario de contacto y footer con links a redes sociales.
+      </div>
+
+      <div class="section-label">Estructura recomendada</div>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-lang">html — estructura</span>
+        </div>
+        <pre><span class="tag">&lt;body&gt;</span>
+
+  <span class="tag">&lt;header&gt;</span>
+    <span class="tag">&lt;h1&gt;</span><span class="tx">Tu Nombre</span><span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"#sobre-mi"</span><span class="tag">&gt;</span><span class="tx">Sobre mí</span><span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"#proyectos"</span><span class="tag">&gt;</span><span class="tx">Proyectos</span><span class="tag">&lt;/a&gt;</span>
+      <span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"#contacto"</span><span class="tag">&gt;</span><span class="tx">Contacto</span><span class="tag">&lt;/a&gt;</span>
+    <span class="tag">&lt;/nav&gt;</span>
+  <span class="tag">&lt;/header&gt;</span>
+
+  <span class="tag">&lt;main&gt;</span>
+    <span class="tag">&lt;section</span> <span class="at">id</span><span class="tx">=</span><span class="str">"sobre-mi"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;img</span> <span class="at">src</span><span class="tx">=</span><span class="str">"tu-foto.jpg"</span> <span class="at">alt</span><span class="tx">=</span><span class="str">"Foto de perfil"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;p&gt;</span><span class="tx">Descripción sobre ti...</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+
+    <span class="tag">&lt;section</span> <span class="at">id</span><span class="tx">=</span><span class="str">"proyectos"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2&gt;</span><span class="tx">Proyectos</span><span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;table&gt;</span><span class="tx">...</span><span class="tag">&lt;/table&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+
+    <span class="tag">&lt;section</span> <span class="at">id</span><span class="tx">=</span><span class="str">"contacto"</span><span class="tag">&gt;</span>
+      <span class="tag">&lt;h2&gt;</span><span class="tx">Contacto</span><span class="tag">&lt;/h2&gt;</span>
+      <span class="tag">&lt;form</span> <span class="at">method</span><span class="tx">=</span><span class="str">"post"</span><span class="tag">&gt;</span><span class="tx">...</span><span class="tag">&lt;/form&gt;</span>
+    <span class="tag">&lt;/section&gt;</span>
+  <span class="tag">&lt;/main&gt;</span>
+
+  <span class="tag">&lt;footer&gt;</span>
+    <span class="tag">&lt;p&gt;</span><span class="tx">&amp;copy; 2025 Tu Nombre</span><span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;a</span> <span class="at">href</span><span class="tx">=</span><span class="str">"https://github.com/tu-usuario"</span>
+       <span class="at">target</span><span class="tx">=</span><span class="str">"_blank"</span>
+       <span class="at">rel</span><span class="tx">=</span><span class="str">"noopener"</span><span class="tag">&gt;</span><span class="tx">GitHub</span><span class="tag">&lt;/a&gt;</span>
+  <span class="tag">&lt;/footer&gt;</span>
+
+<span class="tag">&lt;/body&gt;</span></pre>
+      </div>
+
+      <div class="tips">
+        <div class="tips-title">✅ Checklist del proyecto</div>
+        <ul>
+          <li>Estructura semántica completa (header, main, footer).</li>
+          <li>Al menos un formulario funcional con labels.</li>
+          <li>Una tabla con thead, tbody y tfoot.</li>
+          <li>Todos los links con href y todas las imágenes con alt.</li>
+          <li>El documento pasa el validador: <strong>validator.w3.org</strong></li>
+          <li>La página es accesible navegando solo con el teclado (Tab).</li>
+        </ul>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-label">🔥 Próximos pasos</div>
+        <p>Una vez terminado tu portafolio en HTML puro, agrégale CSS para darle estilo. ¡Eso es la segunda gran aventura del desarrollo web!</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Guía HTML · 12 ejercicios · De principiante a intermedio</p>
+  <p style="margin-top:0.5rem;">Hecho con <span>❤</span> para aprendices de la web</p>
+</footer>
+
+</body>
+</html>

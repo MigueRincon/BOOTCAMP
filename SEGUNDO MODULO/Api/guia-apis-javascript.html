@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Completa: APIs REST y JavaScript</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-light.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        aside {
+            width: 280px;
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        aside nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        aside a {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        aside a:hover {
+            background: #efefef;
+            border-left-color: #0066cc;
+            color: #0066cc;
+        }
+        
+        aside a.active {
+            background: #e3f2fd;
+            border-left-color: #0066cc;
+            color: #0066cc;
+            font-weight: 600;
+        }
+        
+        main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px 60px;
+            max-width: 1000px;
+        }
+        
+        section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        h2 {
+            font-size: 24px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        p, li {
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #d73a49;
+        }
+        
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        
+        .code-block code {
+            background: transparent;
+            color: #333;
+            padding: 0;
+            display: block;
+            white-space: pre;
+            font-size: 13px;
+        }
+        
+        .code-block pre {
+            margin: 0;
+        }
+        
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #0066cc;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .note strong {
+            color: #0066cc;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .diagram {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        
+        .interactive-demo {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        
+        .interactive-demo input, .interactive-demo textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .interactive-demo button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .interactive-demo button:hover {
+            background: #0052a3;
+        }
+        
+        .output {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .endpoint-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 4px solid #0066cc;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        
+        .method-get {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .method-post {
+            background: #bbdefb;
+            color: #1565c0;
+        }
+        
+        .method-put {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+        
+        .method-delete {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+        
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .param-table th, .param-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .param-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 6px;
+        }
+        
+        .comparison-box h4 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #0066cc;
+        }
+        
+        @media (max-width: 1200px) {
+            aside {
+                width: 240px;
+            }
+            main {
+                margin-left: 240px;
+                padding: 30px 40px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            aside {
+                width: 200px;
+            }
+            main {
+                margin-left: 200px;
+                padding: 20px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside>
+            <nav id="navigation">
+                <a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a>
+                <a href="#que-es-api" class="nav-link" data-section="que-es-api">¿Qué es una API?</a>
+                <a href="#rest" class="nav-link" data-section="rest">Arquitectura REST</a>
+                <a href="#endpoints" class="nav-link" data-section="endpoints">Endpoints</a>
+                <a href="#http-metodos" class="nav-link" data-section="http-metodos">Métodos HTTP</a>
+                <a href="#fetch-api" class="nav-link" data-section="fetch-api">Fetch API</a>
+                <a href="#async-await" class="nav-link" data-section="async-await">Async/Await</a>
+                <a href="#ejemplos-practicos" class="nav-link" data-section="ejemplos-practicos">Ejemplos Prácticos</a>
+                <a href="#crear-api-local" class="nav-link" data-section="crear-api-local">Crear API Local</a>
+                <a href="#herramientas" class="nav-link" data-section="herramientas">Herramientas útiles</a>
+                <a href="#ejercicios" class="nav-link" data-section="ejercicios">Ejercicios</a>
+            </nav>
+        </aside>
+        
+        <main>
+            <!-- Inicio -->
+            <section id="inicio" class="active">
+                <h1>🚀 Guía Completa: APIs REST y JavaScript</h1>
+                <p style="font-size: 18px; color: #666; margin: 20px 0;">Para principiantes que quieren aprender a consumir APIs con JavaScript</p>
+                
+                <h2>Lo que aprenderás</h2>
+                <ul>
+                    <li><strong>Qué es una API:</strong> Conceptos fundamentales y por qué existen</li>
+                    <li><strong>REST:</strong> La arquitectura más popular para APIs web</li>
+                    <li><strong>Endpoints:</strong> Cómo están organizados y cómo funcionan</li>
+                    <li><strong>Métodos HTTP:</strong> GET, POST, PUT, DELETE y cuándo usarlos</li>
+                    <li><strong>Fetch API:</strong> Cómo hacer solicitudes con JavaScript</li>
+                    <li><strong>Async/Await:</strong> Escribir código asincrónico limpio</li>
+                    <li><strong>Ejemplos prácticos:</strong> Casos reales que puedes ejecutar</li>
+                    <li><strong>Tu propia API:</strong> Cómo crear una en localhost</li>
+                </ul>
+                
+                <h2>Requisitos previos</h2>
+                <ul>
+                    <li>Conocimiento básico de JavaScript (variables, funciones, objetos)</li>
+                    <li>Editor de código (VS Code, Sublime Text, etc.)</li>
+                    <li>Node.js instalado (para crear la API local)</li>
+                    <li>Navegador web moderno</li>
+                </ul>
+                
+                <div class="note">
+                    <strong>Nota importante:</strong> Esta guía te mostrará cómo consumir APIs y también cómo crear una sencilla para que practiques en localhost.
+                </div>
+            </section>
+            
+            <!-- Qué es una API -->
+            <section id="que-es-api">
+                <h1>¿Qué es una API?</h1>
+                
+                <h2>Definición simple</h2>
+                <p>Una <strong>API</strong> (Application Programming Interface) es un conjunto de reglas que permite a dos programas comunicarse entre sí. Piensa en ella como un mesero en un restaurante:</p>
+                
+                <ul>
+                    <li><strong>Tú (cliente):</strong> Tienes hambre y quieres comida</li>
+                    <li><strong>El mesero (API):</strong> Toma tu pedido y lo pasa a la cocina</li>
+                    <li><strong>La cocina (servidor):</strong> Prepara tu comida</li>
+                    <li><strong>El mesero (API):</strong> Te trae tu comida</li>
+                </ul>
+                
+                <h2>¿Por qué necesitamos APIs?</h2>
+                <ul>
+                    <li><strong>Reutilización:</strong> No necesitas construir todo desde cero</li>
+                    <li><strong>Integración:</strong> Tu app puede usar servicios de otros</li>
+                    <li><strong>Escalabilidad:</strong> El backend procesa datos complejos</li>
+                    <li><strong>Seguridad:</strong> Los datos sensibles nunca llegan al navegador</li>
+                </ul>
+                
+                <h2>Ejemplo cotidiano: Google Maps</h2>
+                <p>Cuando usas Google Maps en un sitio web:</p>
+                <div class="diagram">
+Tu navegador hace una solicitud a los servidores de Google:
+"Dame la ubicación de pizzerías en Bogotá"
+        ↓
+Los servidores de Google buscan en su base de datos
+        ↓
+Google responde con datos:
+[ {nombre: "Pizza Palace", lat: 4.7110, lng: -74.0055}, ... ]
+        ↓
+Tu navegador dibuja el mapa con esos datos
+                </div>
+                
+                <div class="note">
+                    <strong>Idea clave:</strong> Una API es simplemente una forma estandarizada de pedir información a un servidor remoto.
+                </div>
+            </section>
+            
+            <!-- REST -->
+            <section id="rest">
+                <h1>Arquitectura REST</h1>
+                
+                <h2>¿Qué es REST?</h2>
+                <p><strong>REST</strong> (Representational State Transfer) es un estilo de arquitectura para diseñar APIs web. Es el más usado en internet hoy en día.</p>
+                
+                <h2>Principios de REST</h2>
+                
+                <h3>1. Cliente-Servidor</h3>
+                <p>El cliente (navegador) y el servidor (donde viven los datos) están separados.</p>
+                <div class="diagram">
+[Cliente: Tu navegador]  ←→  [Servidor: Donde viven los datos]
+                </div>
+                
+                <h3>2. Stateless (Sin estado)</h3>
+                <p>Cada solicitud es independiente. El servidor no recuerda las solicitudes previas.</p>
+                
+                <h3>3. Recursos</h3>
+                <p>Todo en REST es un <strong>recurso</strong>. Algunos ejemplos:</p>
+                <ul>
+                    <li><code>/usuarios</code> - Recurso de usuarios</li>
+                    <li><code>/productos</code> - Recurso de productos</li>
+                    <li><code>/publicaciones</code> - Recurso de publicaciones</li>
+                </ul>
+                
+                <h3>4. Operaciones estándar</h3>
+                <p>En REST, usamos <strong>métodos HTTP</strong> para indicar qué queremos hacer:</p>
+                <ul>
+                    <li><strong>GET:</strong> Obtener información</li>
+                    <li><strong>POST:</strong> Crear algo nuevo</li>
+                    <li><strong>PUT:</strong> Actualizar algo existente</li>
+                    <li><strong>DELETE:</strong> Eliminar algo</li>
+                </ul>
+                
+                <h2>Ejemplo REST: Sistema de blog</h2>
+                <div class="diagram">
+GET    /posts           → Obtener todos los posts
+POST   /posts           → Crear un nuevo post
+GET    /posts/5         → Obtener el post con ID 5
+PUT    /posts/5         → Actualizar el post con ID 5
+DELETE /posts/5         → Eliminar el post con ID 5
+
+GET    /posts/5/comentarios    → Obtener comentarios del post 5
+POST   /posts/5/comentarios    → Crear comentario en el post 5
+                </div>
+                
+                <div class="note">
+                    <strong>Patrón clave:</strong> REST es predecible. Solo viendo el verbo HTTP y la URL, ya sabes qué hace.
+                </div>
+                
+                <h2>Respuestas REST</h2>
+                <p>Los servidores REST responden generalmente con <strong>JSON</strong> (JavaScript Object Notation):</p>
+                <div class="code-block">
+<code>{
+  "id": 1,
+  "nombre": "Juan",
+  "email": "juan@example.com",
+  "edad": 28
+}</code>
+                </div>
+                
+                <p>O un array de objetos:</p>
+                <div class="code-block">
+<code>[
+  { "id": 1, "nombre": "Juan" },
+  { "id": 2, "nombre": "María" },
+  { "id": 3, "nombre": "Carlos" }
+]</code>
+                </div>
+            </section>
+            
+            <!-- Endpoints -->
+            <section id="endpoints">
+                <h1>Endpoints: La puerta de entrada a los datos</h1>
+                
+                <h2>¿Qué es un endpoint?</h2>
+                <p>Un <strong>endpoint</strong> es una URL específica en un servidor API que te permite acceder a un recurso o realizar una acción.</p>
+                
+                <h2>Estructura de un endpoint</h2>
+                <div class="diagram">
+https://api.ejemplo.com/v1/usuarios/42
+└──────┬────────────┘ └┬┘ └──┬──┘ └─┬─┘
+      Protocolo     Versión Recurso  ID
+                </div>
+                
+                <h3>Desglose:</h3>
+                <ul>
+                    <li><strong>https://</strong> - Protocolo seguro (siempre usar en producción)</li>
+                    <li><strong>api.ejemplo.com</strong> - Dominio del servidor API</li>
+                    <li><strong>/v1</strong> - Versión de la API (permite cambios sin romper código antiguo)</li>
+                    <li><strong>/usuarios</strong> - Recurso (qué tipo de datos quieres)</li>
+                    <li><strong>/42</strong> - Identificador específico (usuario con ID 42)</li>
+                </ul>
+                
+                <h2>Ejemplos de endpoints reales</h2>
+                
+                <div class="endpoint-card">
+                    <h3>
+                        <span class="method-badge method-get">GET</span>
+                        Obtener todos los usuarios
+                    </h3>
+                    <p><code>https://api.ejemplo.com/usuarios</code></p>
+                    <p>Retorna un array con todos los usuarios en la base de datos.</p>
+                </div>
+                
+                <div class="endpoint-card">
+                    <h3>
+                        <span class="method-badge method-get">GET</span>
+                        Obtener un usuario específico
+                    </h3>
+                    <p><code>https://api.ejemplo.com/usuarios/42</code></p>
+                    <p>Retorna solo el usuario con ID 42.</p>
+                </div>
+                
+                <div class="endpoint-card">
+                    <h3>
+                        <span class="method-badge method-post">POST</span>
+                        Crear un nuevo usuario
+                    </h3>
+                    <p><code>https://api.ejemplo.com/usuarios</code></p>
+                    <p>Envías datos del nuevo usuario, el servidor lo crea y retorna el usuario creado.</p>
+                </div>
+                
+                <div class="endpoint-card">
+                    <h3>
+                        <span class="method-badge method-put">PUT</span>
+                        Actualizar un usuario
+                    </h3>
+                    <p><code>https://api.ejemplo.com/usuarios/42</code></p>
+                    <p>Envías datos actualizados del usuario 42, el servidor los actualiza.</p>
+                </div>
+                
+                <div class="endpoint-card">
+                    <h3>
+                        <span class="method-badge method-delete">DELETE</span>
+                        Eliminar un usuario
+                    </h3>
+                    <p><code>https://api.ejemplo.com/usuarios/42</code></p>
+                    <p>Elimina el usuario con ID 42 de la base de datos.</p>
+                </div>
+                
+                <h2>Parámetros en los endpoints</h2>
+                <p>A veces necesitas enviar datos adicionales en la URL:</p>
+                
+                <h3>Query Parameters</h3>
+                <p>Se usan para filtrar o paginar resultados:</p>
+                <div class="code-block">
+<code>https://api.ejemplo.com/usuarios?edad=30&ciudad=bogota&pagina=2
+
+Parámetros:
+- edad=30      → Solo usuarios con edad 30
+- ciudad=bogota → Solo usuarios de Bogotá
+- pagina=2     → Segunda página de resultados</code>
+                </div>
+                
+                <h3>Path Parameters</h3>
+                <p>Se usan en la ruta para identificar recursos específicos:</p>
+                <div class="code-block">
+<code>https://api.ejemplo.com/usuarios/42/publicaciones/10
+
+Parámetros:
+- 42  → ID del usuario
+- 10  → ID de la publicación</code>
+                </div>
+                
+                <div class="note">
+                    <strong>Diferencia clave:</strong> Query parameters (?) son opcionales y filtran. Path parameters (/) son obligatorios e identifican.
+                </div>
+            </section>
+            
+            <!-- Métodos HTTP -->
+            <section id="http-metodos">
+                <h1>Métodos HTTP: El verbo de tu solicitud</h1>
+                
+                <h2>¿Qué son los métodos HTTP?</h2>
+                <p>Son como verbos que le dicen al servidor QUÉ quieres hacer con un recurso. Los 4 principales son:</p>
+                
+                <h2>GET - Obtener datos</h2>
+                <div class="endpoint-card">
+                    <p><strong>Propósito:</strong> Traer información del servidor sin modificarla.</p>
+                    <p><strong>Seguro:</strong> Sí, no cambia nada en el servidor.</p>
+                    <p><strong>Idempotente:</strong> Sí, siempre retorna lo mismo.</p>
+                </div>
+                
+                <h3>Ejemplo GET</h3>
+                <div class="code-block">
+<code>// Solicitud
+GET /usuarios HTTP/1.1
+Host: api.ejemplo.com
+
+// Respuesta
+200 OK
+[
+  { "id": 1, "nombre": "Juan" },
+  { "id": 2, "nombre": "María" }
+]</code>
+                </div>
+                
+                <h2>POST - Crear datos</h2>
+                <div class="endpoint-card">
+                    <p><strong>Propósito:</strong> Enviar datos al servidor para crear algo nuevo.</p>
+                    <p><strong>Seguro:</strong> No, cambia el estado del servidor.</p>
+                    <p><strong>Idempotente:</strong> No, cada solicitud crea un nuevo recurso.</p>
+                </div>
+                
+                <h3>Ejemplo POST</h3>
+                <div class="code-block">
+<code>// Solicitud
+POST /usuarios HTTP/1.1
+Host: api.ejemplo.com
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "email": "pedro@example.com",
+  "edad": 25
+}
+
+// Respuesta
+201 Created
+{
+  "id": 3,
+  "nombre": "Pedro",
+  "email": "pedro@example.com",
+  "edad": 25
+}</code>
+                </div>
+                
+                <h2>PUT - Actualizar datos</h2>
+                <div class="endpoint-card">
+                    <p><strong>Propósito:</strong> Reemplazar un recurso completo con nuevos datos.</p>
+                    <p><strong>Seguro:</strong> No, modifica datos existentes.</p>
+                    <p><strong>Idempotente:</strong> Sí, llamarlo múltiples veces produce el mismo resultado.</p>
+                </div>
+                
+                <h3>Ejemplo PUT</h3>
+                <div class="code-block">
+<code>// Solicitud
+PUT /usuarios/3 HTTP/1.1
+Host: api.ejemplo.com
+Content-Type: application/json
+
+{
+  "nombre": "Pedro González",
+  "email": "pedro.gonzalez@example.com",
+  "edad": 26
+}
+
+// Respuesta
+200 OK
+{
+  "id": 3,
+  "nombre": "Pedro González",
+  "email": "pedro.gonzalez@example.com",
+  "edad": 26
+}</code>
+                </div>
+                
+                <h2>DELETE - Eliminar datos</h2>
+                <div class="endpoint-card">
+                    <p><strong>Propósito:</strong> Eliminar un recurso del servidor.</p>
+                    <p><strong>Seguro:</strong> No, elimina datos permanentemente.</p>
+                    <p><strong>Idempotente:</strong> Sí, borrar dos veces es lo mismo que borrar una.</p>
+                </div>
+                
+                <h3>Ejemplo DELETE</h3>
+                <div class="code-block">
+<code>// Solicitud
+DELETE /usuarios/3 HTTP/1.1
+Host: api.ejemplo.com
+
+// Respuesta
+204 No Content
+(El servidor no retorna nada, solo confirma que fue eliminado)</code>
+                </div>
+                
+                <h2>Tabla comparativa</h2>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Propósito</th>
+                            <th>Tiene body</th>
+                            <th>Seguro</th>
+                            <th>Idempotente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GET</strong></td>
+                            <td>Obtener datos</td>
+                            <td>No</td>
+                            <td>Sí</td>
+                            <td>Sí</td>
+                        </tr>
+                        <tr>
+                            <td><strong>POST</strong></td>
+                            <td>Crear datos</td>
+                            <td>Sí</td>
+                            <td>No</td>
+                            <td>No</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PUT</strong></td>
+                            <td>Actualizar datos</td>
+                            <td>Sí</td>
+                            <td>No</td>
+                            <td>Sí</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DELETE</strong></td>
+                            <td>Eliminar datos</td>
+                            <td>No</td>
+                            <td>No</td>
+                            <td>Sí</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="note">
+                    <strong>Idempotente:</strong> Significa que llamar varias veces produce el mismo resultado que llamar una sola vez.
+                </div>
+            </section>
+            
+            <!-- Fetch API -->
+            <section id="fetch-api">
+                <h1>Fetch API: Haciendo solicitudes con JavaScript</h1>
+                
+                <h2>¿Qué es Fetch?</h2>
+                <p><code>fetch()</code> es la forma moderna de hacer solicitudes HTTP desde JavaScript en el navegador. Reemplazó al antiguo XMLHttpRequest.</p>
+                
+                <h2>Sintaxis básica</h2>
+                <div class="code-block">
+<code>fetch(url)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));</code>
+                </div>
+                
+                <h2>GET - Obtener datos</h2>
+                <h3>Ejemplo simple</h3>
+                <div class="code-block">
+<code>fetch('https://api.ejemplo.com/usuarios')
+  .then(response => response.json())
+  .then(usuarios => {
+    console.log('Usuarios obtenidos:', usuarios);
+  })
+  .catch(error => {
+    console.error('Hubo un error:', error);
+  });</code>
+                </div>
+                
+                <h3>Paso a paso</h3>
+                <div class="code-block">
+<code>// 1. Hacer la solicitud (devuelve una Promise)
+const promise = fetch('https://api.ejemplo.com/usuarios');
+
+// 2. Cuando la respuesta llega, procesarla
+promise.then(response => {
+  // response es un objeto de respuesta HTTP
+  console.log(response.status);  // 200, 404, etc.
+  console.log(response.ok);      // true si status es 200-299
+  
+  // 3. Convertir el body a JSON
+  return response.json();
+})
+// 4. Ahora tenemos los datos reales
+.then(data => {
+  console.log(data);  // Array de usuarios
+})
+// 5. Si algo sale mal
+.catch(error => {
+  console.error('Error de red:', error);
+});</code>
+                </div>
+                
+                <h2>POST - Enviar datos</h2>
+                <h3>Crear un nuevo usuario</h3>
+                <div class="code-block">
+<code>const nuevoUsuario = {
+  nombre: 'Ana',
+  email: 'ana@example.com',
+  edad: 30
+};
+
+fetch('https://api.ejemplo.com/usuarios', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(nuevoUsuario)
+})
+.then(response => response.json())
+.then(usuarioCreado => {
+  console.log('Usuario creado:', usuarioCreado);
+})
+.catch(error => console.error('Error:', error));</code>
+                </div>
+                
+                <h3>Explicación de las opciones</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Opción</th>
+                            <th>Significado</th>
+                            <th>Ejemplo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>method</code></td>
+                            <td>Verbo HTTP</td>
+                            <td>'POST', 'GET', 'PUT', 'DELETE'</td>
+                        </tr>
+                        <tr>
+                            <td><code>headers</code></td>
+                            <td>Metadatos de la solicitud</td>
+                            <td>{ 'Content-Type': 'application/json' }</td>
+                        </tr>
+                        <tr>
+                            <td><code>body</code></td>
+                            <td>Datos a enviar</td>
+                            <td>JSON.stringify(objeto)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>PUT - Actualizar datos</h2>
+                <div class="code-block">
+<code>const usuarioActualizado = {
+  nombre: 'Ana María',
+  email: 'ana.maria@example.com',
+  edad: 31
+};
+
+fetch('https://api.ejemplo.com/usuarios/5', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(usuarioActualizado)
+})
+.then(response => response.json())
+.then(usuario => console.log('Usuario actualizado:', usuario))
+.catch(error => console.error('Error:', error));</code>
+                </div>
+                
+                <h2>DELETE - Eliminar datos</h2>
+                <div class="code-block">
+<code>fetch('https://api.ejemplo.com/usuarios/5', {
+  method: 'DELETE'
+})
+.then(response => {
+  if (response.ok) {
+    console.log('Usuario eliminado correctamente');
+  }
+})
+.catch(error => console.error('Error:', error));</code>
+                </div>
+                
+                <h2>Manejando errores correctamente</h2>
+                <div class="code-block">
+<code>fetch('https://api.ejemplo.com/usuarios')
+  .then(response => {
+    // Importante: fetch solo rechaza promesas en errores de RED
+    // NO si el servidor responde con 404 o 500
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Éxito:', data);
+  })
+  .catch(error => {
+    // Aquí llegan errores de red Y errores que lanzamos
+    console.error('Error:', error.message);
+  });</code>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Importante:</strong> <code>fetch()</code> NO rechaza la promesa con errores HTTP como 404 o 500. Solo rechaza en errores de red. Siempre verifica <code>response.ok</code> o <code>response.status</code>.
+                </div>
+            </section>
+            
+            <!-- Async/Await -->
+            <section id="async-await">
+                <h1>Async/Await: Código más limpio</h1>
+                
+                <h2>¿Qué es async/await?</h2>
+                <p>Es una forma más moderna y legible de trabajar con Promises. Permite escribir código asincrónico como si fuera sincrónico.</p>
+                
+                <h2>Sintaxis básica</h2>
+                <div class="code-block">
+<code>async function obtenerUsuarios() {
+  // El código aquí espera a que terminen las Promises
+  const response = await fetch('https://api.ejemplo.com/usuarios');
+  const usuarios = await response.json();
+  return usuarios;
+}
+
+// Usar la función
+obtenerUsuarios()
+  .then(usuarios => console.log(usuarios))
+  .catch(error => console.error(error));</code>
+                </div>
+                
+                <h2>Comparación: Promises vs Async/Await</h2>
+                
+                <div class="comparison">
+                    <div class="comparison-box">
+                        <h4>Con .then() (Promises)</h4>
+                        <div class="code-block">
+<code>function obtenerDatos() {
+  return fetch('/api/datos')
+    .then(response => 
+      response.json()
+    )
+    .then(data => {
+      console.log(data);
+      return data;
+    })
+    .catch(error => 
+      console.error(error)
+    );
+}</code>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-box">
+                        <h4>Con async/await</h4>
+                        <div class="code-block">
+<code>async function obtenerDatos() {
+  try {
+    const response = await 
+      fetch('/api/datos');
+    const data = await 
+      response.json();
+    
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+}</code>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>¿Cuál prefieres leer? Probablemente la segunda, ¿verdad? Eso es async/await.</p>
+                
+                <h2>Las palabras clave</h2>
+                
+                <h3>async</h3>
+                <p>Transforma una función normal en una que retorna una Promise:</p>
+                <div class="code-block">
+<code>// Sin async: función normal
+function saludar() {
+  return 'Hola';
+}
+console.log(saludar());  // 'Hola'
+
+// Con async: retorna Promise
+async function saludar() {
+  return 'Hola';
+}
+console.log(saludar());  // Promise { 'Hola' }
+// Para obtener el valor:
+saludar().then(msg => console.log(msg));  // 'Hola'</code>
+                </div>
+                
+                <h3>await</h3>
+                <p>Pausa la ejecución hasta que una Promise se resuelva. SOLO funciona dentro de funciones async:</p>
+                <div class="code-block">
+<code>async function ejemploAwait() {
+  console.log('Antes');
+  
+  const response = await fetch('/api/datos');
+  // Se pausa aquí hasta que fetch termine
+  
+  console.log('Después');
+}
+
+// Esto NO funciona:
+// const data = await fetch(...);  ❌ Error fuera de async</code>
+                </div>
+                
+                <h2>Manejo de errores con try/catch</h2>
+                <p>En async/await, usamos try/catch en lugar de .catch():</p>
+                <div class="code-block">
+<code>async function obtenerUsuario(id) {
+  try {
+    // Código que queremos ejecutar
+    const response = await fetch(`/api/usuarios/${id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Usuario no encontrado (${response.status})`);
+    }
+    
+    const usuario = await response.json();
+    console.log('Usuario:', usuario);
+    return usuario;
+    
+  } catch (error) {
+    // Código si algo sale mal
+    console.error('Error:', error.message);
+    return null;  // O hacer algo más
+  }
+}</code>
+                </div>
+                
+                <h2>Ejemplo completo: CRUD de usuarios</h2>
+                <div class="code-block">
+<code>async function obtenerUsuarios() {
+  const response = await fetch('/api/usuarios');
+  return await response.json();
+}
+
+async function obtenerUnUsuario(id) {
+  const response = await fetch(`/api/usuarios/${id}`);
+  if (!response.ok) throw new Error('Usuario no encontrado');
+  return await response.json();
+}
+
+async function crearUsuario(datos) {
+  const response = await fetch('/api/usuarios', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos)
+  });
+  return await response.json();
+}
+
+async function actualizarUsuario(id, datos) {
+  const response = await fetch(`/api/usuarios/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos)
+  });
+  return await response.json();
+}
+
+async function eliminarUsuario(id) {
+  const response = await fetch(`/api/usuarios/${id}`, {
+    method: 'DELETE'
+  });
+  if (response.ok) {
+    console.log('Usuario eliminado');
+  }
+}
+
+// Usar las funciones
+async function main() {
+  try {
+    // Obtener todos
+    const usuarios = await obtenerUsuarios();
+    console.log('Todos los usuarios:', usuarios);
+    
+    // Obtener uno
+    const usuario = await obtenerUnUsuario(1);
+    console.log('Usuario 1:', usuario);
+    
+    // Crear
+    const nuevo = await crearUsuario({
+      nombre: 'Roberto',
+      email: 'roberto@example.com'
+    });
+    console.log('Usuario creado:', nuevo);
+    
+    // Actualizar
+    const actualizado = await actualizarUsuario(nuevo.id, {
+      nombre: 'Roberto García'
+    });
+    console.log('Usuario actualizado:', actualizado);
+    
+    // Eliminar
+    await eliminarUsuario(nuevo.id);
+    
+  } catch (error) {
+    console.error('Error en main:', error);
+  }
+}
+
+// Ejecutar
+main();</code>
+                </div>
+                
+                <div class="note">
+                    <strong>Consejo:</strong> async/await hace el código más fácil de leer y mantener. Úsalo en lugar de .then() cuando sea posible.
+                </div>
+            </section>
+            
+            <!-- Ejemplos Prácticos -->
+            <section id="ejemplos-practicos">
+                <h1>Ejemplos Prácticos</h1>
+                
+                <h2>Ejemplo 1: Mostrar datos en una página</h2>
+                <p>Obtener un list de usuarios y mostrarlos en HTML:</p>
+                <div class="code-block">
+<code>async function cargarUsuarios() {
+  try {
+    const response = await fetch('http://localhost:3000/usuarios');
+    const usuarios = await response.json();
+    
+    // Obtener elemento HTML
+    const listado = document.getElementById('lista-usuarios');
+    listado.innerHTML = '';  // Limpiar
+    
+    // Crear HTML para cada usuario
+    usuarios.forEach(usuario => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <h3>${usuario.nombre}</h3>
+        <p>Email: ${usuario.email}</p>
+        <p>Edad: ${usuario.edad}</p>
+      `;
+      listado.appendChild(div);
+    });
+    
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Ejecutar cuando carga la página
+document.addEventListener('DOMContentLoaded', cargarUsuarios);</code>
+                </div>
+                
+                <h2>Ejemplo 2: Formulario para crear usuario</h2>
+                <div class="code-block">
+<code>const form = document.getElementById('form-usuario');
+
+form.addEventListener('submit', async (evento) => {
+  evento.preventDefault();  // No recarga la página
+  
+  // Obtener valores del formulario
+  const nombre = document.getElementById('nombre').value;
+  const email = document.getElementById('email').value;
+  const edad = document.getElementById('edad').value;
+  
+  try {
+    const response = await fetch('http://localhost:3000/usuarios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, email, edad })
+    });
+    
+    if (response.ok) {
+      const usuarioCreado = await response.json();
+      console.log('Usuario creado:', usuarioCreado);
+      form.reset();  // Limpiar el formulario
+      alert('Usuario creado exitosamente');
+    } else {
+      alert('Error al crear usuario');
+    }
+    
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error de red');
+  }
+});</code>
+                </div>
+                
+                <h2>Ejemplo 3: Buscar usuario por ID</h2>
+                <div class="code-block">
+<code>async function buscarUsuario(id) {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/usuarios/${id}`
+    );
+    
+    if (!response.ok) {
+      throw new Error('Usuario no encontrado');
+    }
+    
+    const usuario = await response.json();
+    return usuario;
+    
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+}
+
+// Usar
+const usuarioBuscado = await buscarUsuario(1);
+if (usuarioBuscado) {
+  console.log('Encontrado:', usuarioBuscado);
+}</code>
+                </div>
+                
+                <h2>Ejemplo 4: Actualizar usuario</h2>
+                <div class="code-block">
+<code>async function actualizarUsuario(id, nuevosDatos) {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/usuarios/${id}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevosDatos)
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Error al actualizar');
+    }
+    
+    const usuarioActualizado = await response.json();
+    console.log('Actualizado:', usuarioActualizado);
+    return usuarioActualizado;
+    
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Usar
+await actualizarUsuario(1, {
+  nombre: 'Juan Pérez',
+  edad: 35
+});</code>
+                </div>
+                
+                <h2>Ejemplo 5: Borrar usuario con confirmación</h2>
+                <div class="code-block">
+<code>async function eliminarUsuario(id) {
+  // Pedir confirmación
+  if (!confirm('¿Estás seguro de que quieres eliminar?')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(
+      `http://localhost:3000/usuarios/${id}`,
+      { method: 'DELETE' }
+    );
+    
+    if (response.ok) {
+      console.log('Usuario eliminado');
+      // Recargar la lista
+      await cargarUsuarios();
+    }
+    
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}</code>
+                </div>
+            </section>
+            
+            <!-- Crear API Local -->
+            <section id="crear-api-local">
+                <h1>Crear tu propia API en localhost</h1>
+                
+                <h2>¿Por qué tu propia API?</h2>
+                <p>Para practicar, necesitas un servidor que responda. Aquí te mostraré cómo crear uno sencillo con Node.js y Express.</p>
+                
+                <h2>Requisitos</h2>
+                <ul>
+                    <li>Node.js instalado (descargalo de <code>nodejs.org</code>)</li>
+                    <li>Un editor de código</li>
+                    <li>Terminal/Command Prompt</li>
+                </ul>
+                
+                <h2>Paso 1: Crear la carpeta del proyecto</h2>
+                <div class="code-block">
+<code>mkdir mi-api
+cd mi-api</code>
+                </div>
+                
+                <h2>Paso 2: Inicializar Node.js</h2>
+                <div class="code-block">
+<code>npm init -y</code>
+                </div>
+                
+                <p>Esto crea un archivo <code>package.json</code>.</p>
+                
+                <h2>Paso 3: Instalar Express</h2>
+                <div class="code-block">
+<code>npm install express cors</code>
+                </div>
+                
+                <p><code>cors</code> permite que tu navegador se comunique con la API.</p>
+                
+                <h2>Paso 4: Crear el servidor</h2>
+                <p>Crea un archivo llamado <code>server.js</code>:</p>
+                <div class="code-block">
+<code>const express = require('express');
+const cors = require('cors');
+
+const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(cors());  // Permite solicitudes del navegador
+app.use(express.json());  // Parsea JSON
+
+// Base de datos simulada (en memoria)
+let usuarios = [
+  { id: 1, nombre: 'Juan', email: 'juan@example.com', edad: 28 },
+  { id: 2, nombre: 'María', email: 'maria@example.com', edad: 32 },
+  { id: 3, nombre: 'Carlos', email: 'carlos@example.com', edad: 25 }
+];
+
+let nextId = 4;
+
+// GET - Obtener todos los usuarios
+app.get('/usuarios', (req, res) => {
+  res.json(usuarios);
+});
+
+// GET - Obtener un usuario por ID
+app.get('/usuarios/:id', (req, res) => {
+  const usuario = usuarios.find(u => u.id === parseInt(req.params.id));
+  
+  if (!usuario) {
+    return res.status(404).json({ error: 'Usuario no encontrado' });
+  }
+  
+  res.json(usuario);
+});
+
+// POST - Crear un nuevo usuario
+app.post('/usuarios', (req, res) => {
+  const { nombre, email, edad } = req.body;
+  
+  // Validar que vienen los datos
+  if (!nombre || !email || !edad) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+  
+  const nuevoUsuario = {
+    id: nextId++,
+    nombre,
+    email,
+    edad
+  };
+  
+  usuarios.push(nuevoUsuario);
+  res.status(201).json(nuevoUsuario);
+});
+
+// PUT - Actualizar un usuario
+app.put('/usuarios/:id', (req, res) => {
+  const usuario = usuarios.find(u => u.id === parseInt(req.params.id));
+  
+  if (!usuario) {
+    return res.status(404).json({ error: 'Usuario no encontrado' });
+  }
+  
+  // Actualizar solo los campos que vienen
+  if (req.body.nombre) usuario.nombre = req.body.nombre;
+  if (req.body.email) usuario.email = req.body.email;
+  if (req.body.edad) usuario.edad = req.body.edad;
+  
+  res.json(usuario);
+});
+
+// DELETE - Eliminar un usuario
+app.delete('/usuarios/:id', (req, res) => {
+  const index = usuarios.findIndex(u => u.id === parseInt(req.params.id));
+  
+  if (index === -1) {
+    return res.status(404).json({ error: 'Usuario no encontrado' });
+  }
+  
+  const usuarioEliminado = usuarios.splice(index, 1);
+  res.json(usuarioEliminado[0]);
+});
+
+// Iniciar el servidor
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Prueba: GET http://localhost:${PORT}/usuarios`);
+});</code>
+                </div>
+                
+                <h2>Paso 5: Ejecutar el servidor</h2>
+                <div class="code-block">
+<code>node server.js</code>
+                </div>
+                
+                <p>Deberías ver:</p>
+                <div class="success">
+                    Servidor corriendo en http://localhost:3000<br>
+                    Prueba: GET http://localhost:3000/usuarios
+                </div>
+                
+                <h2>Paso 6: Probar la API</h2>
+                <p>Abre tu navegador y ve a:</p>
+                <div class="code-block">
+<code>http://localhost:3000/usuarios</code>
+                </div>
+                
+                <p>Deberías ver el JSON con los usuarios.</p>
+                
+                <h2>Crear un archivo HTML para consumirla</h2>
+                <p>Crea un archivo <code>index.html</code> en la misma carpeta:</p>
+                <div class="code-block">
+<code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Consumir API&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: Arial; padding: 20px; }
+    div { margin: 20px 0; padding: 15px; background: #f0f0f0; }
+    input { padding: 8px; margin: 5px 0; width: 200px; }
+    button { padding: 8px 15px; cursor: pointer; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Mi API en localhost&lt;/h1&gt;
+  
+  &lt;div&gt;
+    &lt;h2&gt;Usuarios&lt;/h2&gt;
+    &lt;button onclick="cargarUsuarios()"&gt;Cargar&lt;/button&gt;
+    &lt;pre id="resultado"&gt;&lt;/pre&gt;
+  &lt;/div&gt;
+  
+  &lt;div&gt;
+    &lt;h2&gt;Crear Usuario&lt;/h2&gt;
+    &lt;input type="text" id="nombre" placeholder="Nombre"&gt;
+    &lt;input type="email" id="email" placeholder="Email"&gt;
+    &lt;input type="number" id="edad" placeholder="Edad"&gt;
+    &lt;button onclick="crearUsuario()"&gt;Crear&lt;/button&gt;
+  &lt;/div&gt;
+  
+  &lt;script&gt;
+    async function cargarUsuarios() {
+      try {
+        const response = await fetch('http://localhost:3000/usuarios');
+        const usuarios = await response.json();
+        document.getElementById('resultado').textContent = 
+          JSON.stringify(usuarios, null, 2);
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+    
+    async function crearUsuario() {
+      const nombre = document.getElementById('nombre').value;
+      const email = document.getElementById('email').value;
+      const edad = document.getElementById('edad').value;
+      
+      try {
+        const response = await fetch('http://localhost:3000/usuarios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, email, edad })
+        });
+        
+        const nuevoUsuario = await response.json();
+        alert('Usuario creado: ' + nuevoUsuario.nombre);
+        cargarUsuarios();
+        
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code>
+                </div>
+                
+                <p>Abre este archivo en tu navegador y prueba crear usuarios.</p>
+                
+                <div class="note">
+                    <strong>Nota:</strong> Los datos se guardan en memoria. Si reinicias el servidor, se pierden. Para persistencia, usarías una base de datos.
+                </div>
+            </section>
+            
+            <!-- Herramientas -->
+            <section id="herramientas">
+                <h1>Herramientas útiles para desarrolladores</h1>
+                
+                <h2>Postman - Tester de APIs</h2>
+                <p><strong>Descarga:</strong> <code>postman.com</code></p>
+                <p>Postman es una herramienta gráfica para probar APIs sin escribir código.</p>
+                
+                <h3>Ventajas:</h3>
+                <ul>
+                    <li>Interfaz visual, no necesitas código</li>
+                    <li>Guarda tus solicitudes para reutilizarlas</li>
+                    <li>Organiza solicitudes en colecciones</li>
+                    <li>Prueba todos los métodos HTTP fácilmente</li>
+                </ul>
+                
+                <h3>Uso básico:</h3>
+                <div class="diagram">
+1. Abre Postman
+2. Clic en "New Request"
+3. Elige el método (GET, POST, etc.)
+4. Coloca la URL: http://localhost:3000/usuarios
+5. Si es POST, ve a "Body" y coloca JSON
+6. Clic en "Send"
+7. Ves la respuesta abajo
+                </div>
+                
+                <h2>Insomnia - Alternativa moderna</h2>
+                <p><strong>Descarga:</strong> <code>insomnia.rest</code></p>
+                <p>Similar a Postman pero más moderna y ligera.</p>
+                
+                <h2>Herramientas del navegador</h2>
+                
+                <h3>DevTools - Network Tab</h3>
+                <p>Presiona F12 en tu navegador y ve a la pestaña Network:</p>
+                <ul>
+                    <li>Ve todas las solicitudes fetch que hace tu página</li>
+                    <li>Inspecciona headers, body, respuesta</li>
+                    <li>Verifica códigos de estado HTTP</li>
+                    <li>Analiza tiempo de respuesta</li>
+                </ul>
+                
+                <h3>DevTools - Console</h3>
+                <p>F12 → Console:</p>
+                <ul>
+                    <li>Ejecuta JavaScript directamente</li>
+                    <li>Ve logs de tus fetch()</li>
+                    <li>Prueba fetch() en tiempo real</li>
+                </ul>
+                
+                <h2>Curl - Desde la terminal</h2>
+                <p>Si no quieres usar Postman, puedes usar curl:</p>
+                <div class="code-block">
+<code># GET
+curl http://localhost:3000/usuarios
+
+# POST
+curl -X POST http://localhost:3000/usuarios \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Ana","email":"ana@example.com","edad":28}'
+
+# PUT
+curl -X PUT http://localhost:3000/usuarios/1 \
+  -H "Content-Type: application/json" \
+  -d '{"nombre":"Juan García"}'
+
+# DELETE
+curl -X DELETE http://localhost:3000/usuarios/1</code>
+                </div>
+                
+                <h2>Extensiones útiles para Chrome</h2>
+                <ul>
+                    <li><strong>REST Client:</strong> Haz requests REST directamente</li>
+                    <li><strong>Talend API Tester:</strong> Similar a Postman</li>
+                    <li><strong>JSON Viewer:</strong> Visualiza JSON mejor</li>
+                </ul>
+            </section>
+            
+            <!-- Ejercicios -->
+            <section id="ejercicios">
+                <h1>Ejercicios prácticos</h1>
+                
+                <h2>Ejercicio 1: GET simple</h2>
+                <div class="interactive-demo">
+                    <h3>Obtén la lista de usuarios de tu API local</h3>
+                    <p>Usa fetch() para llamar a: <code>http://localhost:3000/usuarios</code></p>
+                    <textarea id="ex1-code" placeholder="Escribe tu código aquí" style="height: 150px;">async function obtenerUsuarios() {
+  // Tu código
+}
+
+obtenerUsuarios();</textarea>
+                    <button onclick="ejecutarEjercicio1()">Ejecutar</button>
+                    <div id="ex1-output" class="output" style="display:none;"></div>
+                </div>
+                
+                <h2>Ejercicio 2: POST - Crear usuario</h2>
+                <div class="interactive-demo">
+                    <h3>Crea un nuevo usuario en la API</h3>
+                    <p>Usa POST para crear un usuario con nombre "TuNombre", email "tu@email.com" y edad 25</p>
+                    <textarea id="ex2-code" placeholder="Escribe tu código aquí" style="height: 150px;">async function crearUsuario() {
+  // Tu código
+}
+
+crearUsuario();</textarea>
+                    <button onclick="ejecutarEjercicio2()">Ejecutar</button>
+                    <div id="ex2-output" class="output" style="display:none;"></div>
+                </div>
+                
+                <h2>Ejercicio 3: PUT - Actualizar</h2>
+                <div class="interactive-demo">
+                    <h3>Actualiza el usuario con ID 1</h3>
+                    <p>Cambia su nombre a "Juan García" usando PUT</p>
+                    <textarea id="ex3-code" placeholder="Escribe tu código aquí" style="height: 150px;">async function actualizarUsuario() {
+  // Tu código
+}
+
+actualizarUsuario();</textarea>
+                    <button onclick="ejecutarEjercicio3()">Ejecutar</button>
+                    <div id="ex3-output" class="output" style="display:none;"></div>
+                </div>
+                
+                <h2>Ejercicio 4: DELETE - Eliminar</h2>
+                <div class="interactive-demo">
+                    <h3>Elimina el usuario con ID 3</h3>
+                    <p>Usa DELETE. ¿Qué código de estado esperas?</p>
+                    <textarea id="ex4-code" placeholder="Escribe tu código aquí" style="height: 150px;">async function eliminarUsuario() {
+  // Tu código
+}
+
+eliminarUsuario();</textarea>
+                    <button onclick="ejecutarEjercicio4()">Ejecutar</button>
+                    <div id="ex4-output" class="output" style="display:none;"></div>
+                </div>
+                
+                <h2>Ejercicio 5: Manejo de errores</h2>
+                <div class="interactive-demo">
+                    <h3>Obtén un usuario que NO existe (ID 999)</h3>
+                    <p>Intenta obtener el usuario 999 y maneja el error apropiadamente</p>
+                    <textarea id="ex5-code" placeholder="Escribe tu código aquí" style="height: 150px;">async function buscarUsuarioInexistente() {
+  // Tu código
+  // Debe mostrar error si no existe
+}
+
+buscarUsuarioInexistente();</textarea>
+                    <button onclick="ejecutarEjercicio5()">Ejecutar</button>
+                    <div id="ex5-output" class="output" style="display:none;"></div>
+                </div>
+                
+                <h2>Desafío final</h2>
+                <div class="note">
+                    <strong>Crea una página HTML que:</strong>
+                    <ol>
+                        <li>Muestre la lista de todos los usuarios (GET /usuarios)</li>
+                        <li>Tenga un formulario para crear usuarios (POST /usuarios)</li>
+                        <li>Pueda actualizar usuarios existentes (PUT /usuarios/:id)</li>
+                        <li>Pueda eliminar usuarios (DELETE /usuarios/:id)</li>
+                        <li>Maneje todos los errores apropiadamente</li>
+                    </ol>
+                </div>
+                
+            </section>
+        </main>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>
+        // Navegación
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remover activos
+                navLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                
+                // Activar seleccionado
+                link.classList.add('active');
+                const sectionId = link.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+                
+                // Scroll al top
+                window.scrollTo(0, 0);
+            });
+        });
+        
+        // Ejercicios interactivos
+        const originalLog = console.log;
+        let logs = [];
+        
+        function capturarLogs() {
+            logs = [];
+            console.log = function(...args) {
+                logs.push(args.map(arg => 
+                    typeof arg === 'string' ? arg : JSON.stringify(arg, null, 2)
+                ).join(' '));
+                originalLog(...args);
+            };
+        }
+        
+        function restaurarLogs() {
+            console.log = originalLog;
+        }
+        
+        function mostrarResultado(ejercicio, resultado, error = false) {
+            const output = document.getElementById(`${ejercicio}-output`);
+            output.style.display = 'block';
+            if (error) {
+                output.textContent = '❌ Error: ' + resultado;
+                output.style.background = '#ffebee';
+                output.style.color = '#c62828';
+            } else {
+                output.textContent = resultado;
+                output.style.background = '#fff';
+                output.style.color = '#333';
+            }
+        }
+        
+        function ejecutarEjercicio1() {
+            const codigo = document.getElementById('ex1-code').value;
+            capturarLogs();
+            try {
+                eval(codigo);
+                restaurarLogs();
+                mostrarResultado('ex1', logs.join('\n') || '✓ Ejecutado. Revisa la consola del navegador (F12).');
+            } catch (error) {
+                restaurarLogs();
+                mostrarResultado('ex1', error.message, true);
+            }
+        }
+        
+        function ejecutarEjercicio2() {
+            const codigo = document.getElementById('ex2-code').value;
+            capturarLogs();
+            try {
+                eval(codigo);
+                restaurarLogs();
+                mostrarResultado('ex2', logs.join('\n') || '✓ Ejecutado. Revisa la consola del navegador (F12).');
+            } catch (error) {
+                restaurarLogs();
+                mostrarResultado('ex2', error.message, true);
+            }
+        }
+        
+        function ejecutarEjercicio3() {
+            const codigo = document.getElementById('ex3-code').value;
+            capturarLogs();
+            try {
+                eval(codigo);
+                restaurarLogs();
+                mostrarResultado('ex3', logs.join('\n') || '✓ Ejecutado. Revisa la consola del navegador (F12).');
+            } catch (error) {
+                restaurarLogs();
+                mostrarResultado('ex3', error.message, true);
+            }
+        }
+        
+        function ejecutarEjercicio4() {
+            const codigo = document.getElementById('ex4-code').value;
+            capturarLogs();
+            try {
+                eval(codigo);
+                restaurarLogs();
+                mostrarResultado('ex4', logs.join('\n') || '✓ Ejecutado. Revisa la consola del navegador (F12).');
+            } catch (error) {
+                restaurarLogs();
+                mostrarResultado('ex4', error.message, true);
+            }
+        }
+        
+        function ejecutarEjercicio5() {
+            const codigo = document.getElementById('ex5-code').value;
+            capturarLogs();
+            try {
+                eval(codigo);
+                restaurarLogs();
+                mostrarResultado('ex5', logs.join('\n') || '✓ Ejecutado. Revisa la consola del navegador (F12).');
+            } catch (error) {
+                restaurarLogs();
+                mostrarResultado('ex5', error.message, true);
+            }
+        }
+    </script>
+</body>
+</html>

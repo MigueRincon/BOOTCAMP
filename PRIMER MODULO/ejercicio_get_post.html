@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ejercicio: GET y POST · En clase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --ink: #1a1510;
+      --muted: #7a7060;
+      --border: #e0d8cc;
+      --surface: #fff;
+      --get: #1a7a4a;
+      --get-bg: #e8f7ef;
+      --post: #c0392b;
+      --post-bg: #fdecea;
+      --accent: #e8a020;
+      --accent-bg: #fef8ec;
+      --code-bg: #f2ede6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Syne', sans-serif;
+      font-weight: 400;
+      line-height: 1.65;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 48px 28px 80px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      border-bottom: 3px solid var(--ink);
+      padding-bottom: 28px;
+      margin-bottom: 40px;
+    }
+    .meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .meta span { display: flex; align-items: center; gap: 6px; }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -.02em;
+    }
+    h1 em { font-style: normal; border-bottom: 4px solid var(--accent); }
+    .subtitle {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    /* ── OBJECTIVES ── */
+    .obj-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 28px 0;
+    }
+    .obj-card {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      background: var(--surface);
+    }
+    .obj-card .icon { font-size: 1.4rem; margin-bottom: 8px; }
+    .obj-card p { font-size: .85rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+    /* ── SECTION HEADERS ── */
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2::before {
+      content: attr(data-n);
+      font-family: 'Space Mono', monospace;
+      font-size: .75rem;
+      background: var(--ink);
+      color: var(--bg);
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    section { margin-bottom: 44px; }
+
+    p { color: var(--muted); margin-bottom: 12px; font-size: .95rem; }
+    p strong { color: var(--ink); }
+
+    /* ── CONTEXT BOX ── */
+    .context {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-left: 5px solid var(--accent);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .context .ctx-title {
+      font-size: .7rem;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .context p { margin: 0; color: var(--ink); }
+
+    /* ── TASK CARDS ── */
+    .task {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .task-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .task-num {
+      font-family: 'Space Mono', monospace;
+      font-size: .8rem;
+      font-weight: 700;
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .task.get .task-num { background: var(--get-bg); color: var(--get); }
+    .task.post .task-num { background: var(--post-bg); color: var(--post); }
+    .task.both .task-num { background: var(--accent-bg); color: var(--accent); }
+
+    .task-title { font-weight: 700; font-size: 1rem; }
+    .task-badge {
+      margin-left: auto;
+      font-family: 'Space Mono', monospace;
+      font-size: .65rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .task.get .task-badge  { background: var(--get-bg);  color: var(--get);  }
+    .task.post .task-badge { background: var(--post-bg); color: var(--post); }
+    .task.both .task-badge { background: var(--accent-bg); color: var(--accent); }
+
+    .task-body { padding: 20px 20px 22px; }
+    .task-body p { font-size: .9rem; }
+
+    /* ── REQUIREMENTS LIST ── */
+    .req-list {
+      list-style: none;
+      margin: 14px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .req-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: .88rem;
+      color: var(--ink);
+    }
+    .req-list li::before {
+      content: '□';
+      font-family: 'Space Mono', monospace;
+      font-size: 1rem;
+      flex-shrink: 0;
+      color: var(--muted);
+      margin-top: .05em;
+    }
+
+    /* ── CODE STARTER ── */
+    .code-starter {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: .78rem;
+      line-height: 1.9;
+      color: var(--muted);
+    }
+    .code-starter .ck  { color: #1a7a4a; }  /* keyword/tag */
+    .code-starter .ca  { color: #c0392b; }  /* attr */
+    .code-starter .cv  { color: #6d4c1a; }  /* value */
+    .code-starter .cc  { color: #a09080; font-style: italic; } /* comment */
+    .code-starter .cb  { color: #2563eb; } /* blank to fill */
+
+    /* ── HINT BOX ── */
+    .hint {
+      background: var(--accent-bg);
+      border: 1.5px dashed var(--accent);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-top: 14px;
+      font-size: .84rem;
+    }
+    .hint .hint-label {
+      font-family: 'Space Mono', monospace;
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent);
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+    .hint p { margin: 0; color: var(--ink); }
+
+    /* ── EVALUATION ── */
+    .eval-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+    .eval-table th, .eval-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .eval-table th {
+      font-family: 'Space Mono', monospace;
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      background: var(--code-bg);
+    }
+    .eval-table td:last-child {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      text-align: center;
+    }
+    .pts { color: var(--ink); }
+
+    /* ── QUESTIONS ── */
+    .q-list {
+      list-style: none;
+      counter-reset: qctr;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .q-list li {
+      counter-increment: qctr;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .q-list li::before {
+      content: counter(qctr);
+      font-family: 'Space Mono', monospace;
+      font-size: .75rem;
+      font-weight: 700;
+      background: var(--ink);
+      color: var(--bg);
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: .15em;
+    }
+    .q-list li p {
+      color: var(--ink);
+      font-size: .92rem;
+      margin: 0;
+    }
+    .answer-line {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin-top: 8px;
+      display: block;
+    }
+    .answer-line + .answer-line { margin-top: 16px; }
+
+    /* ── FOOTER ── */
+    .footer-note {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 2px solid var(--ink);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+    }
+
+    @media print {
+      body { padding: 20px; }
+      .task { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="meta">
+    <span>📅 Fecha: _______________</span>
+    <span>👤 Nombre: _____________________________</span>
+    <span>⏱ Tiempo: 45 min</span>
+  </div>
+  <h1>Ejercicio en clase:<br><em>GET y POST</em> en acción</h1>
+  <p class="subtitle">Aprende cómo viajan los datos entre el navegador y el servidor.</p>
+</div>
+
+<!-- OBJETIVOS -->
+<section>
+  <h2 data-n="★">Objetivos del ejercicio</h2>
+  <div class="obj-grid">
+    <div class="obj-card">
+      <div class="icon">🔍</div>
+      <p>Construir un formulario con <strong>método GET</strong> y ver los datos en la URL.</p>
+    </div>
+    <div class="obj-card">
+      <div class="icon">🔐</div>
+      <p>Construir un formulario con <strong>método POST</strong> para datos sensibles.</p>
+    </div>
+    <div class="obj-card">
+      <div class="icon">🔬</div>
+      <p>Inspeccionar el tráfico HTTP con las <strong>DevTools</strong> del navegador.</p>
+    </div>
+    <div class="obj-card">
+      <div class="icon">🧠</div>
+      <p>Decidir <strong>cuándo usar cada método</strong> en situaciones reales.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTEXTO -->
+<section>
+  <h2 data-n="0">Contexto del escenario</h2>
+  <div class="context">
+    <div class="ctx-title">📋 Situación</div>
+    <p>Eres el desarrollador frontend de <strong>"TiendaYa"</strong>, una tienda en línea. Tu jefe te pide construir dos páginas: un <strong>buscador de productos</strong> (donde el usuario filtra por nombre y categoría) y un <strong>formulario de inicio de sesión</strong> (donde ingresa correo y contraseña). Debes elegir el método HTTP correcto para cada uno.</p>
+  </div>
+</section>
+
+<!-- PARTE 1 -->
+<section>
+  <h2 data-n="1">Parte 1 · Formulario de búsqueda con GET</h2>
+
+  <div class="task get">
+    <div class="task-header">
+      <div class="task-num">1A</div>
+      <div class="task-title">Crea el archivo <code style="font-family:'Space Mono',monospace;font-size:.8em">buscar.html</code></div>
+      <span class="task-badge">GET</span>
+    </div>
+    <div class="task-body">
+      <p>Crea un formulario que envíe una búsqueda. El formulario debe enviar los datos usando <strong>método GET</strong> a la acción <code style="font-family:'Space Mono',monospace">#</code> (por ahora, sin servidor real).</p>
+      <ul class="req-list">
+        <li>El formulario tiene el atributo <code style="font-family:'Space Mono',monospace">method="GET"</code></li>
+        <li>Campo de texto: "Nombre del producto" → <code style="font-family:'Space Mono',monospace">name="producto"</code></li>
+        <li>Campo de texto: "Categoría" → <code style="font-family:'Space Mono',monospace">name="categoria"</code></li>
+        <li>Un botón de tipo <code style="font-family:'Space Mono',monospace">submit</code> con el texto "Buscar"</li>
+        <li>Cada campo tiene su respectivo <code style="font-family:'Space Mono',monospace">&lt;label&gt;</code></li>
+      </ul>
+
+      <div class="code-starter">
+<span class="cc">&lt;!-- buscar.html · Completa los blancos con __ --&gt;</span>
+<span class="ck">&lt;form</span> <span class="ca">action=</span><span class="cv">"#"</span> <span class="ca">method=</span><span class="cv">"<span class="cb">______</span>"</span><span class="ck">&gt;</span>
+
+  <span class="ck">&lt;label</span> <span class="ca">for=</span><span class="cv">"producto"</span><span class="ck">&gt;</span>Nombre del producto:<span class="ck">&lt;/label&gt;</span>
+  <span class="ck">&lt;input</span> <span class="ca">type=</span><span class="cv">"<span class="cb">______</span>"</span>
+         <span class="ca">id=</span><span class="cv">"producto"</span>
+         <span class="ca">name=</span><span class="cv">"<span class="cb">______</span>"</span>
+         <span class="ca">placeholder=</span><span class="cv">"ej: zapatos"</span><span class="ck">&gt;</span>
+
+  <span class="ck">&lt;label</span> <span class="ca">for=</span><span class="cv">"categoria"</span><span class="ck">&gt;</span>Categoría:<span class="ck">&lt;/label&gt;</span>
+  <span class="ck">&lt;input</span> <span class="ca">type=</span><span class="cv">"text"</span>
+         <span class="ca">id=</span><span class="cv">"<span class="cb">______</span>"</span>
+         <span class="ca">name=</span><span class="cv">"categoria"</span><span class="ck">&gt;</span>
+
+  <span class="ck">&lt;button</span> <span class="ca">type=</span><span class="cv">"<span class="cb">______</span>"</span><span class="ck">&gt;</span><span class="cb">______</span><span class="ck">&lt;/button&gt;</span>
+
+<span class="ck">&lt;/form&gt;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="task get">
+    <div class="task-header">
+      <div class="task-num">1B</div>
+      <div class="task-title">Observa la URL en el navegador</div>
+      <span class="task-badge">GET</span>
+    </div>
+    <div class="task-body">
+      <p>Abre <code style="font-family:'Space Mono',monospace">buscar.html</code> en el navegador. Escribe "zapatos" en producto y "ropa" en categoría. Haz clic en Buscar.</p>
+      <ul class="req-list">
+        <li>Copia aquí la URL que aparece en la barra de dirección:</li>
+      </ul>
+      <div style="margin-top:12px; background:#f2ede6; border-radius:8px; padding:14px; font-family:'Space Mono',monospace; font-size:.8rem; color:#a09080;">
+        URL: _______________________________________________________________________
+      </div>
+      <ul class="req-list" style="margin-top:14px">
+        <li>¿Puedes ver los datos que escribiste en la URL? (Sí / No): _______</li>
+        <li>¿Cuál es el símbolo que separa la URL base de los parámetros?: _______</li>
+        <li>¿Cuál es el símbolo que separa los parámetros entre sí?: _______</li>
+      </ul>
+
+      <div class="hint">
+        <div class="hint-label">💡 Pista</div>
+        <p>Observa bien la URL. Debería verse algo así: <code style="font-family:'Space Mono',monospace">buscar.html?producto=zapatos&categoria=ropa</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTE 2 -->
+<section>
+  <h2 data-n="2">Parte 2 · Formulario de login con POST</h2>
+
+  <div class="task post">
+    <div class="task-header">
+      <div class="task-num">2A</div>
+      <div class="task-title">Crea el archivo <code style="font-family:'Space Mono',monospace;font-size:.8em">login.html</code></div>
+      <span class="task-badge">POST</span>
+    </div>
+    <div class="task-body">
+      <p>Ahora construye el formulario de inicio de sesión. Los datos <strong>no deben aparecer en la URL</strong>. Usa el <strong>método POST</strong>.</p>
+      <ul class="req-list">
+        <li>El formulario tiene el atributo <code style="font-family:'Space Mono',monospace">method="POST"</code></li>
+        <li>Campo de tipo <code style="font-family:'Space Mono',monospace">email</code>: "Correo electrónico" → <code style="font-family:'Space Mono',monospace">name="correo"</code></li>
+        <li>Campo de tipo <code style="font-family:'Space Mono',monospace">password</code>: "Contraseña" → <code style="font-family:'Space Mono',monospace">name="clave"</code></li>
+        <li>Botón de envío con el texto "Iniciar sesión"</li>
+        <li><strong>Bonus:</strong> Agrega un campo <code style="font-family:'Space Mono',monospace">checkbox</code> "Recordarme" → <code style="font-family:'Space Mono',monospace">name="recordar"</code></li>
+      </ul>
+
+      <div class="code-starter">
+<span class="cc">&lt;!-- login.html · Completa el formulario desde cero --&gt;</span>
+<span class="ck">&lt;!DOCTYPE html&gt;</span>
+<span class="ck">&lt;html</span> <span class="ca">lang=</span><span class="cv">"es"</span><span class="ck">&gt;</span>
+<span class="ck">&lt;head&gt;</span>
+  <span class="ck">&lt;meta</span> <span class="ca">charset=</span><span class="cv">"UTF-8"</span><span class="ck">&gt;</span>
+  <span class="ck">&lt;title&gt;</span>Login - TiendaYa<span class="ck">&lt;/title&gt;</span>
+<span class="ck">&lt;/head&gt;</span>
+<span class="ck">&lt;body&gt;</span>
+
+  <span class="ck">&lt;h1&gt;</span>Iniciar sesión<span class="ck">&lt;/h1&gt;</span>
+
+  <span class="cc">&lt;!-- Escribe el formulario aquí --&gt;</span>
+  <span class="cb">___________________________________________________
+  ___________________________________________________
+  ___________________________________________________
+  ___________________________________________________
+  ___________________________________________________</span>
+
+<span class="ck">&lt;/body&gt;</span>
+<span class="ck">&lt;/html&gt;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="task post">
+    <div class="task-header">
+      <div class="task-num">2B</div>
+      <div class="task-title">Inspecciona el tráfico con DevTools</div>
+      <span class="task-badge">POST</span>
+    </div>
+    <div class="task-body">
+      <p>Abre <code style="font-family:'Space Mono',monospace">login.html</code> en el navegador. Llena los campos con datos de prueba. Antes de enviar, abre las DevTools (<strong>F12</strong> → pestaña <strong>Network / Red</strong>). Envía el formulario y observa la petición.</p>
+      <ul class="req-list">
+        <li>¿Cambió la URL después de enviar el formulario? (Sí / No): _______</li>
+        <li>¿Puedes ver la contraseña en la URL?: _______</li>
+        <li>En DevTools → Network, haz clic en la petición. ¿En qué sección encuentras los datos enviados?</li>
+      </ul>
+      <div style="margin-top:12px; background:#fdecea; border-radius:8px; padding:14px; font-family:'Space Mono',monospace; font-size:.8rem; color:#a09080;">
+        Sección en DevTools: _____________________________________________________
+      </div>
+
+      <div class="hint">
+        <div class="hint-label">💡 Pista</div>
+        <p>En la pestaña <strong>Network</strong>, selecciona la petición y busca la sección <strong>"Payload"</strong> o <strong>"Form Data"</strong>. Ahí están los datos del POST.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTE 3 -->
+<section>
+  <h2 data-n="3">Parte 3 · Análisis y decisión</h2>
+
+  <div class="task both">
+    <div class="task-header">
+      <div class="task-num">3A</div>
+      <div class="task-title">¿GET o POST? Elige el método correcto</div>
+      <span class="task-badge">Análisis</span>
+    </div>
+    <div class="task-body">
+      <p>Para cada situación, escribe el método que usarías y por qué (una frase breve).</p>
+
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:18px; font-size:.88rem;">
+        <div>
+          <strong>a) Un formulario para suscribirse a un boletín de noticias (nombre + correo)</strong><br>
+          <span style="color:var(--muted)">Método: _______ · Razón: _______________________________________________</span>
+        </div>
+        <div>
+          <strong>b) La barra de búsqueda de Google</strong><br>
+          <span style="color:var(--muted)">Método: _______ · Razón: _______________________________________________</span>
+        </div>
+        <div>
+          <strong>c) Un formulario para cambiar tu contraseña</strong><br>
+          <span style="color:var(--muted)">Método: _______ · Razón: _______________________________________________</span>
+        </div>
+        <div>
+          <strong>d) Filtros de precio en una tienda ("precio mín / precio máx")</strong><br>
+          <span style="color:var(--muted)">Método: _______ · Razón: _______________________________________________</span>
+        </div>
+        <div>
+          <strong>e) Formulario de contacto (nombre, correo, mensaje)</strong><br>
+          <span style="color:var(--muted)">Método: _______ · Razón: _______________________________________________</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task both">
+    <div class="task-header">
+      <div class="task-num">3B</div>
+      <div class="task-title">Preguntas de reflexión</div>
+      <span class="task-badge">Escrito</span>
+    </div>
+    <div class="task-body">
+      <ol class="q-list">
+        <li>
+          <p>¿Por qué es <strong>peligroso</strong> enviar una contraseña con método GET, aunque el servidor la procese igual?</p>
+          <span class="answer-line"></span>
+          <span class="answer-line"></span>
+        </li>
+        <li>
+          <p>Si compartes el enlace de una búsqueda en Google con un amigo, ¿por qué él puede ver los mismos resultados? ¿Qué método usa Google?</p>
+          <span class="answer-line"></span>
+          <span class="answer-line"></span>
+        </li>
+        <li>
+          <p>Un desarrollador usó GET para un formulario de registro. El usuario completa sus datos y refresca (F5) la página. ¿Qué problema puede ocurrir?</p>
+          <span class="answer-line"></span>
+          <span class="answer-line"></span>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- EVALUACIÓN -->
+<section>
+  <h2 data-n="4">Criterios de evaluación</h2>
+  <table class="eval-table">
+    <thead>
+      <tr>
+        <th>Criterio</th>
+        <th>Descripción</th>
+        <th>Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Formulario GET correcto</td>
+        <td>Atributos correctos, name en cada campo, URL visible</td>
+        <td class="pts">25</td>
+      </tr>
+      <tr>
+        <td>Formulario POST correcto</td>
+        <td>Método POST, campos con name, tipo password correcto</td>
+        <td class="pts">25</td>
+      </tr>
+      <tr>
+        <td>Observación de URL</td>
+        <td>Respuestas correctas sobre la URL y parámetros (1B)</td>
+        <td class="pts">15</td>
+      </tr>
+      <tr>
+        <td>Inspección DevTools</td>
+        <td>Identifica correctamente dónde van los datos POST (2B)</td>
+        <td class="pts">15</td>
+      </tr>
+      <tr>
+        <td>Elección de métodos</td>
+        <td>Decisiones correctas en los 5 escenarios (3A)</td>
+        <td class="pts">10</td>
+      </tr>
+      <tr>
+        <td>Preguntas de reflexión</td>
+        <td>Respuestas argumentadas y correctas (3B)</td>
+        <td class="pts">10</td>
+      </tr>
+      <tr>
+        <td style="color:#c0392b">Bonus — checkbox "Recordarme"</td>
+        <td style="color:var(--muted)">Implementado correctamente en el formulario POST</td>
+        <td class="pts" style="color:#c0392b">+5</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="footer-note">
+  <span>TiendaYa · Ejercicio HTTP Forms</span>
+  <span>GET &amp; POST · Fundamentos Web</span>
+  <span>Calificación: _____ / 100</span>
+</div>
+
+</body>
+</html>
