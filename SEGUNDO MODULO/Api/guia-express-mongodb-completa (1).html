@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB + Express: Esquemas, Rutas y Controladores</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0f1419;
+            color: #e1e8ed;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: #1a1f26;
+            border-right: 1px solid #2d3139;
+            overflow-y: auto;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-title {
+            padding: 0 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #8b92a1;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 14px;
+            color: #a8b1be;
+        }
+
+        .nav-item:hover {
+            background: #242b34;
+            color: #e1e8ed;
+        }
+
+        .nav-item.active {
+            border-left-color: #58a6ff;
+            background: #1f2937;
+            color: #58a6ff;
+            font-weight: 500;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #f0f6fc;
+        }
+
+        .header p {
+            color: #8b92a1;
+            font-size: 14px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-block {
+            margin-bottom: 40px;
+        }
+
+        .content-block h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #f0f6fc;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2d3139;
+        }
+
+        .content-block h3 {
+            font-size: 16px;
+            margin: 24px 0 12px 0;
+            color: #d0d8e0;
+            font-weight: 600;
+        }
+
+        .content-block p, .content-block li {
+            color: #a8b1be;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .content-block ul {
+            margin-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #2d3139;
+            background: #1a1f26;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            border: none;
+            background: #1a1f26;
+            color: #8b92a1;
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #d0d8e0;
+            background: #242b34;
+        }
+
+        .tab.active {
+            color: #58a6ff;
+            border-bottom-color: #58a6ff;
+            background: #0d1117;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* CODE */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #2d3139;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .code-header {
+            background: #1a1f26;
+            padding: 12px 16px;
+            border-bottom: 1px solid #2d3139;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-filename {
+            font-size: 12px;
+            color: #8b92a1;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: #238636;
+            color: #fff;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #2ea043;
+        }
+
+        .copy-btn:active {
+            background: #1f6feb;
+        }
+
+        pre {
+            margin: 0;
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .hljs {
+            background: transparent !important;
+            color: #e1e8ed;
+        }
+
+        /* STRUCTURE DIAGRAM */
+        .structure {
+            background: #1a1f26;
+            border: 1px solid #2d3139;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #a8b1be;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .structure .dir {
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        .structure .file {
+            color: #d0d8e0;
+        }
+
+        .note {
+            background: #1a1f26;
+            border-left: 4px solid #58a6ff;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+
+        .note p {
+            margin: 0;
+            color: #a8b1be;
+            font-size: 13px;
+        }
+
+        .alert {
+            background: #3d2621;
+            border-left: 4px solid #da3633;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+
+        .alert p {
+            margin: 0;
+            color: #f85149;
+            font-size: 13px;
+        }
+
+        .success {
+            background: #1a3a1a;
+            border-left: 4px solid #3fb950;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+
+        .success p {
+            margin: 0;
+            color: #3fb950;
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #58a6ff;
+            color: #0d1117;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .method-get {
+            color: #3fb950;
+        }
+
+        .method-post {
+            color: #58a6ff;
+        }
+
+        .method-put {
+            color: #ffa657;
+        }
+
+        .method-delete {
+            color: #f85149;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #2d3139;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1419;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3d444d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #545d66;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-title">Temas</div>
+            <div class="nav-item active" onclick="showSection('esquemas')">1. Esquemas</div>
+            <div class="nav-item" onclick="showSection('estructura')">2. Estructura del Proyecto</div>
+            <div class="nav-item" onclick="showSection('rutas')">3. Definir Rutas</div>
+            <div class="nav-item" onclick="showSection('controlador')">4. Crear Controlador</div>
+            <div class="nav-item" onclick="showSection('consultas')">5. Consultas MongoDB</div>
+            <div class="nav-item" onclick="showSection('peticiones')">6. Realizar Peticiones</div>
+            <div class="nav-item" onclick="showSection('completo')">7. Ejemplo Completo</div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main">
+            <!-- ESQUEMAS -->
+            <div id="esquemas" class="section active">
+                <div class="header">
+                    <h1>1. Definir Esquemas</h1>
+                    <p>Los esquemas definen la estructura de tus documentos en MongoDB</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>¿Qué es un Esquema?</h2>
+                    <p>Un esquema de Mongoose define la estructura, tipos de datos y validaciones para tus documentos en MongoDB. Es como una plantilla para tus datos.</p>
+
+                    <h3>Características clave:</h3>
+                    <ul>
+                        <li><strong>Tipado:</strong> Define qué tipo de dato es cada campo</li>
+                        <li><strong>Validaciones:</strong> Reglas que deben cumplir los datos</li>
+                        <li><strong>Valores por defecto:</strong> Valores que se asignan automáticamente</li>
+                        <li><strong>Métodos personalizados:</strong> Funciones que puedes ejecutar</li>
+                    </ul>
+                </div>
+
+                <div class="content-block">
+                    <h2>Ejemplo: Esquema de Usuarios</h2>
+                    
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'schema-user')">User.js</button>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">models/User.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+  nombre: {
+    type: String,
+    required: [true, 'El nombre es requerido'],
+    trim: true,
+    minlength: [2, 'El nombre debe tener al menos 2 caracteres'],
+    maxlength: [50, 'El nombre no puede exceder 50 caracteres']
+  },
+  
+  email: {
+    type: String,
+    required: [true, 'El email es requerido'],
+    unique: true,
+    lowercase: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido']
+  },
+  
+  edad: {
+    type: Number,
+    min: [18, 'Debes ser mayor de 18'],
+    max: [120, 'Edad no válida']
+  },
+  
+  ciudad: {
+    type: String,
+    default: 'No especificada'
+  },
+  
+  telefono: {
+    type: String,
+    sparse: true
+  },
+  
+  activo: {
+    type: Boolean,
+    default: true
+  },
+  
+  fechaCreacion: {
+    type: Date,
+    default: Date.now
+  },
+  
+  rol: {
+    type: String,
+    enum: ['usuario', 'admin', 'moderador'],
+    default: 'usuario'
+  }
+}, { timestamps: true });
+
+module.exports = mongoose.model('User', userSchema);
+</code></pre>
+                    </div>
+
+                    <div class="note">
+                        <p><strong>📌 Nota:</strong> El parámetro <code>{ timestamps: true }</code> agrega automáticamente <code>createdAt</code> y <code>updatedAt</code> a cada documento.</p>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Ejemplo: Esquema de Productos</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">models/Product.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const mongoose = require('mongoose');
+
+const productSchema = new mongoose.Schema({
+  nombre: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  
+  descripcion: {
+    type: String,
+    required: true
+  },
+  
+  precio: {
+    type: Number,
+    required: true,
+    min: [0, 'El precio no puede ser negativo']
+  },
+  
+  cantidad: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  
+  categoria: {
+    type: String,
+    required: true,
+    enum: ['Electrónica', 'Ropa', 'Alimentos', 'Otros']
+  },
+  
+  disponible: {
+    type: Boolean,
+    default: true
+  },
+  
+  sku: {
+    type: String,
+    unique: true,
+    sparse: true
+  }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Product', productSchema);
+</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTRUCTURA -->
+            <div id="estructura" class="section">
+                <div class="header">
+                    <h1>2. Estructura del Proyecto</h1>
+                    <p>Cómo organizar tu proyecto Express + MongoDB</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>Carpetas recomendadas</h2>
+                    
+                    <div class="structure">
+proyecto/
+│
+├── <span class="dir">models</span>/              # Esquemas de Mongoose
+│   ├── User.js
+│   ├── Product.js
+│   └── Order.js
+│
+├── <span class="dir">routes</span>/              # Rutas/Endpoints
+│   ├── userRoutes.js
+│   ├── productRoutes.js
+│   └── orderRoutes.js
+│
+├── <span class="dir">controllers</span>/         # Lógica de negocio
+│   ├── userController.js
+│   ├── productController.js
+│   └── orderController.js
+│
+├── <span class="dir">middleware</span>/          # Middleware personalizado
+│   └── errorHandler.js
+│
+├── <span class="dir">config</span>/              # Configuración
+│   └── db.js
+│
+├── app.js                  # Configuración principal
+├── server.js               # Iniciar servidor
+└── .env                    # Variables de entorno
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Archivo de Conexión (config/db.js)</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">config/db.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const mongoose = require('mongoose');
+
+const conectarDB = async () => {
+  try {
+    const conexion = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/miapp', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    
+    console.log('✅ MongoDB conectada:', conexion.connection.host);
+    return conexion;
+  } catch (error) {
+    console.error('❌ Error al conectar MongoDB:', error.message);
+    process.exit(1);
+  }
+};
+
+module.exports = conectarDB;
+</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUTAS -->
+            <div id="rutas" class="section">
+                <div class="header">
+                    <h1>3. Definir Rutas</h1>
+                    <p>Endpoints para acceder a los datos</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>¿Qué son las Rutas?</h2>
+                    <p>Las rutas (routes) definen los endpoints de tu API. Cada ruta mapea una URL a un controlador que manejará la lógica.</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>Rutas de Usuarios</h2>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'routes-user')">userRoutes.js</button>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">routes/userRoutes.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const express = require('express');
+const router = express.Router();
+const {
+  obtenerUsuarios,
+  obtenerUsuarioPorId,
+  crearUsuario,
+  actualizarUsuario,
+  eliminarUsuario
+} = require('../controllers/userController');
+
+// GET - Obtener todos los usuarios
+router.get('/', obtenerUsuarios);
+
+// GET - Obtener un usuario por ID
+router.get('/:id', obtenerUsuarioPorId);
+
+// POST - Crear un nuevo usuario
+router.post('/', crearUsuario);
+
+// PUT - Actualizar un usuario
+router.put('/:id', actualizarUsuario);
+
+// DELETE - Eliminar un usuario
+router.delete('/:id', eliminarUsuario);
+
+module.exports = router;
+</code></pre>
+                    </div>
+
+                    <div class="note">
+                        <p><strong>💡 Convención:</strong> Usa métodos HTTP estándar: GET (lectura), POST (creación), PUT (actualización), DELETE (eliminación).</p>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Rutas de Productos</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">routes/productRoutes.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const express = require('express');
+const router = express.Router();
+const {
+  obtenerProductos,
+  obtenerProductoPorId,
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto,
+  obtenerProductosPorCategoria
+} = require('../controllers/productController');
+
+// GET - Todos los productos
+router.get('/', obtenerProductos);
+
+// GET - Productos por categoría
+router.get('/categoria/:categoria', obtenerProductosPorCategoria);
+
+// GET - Producto por ID
+router.get('/:id', obtenerProductoPorId);
+
+// POST - Crear producto
+router.post('/', crearProducto);
+
+// PUT - Actualizar producto
+router.put('/:id', actualizarProducto);
+
+// DELETE - Eliminar producto
+router.delete('/:id', eliminarProducto);
+
+module.exports = router;
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Registrar Rutas en app.js</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">app.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const express = require('express');
+const conectarDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+
+const app = express();
+
+// Conectar a MongoDB
+conectarDB();
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Registrar rutas
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+
+// Ruta de prueba
+app.get('/', (req, res) => {
+  res.json({ mensaje: '¡API funcionando!' });
+});
+
+module.exports = app;
+</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROLADOR -->
+            <div id="controlador" class="section">
+                <div class="header">
+                    <h1>4. Crear Controlador</h1>
+                    <p>Lógica de negocio y manejo de peticiones</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>¿Qué es un Controlador?</h2>
+                    <p>Un controlador contiene la lógica que se ejecuta cuando alguien accede a una ruta. Aquí consultas la base de datos, procesas datos y envías respuestas.</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>Controlador de Usuarios</h2>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'controller-user')">userController.js</button>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">controllers/userController.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const User = require('../models/User');
+
+// GET - Obtener todos los usuarios
+exports.obtenerUsuarios = async (req, res) => {
+  try {
+    // Consulta a MongoDB
+    const usuarios = await User.find();
+    
+    res.status(200).json({
+      exitoso: true,
+      cantidad: usuarios.length,
+      datos: usuarios
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al obtener usuarios',
+      error: error.message
+    });
+  }
+};
+
+// GET - Obtener un usuario por ID
+exports.obtenerUsuarioPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const usuario = await User.findById(id);
+    
+    if (!usuario) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: 'Usuario no encontrado'
+      });
+    }
+    
+    res.status(200).json({
+      exitoso: true,
+      datos: usuario
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al obtener usuario',
+      error: error.message
+    });
+  }
+};
+
+// POST - Crear un nuevo usuario
+exports.crearUsuario = async (req, res) => {
+  try {
+    const { nombre, email, edad, ciudad, rol } = req.body;
+    
+    // Crear nuevo documento
+    const nuevoUsuario = new User({
+      nombre,
+      email,
+      edad,
+      ciudad,
+      rol
+    });
+    
+    // Guardar en MongoDB
+    const usuarioGuardado = await nuevoUsuario.save();
+    
+    res.status(201).json({
+      exitoso: true,
+      mensaje: 'Usuario creado exitosamente',
+      datos: usuarioGuardado
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: 'Error al crear usuario',
+      error: error.message
+    });
+  }
+};
+
+// PUT - Actualizar un usuario
+exports.actualizarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const datosActualizados = req.body;
+    
+    const usuarioActualizado = await User.findByIdAndUpdate(
+      id,
+      datosActualizados,
+      { new: true, runValidators: true }
+    );
+    
+    if (!usuarioActualizado) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: 'Usuario no encontrado'
+      });
+    }
+    
+    res.status(200).json({
+      exitoso: true,
+      mensaje: 'Usuario actualizado',
+      datos: usuarioActualizado
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: 'Error al actualizar usuario',
+      error: error.message
+    });
+  }
+};
+
+// DELETE - Eliminar un usuario
+exports.eliminarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const usuarioEliminado = await User.findByIdAndDelete(id);
+    
+    if (!usuarioEliminado) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: 'Usuario no encontrado'
+      });
+    }
+    
+    res.status(200).json({
+      exitoso: true,
+      mensaje: 'Usuario eliminado',
+      datos: usuarioEliminado
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al eliminar usuario',
+      error: error.message
+    });
+  }
+};
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Controlador de Productos</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">controllers/productController.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">const Product = require('../models/Product');
+
+// GET - Obtener todos los productos
+exports.obtenerProductos = async (req, res) => {
+  try {
+    const productos = await Product.find();
+    
+    res.status(200).json({
+      exitoso: true,
+      cantidad: productos.length,
+      datos: productos
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al obtener productos',
+      error: error.message
+    });
+  }
+};
+
+// GET - Obtener productos por categoría
+exports.obtenerProductosPorCategoria = async (req, res) => {
+  try {
+    const { categoria } = req.params;
+    
+    const productos = await Product.find({ categoria: categoria });
+    
+    res.status(200).json({
+      exitoso: true,
+      cantidad: productos.length,
+      datos: productos
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al obtener productos',
+      error: error.message
+    });
+  }
+};
+
+// GET - Obtener un producto por ID
+exports.obtenerProductoPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const producto = await Product.findById(id);
+    
+    if (!producto) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    res.status(200).json({
+      exitoso: true,
+      datos: producto
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al obtener producto',
+      error: error.message
+    });
+  }
+};
+
+// POST - Crear un nuevo producto
+exports.crearProducto = async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, cantidad, categoria, sku } = req.body;
+    
+    const nuevoProducto = new Product({
+      nombre,
+      descripcion,
+      precio,
+      cantidad,
+      categoria,
+      sku
+    });
+    
+    const productoGuardado = await nuevoProducto.save();
+    
+    res.status(201).json({
+      exitoso: true,
+      mensaje: 'Producto creado exitosamente',
+      datos: productoGuardado
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: 'Error al crear producto',
+      error: error.message
+    });
+  }
+};
+
+// PUT - Actualizar un producto
+exports.actualizarProducto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const datosActualizados = req.body;
+    
+    const productoActualizado = await Product.findByIdAndUpdate(
+      id,
+      datosActualizados,
+      { new: true, runValidators: true }
+    );
+    
+    if (!productoActualizado) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    res.status(200).json({
+      exitoso: true,
+      mensaje: 'Producto actualizado',
+      datos: productoActualizado
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: 'Error al actualizar producto',
+      error: error.message
+    });
+  }
+};
+
+// DELETE - Eliminar un producto
+exports.eliminarProducto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const productoEliminado = await Product.findByIdAndDelete(id);
+    
+    if (!productoEliminado) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: 'Producto no encontrado'
+      });
+    }
+    
+    res.status(200).json({
+      exitoso: true,
+      mensaje: 'Producto eliminado',
+      datos: productoEliminado
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al eliminar producto',
+      error: error.message
+    });
+  }
+};
+</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONSULTAS -->
+            <div id="consultas" class="section">
+                <div class="header">
+                    <h1>5. Consultas MongoDB</h1>
+                    <p>Métodos principales para buscar y manipular datos</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>Métodos de Consulta Principales</h2>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab(event, 'queries-basicas')">Básicas</button>
+                        <button class="tab" onclick="switchTab(event, 'queries-avanzadas')">Avanzadas</button>
+                        <button class="tab" onclick="switchTab(event, 'queries-parametros')">Con Parámetros</button>
+                    </div>
+
+                    <div id="queries-basicas" class="tab-content active">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-filename">Consultas Básicas</span>
+                            </div>
+                            <pre><code class="language-javascript">// Obtener TODOS los documentos
+const usuarios = await User.find();
+
+// Obtener por ID
+const usuario = await User.findById(id);
+
+// Obtener por un campo específico
+const usuario = await User.findOne({ email: 'juan@email.com' });
+
+// Contar documentos
+const cantidad = await User.countDocuments();
+
+// Obtener solo ciertos campos
+const usuarios = await User.find().select('nombre email edad');
+
+// Excluir ciertos campos
+const usuarios = await User.find().select('-__v -fechaCreacion');
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="queries-avanzadas" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-filename">Consultas Avanzadas</span>
+                            </div>
+                            <pre><code class="language-javascript">// Filtrar por condiciones (usuarios mayores de 30)
+const usuarios = await User.find({ edad: { $gte: 30 } });
+
+// Filtrar por múltiples condiciones (AND)
+const usuarios = await User.find({ 
+  edad: { $gte: 25 },
+  ciudad: 'Bogotá'
+});
+
+// Filtrar por OR
+const usuarios = await User.find({
+  $or: [
+    { rol: 'admin' },
+    { rol: 'moderador' }
+  ]
+});
+
+// Ordenar resultados (1 = ascendente, -1 = descendente)
+const usuarios = await User.find().sort({ nombre: 1 });
+const usuarios = await User.find().sort({ fechaCreacion: -1 });
+
+// Limitar resultados
+const usuarios = await User.find().limit(10);
+
+// Saltar documentos (paginación)
+const pagina = 2;
+const porPagina = 10;
+const usuarios = await User.find()
+  .skip((pagina - 1) * porPagina)
+  .limit(porPagina);
+
+// Buscar texto
+const usuarios = await User.find(
+  { $text: { $search: 'juan' } }
+);
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="queries-parametros" class="tab-content">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-filename">Con Parámetros de Query</span>
+                            </div>
+                            <pre><code class="language-javascript">// Controlador con búsqueda y filtro flexible
+exports.obtenerProductos = async (req, res) => {
+  try {
+    // ?categoria=Electrónica&minPrecio=100&maxPrecio=5000&pagina=1
+    const { categoria, minPrecio, maxPrecio, pagina = 1, limite = 10 } = req.query;
+    
+    // Construir filtro dinámico
+    let filtro = {};
+    
+    if (categoria) {
+      filtro.categoria = categoria;
+    }
+    
+    if (minPrecio || maxPrecio) {
+      filtro.precio = {};
+      if (minPrecio) filtro.precio.$gte = Number(minPrecio);
+      if (maxPrecio) filtro.precio.$lte = Number(maxPrecio);
+    }
+    
+    if (req.query.disponible === 'true') {
+      filtro.disponible = true;
+    }
+    
+    // Ejecutar consulta con paginación
+    const productos = await Product.find(filtro)
+      .limit(Number(limite))
+      .skip((Number(pagina) - 1) * Number(limite))
+      .sort({ nombre: 1 });
+    
+    const total = await Product.countDocuments(filtro);
+    
+    res.json({
+      exitoso: true,
+      datos: productos,
+      paginacion: {
+        total,
+        pagina: Number(pagina),
+        paginas: Math.ceil(total / Number(limite))
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ exitoso: false, error: error.message });
+  }
+};
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Operadores de Comparación</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">Operadores MongoDB</span>
+                        </div>
+                        <pre><code class="language-javascript">// Igual (por defecto)
+{ edad: 25 }
+
+// Mayor que ($gt) y Mayor o igual ($gte)
+{ edad: { $gt: 25 } }      // edad > 25
+{ edad: { $gte: 25 } }     // edad >= 25
+
+// Menor que ($lt) y Menor o igual ($lte)
+{ edad: { $lt: 65 } }      // edad < 65
+{ edad: { $lte: 65 } }     // edad <= 65
+
+// No igual ($ne)
+{ rol: { $ne: 'usuario' } }
+
+// En una lista ($in)
+{ estado: { $in: ['activo', 'pendiente'] } }
+
+// No en una lista ($nin)
+{ estado: { $nin: ['eliminado', 'archivado'] } }
+
+// Existe o no existe ($exists)
+{ telefono: { $exists: true } }
+
+// Coincide con expresión regular ($regex)
+{ nombre: { $regex: /juan/i } }  // 'i' = case insensitive
+</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PETICIONES -->
+            <div id="peticiones" class="section">
+                <div class="header">
+                    <h1>6. Realizar Peticiones</h1>
+                    <p>Cómo hacer peticiones a tu API</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>Con cURL</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">Ejemplos cURL</span>
+                        </div>
+                        <pre><code class="language-bash"># GET - Obtener todos los usuarios
+curl http://localhost:3000/api/users
+
+# GET - Obtener un usuario por ID
+curl http://localhost:3000/api/users/63f8a4b2c9e1d5e2f0g1h2i3
+
+# POST - Crear un nuevo usuario
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Juan Pérez",
+    "email": "juan@email.com",
+    "edad": 28,
+    "ciudad": "Bogotá",
+    "rol": "usuario"
+  }'
+
+# PUT - Actualizar un usuario
+curl -X PUT http://localhost:3000/api/users/63f8a4b2c9e1d5e2f0g1h2i3 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Juan Carlos Pérez",
+    "edad": 29
+  }'
+
+# DELETE - Eliminar un usuario
+curl -X DELETE http://localhost:3000/api/users/63f8a4b2c9e1d5e2f0g1h2i3
+
+# GET con parámetros de búsqueda
+curl "http://localhost:3000/api/products?categoria=Electrónica&minPrecio=100&maxPrecio=5000"
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Con JavaScript (Fetch)</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">Fetch API</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">// GET - Obtener usuarios
+async function obtenerUsuarios() {
+  try {
+    const response = await fetch('http://localhost:3000/api/users');
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// POST - Crear usuario
+async function crearUsuario(nuevoUsuario) {
+  try {
+    const response = await fetch('http://localhost:3000/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(nuevoUsuario)
+    });
+    const data = await response.json();
+    console.log('Usuario creado:', data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// PUT - Actualizar usuario
+async function actualizarUsuario(id, datosActualizados) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/users/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(datosActualizados)
+    });
+    const data = await response.json();
+    console.log('Usuario actualizado:', data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// DELETE - Eliminar usuario
+async function eliminarUsuario(id) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/users/${id}`, {
+      method: 'DELETE'
+    });
+    const data = await response.json();
+    console.log('Usuario eliminado:', data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Ejemplo de uso
+crearUsuario({
+  nombre: 'María García',
+  email: 'maria@email.com',
+  edad: 26,
+  ciudad: 'Medellín'
+});
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>Con Axios</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">Axios</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">// npm install axios
+
+const axios = require('axios');
+const API_URL = 'http://localhost:3000/api';
+
+// GET
+axios.get(`${API_URL}/users`)
+  .then(response => console.log(response.data))
+  .catch(error => console.error(error));
+
+// POST
+axios.post(`${API_URL}/users`, {
+  nombre: 'Carlos López',
+  email: 'carlos@email.com',
+  edad: 32,
+  ciudad: 'Cali'
+})
+  .then(response => console.log('Creado:', response.data))
+  .catch(error => console.error(error));
+
+// PUT
+axios.put(`${API_URL}/users/63f8a4b2c9e1d5e2f0g1h2i3`, {
+  edad: 33
+})
+  .then(response => console.log('Actualizado:', response.data))
+  .catch(error => console.error(error));
+
+// DELETE
+axios.delete(`${API_URL}/users/63f8a4b2c9e1d5e2f0g1h2i3`)
+  .then(response => console.log('Eliminado:', response.data))
+  .catch(error => console.error(error));
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>En Postman</h2>
+
+                    <div class="note">
+                        <p><strong>📌 Pasos:</strong></p>
+                        <p>1. Abre Postman</p>
+                        <p>2. Selecciona el método HTTP (GET, POST, PUT, DELETE)</p>
+                        <p>3. Ingresa la URL: <code>http://localhost:3000/api/users</code></p>
+                        <p>4. Si es POST/PUT, ve a la pestaña "Body" y selecciona "raw" + "JSON"</p>
+                        <p>5. Ingresa el JSON con los datos</p>
+                        <p>6. Haz clic en "Send"</p>
+                    </p></div>
+                </div>
+            </div>
+
+            <!-- EJEMPLO COMPLETO -->
+            <div id="completo" class="section">
+                <div class="header">
+                    <h1>7. Ejemplo Completo Paso a Paso</h1>
+                    <p>Un proyecto funcional desde cero</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>1. Instalación de dependencias</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">Terminal</span>
+                        </div>
+                        <pre><code class="language-bash">npm init -y
+npm install express mongoose dotenv
+npm install -D nodemon
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>2. Archivo .env</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">.env</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-bash">MONGODB_URI=mongodb://localhost:27017/miapp
+PORT=3000
+NODE_ENV=development
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>3. Archivo server.js</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">server.js</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <pre><code class="language-javascript">require('dotenv').config();
+const app = require('./app');
+
+const PORT = process.env.PORT || 3000;
+
+const servidor = app.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
+  console.log(`🔗 http://localhost:${PORT}`);
+});
+
+// Manejo de errores no capturados
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Error no manejado:', err);
+  servidor.close(() => process.exit(1));
+});
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>4. Actualizar package.json</h2>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-filename">package.json (scripts)</span>
+                        </div>
+                        <pre><code class="language-json">{
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  }
+}
+</code></pre>
+                    </div>
+
+                    <div class="success">
+                        <p><strong>✅ Ejecutar con:</strong> <code>npm run dev</code></p>
+                    </div>
+                </div>
+
+                <div class="content-block">
+                    <h2>5. URLs de tu API</h2>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr style="background: #1a1f26; border-bottom: 1px solid #2d3139;">
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><strong>Método</strong></td>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><strong>URL</strong></td>
+                            <td style="padding: 12px;"><strong>Descripción</strong></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #2d3139;">
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><span class="method-get">GET</span></td>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><code>/api/users</code></td>
+                            <td style="padding: 12px;">Todos los usuarios</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #2d3139;">
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><span class="method-get">GET</span></td>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><code>/api/users/:id</code></td>
+                            <td style="padding: 12px;">Usuario por ID</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #2d3139;">
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><span class="method-post">POST</span></td>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><code>/api/users</code></td>
+                            <td style="padding: 12px;">Crear usuario</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #2d3139;">
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><span class="method-put">PUT</span></td>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><code>/api/users/:id</code></td>
+                            <td style="padding: 12px;">Actualizar usuario</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><span class="method-delete">DELETE</span></td>
+                            <td style="padding: 12px; border-right: 1px solid #2d3139;"><code>/api/users/:id</code></td>
+                            <td style="padding: 12px;">Eliminar usuario</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="alert">
+                    <p><strong>⚠️ IMPORTANTE:</strong> Asegúrate de que MongoDB esté ejecutándose en <code>localhost:27017</code> o usa MongoDB Atlas con la URI en el .env.</p>
+                </div>
+
+                <div class="content-block">
+                    <h2>Flujo Completo de una Petición</h2>
+
+                    <div class="structure">
+1️⃣  Cliente hace petición
+   GET /api/users
+
+2️⃣  Express recibe en app.js
+   app.use('/api/users', userRoutes)
+
+3️⃣  Router busca la ruta
+   router.get('/', obtenerUsuarios)
+
+4️⃣  Se ejecuta el controlador
+   exports.obtenerUsuarios = async (req, res) => { ... }
+
+5️⃣  Controlador consulta MongoDB
+   const usuarios = await User.find()
+
+6️⃣  MongoDB retorna datos
+   [{ _id, nombre, email, ... }, ...]
+
+7️⃣  Controlador envía respuesta
+   res.json({ exitoso: true, datos: usuarios })
+
+8️⃣  Cliente recibe JSON
+   { exitoso: true, datos: [...] }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            // Mostrar sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Actualizar nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Highlight código
+            document.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        function switchTab(event, tabId) {
+            const tabs = event.target.parentElement.querySelectorAll('.tab');
+            const contents = event.target.parentElement.nextElementSibling.parentElement.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        function copyCode(button) {
+            const code = button.parentElement.nextElementSibling.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '✓ Copiado';
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 2000);
+            });
+        }
+
+        // Highlight inicial
+        document.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+        });
+    </script>
+</body>
+</html>

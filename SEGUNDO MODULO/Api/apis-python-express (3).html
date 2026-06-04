@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APIs desde Cero — Python & Express</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0e14;
+    --bg2: #111620;
+    --bg3: #171d2b;
+    --border: #1e2736;
+    --py: #3fb950;
+    --py-dim: #2a7a38;
+    --js: #f7c948;
+    --js-dim: #a07e20;
+    --accent: #58a6ff;
+    --accent-dim: #1a3a5c;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --cyan: #39d5d3;
+    --text: #cdd9e5;
+    --text-dim: #768390;
+    --text-muted: #444c58;
+    --gutter: 280px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ─── SIDEBAR ─── */
+  nav {
+    width: var(--gutter);
+    min-width: var(--gutter);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    padding: 24px 0 40px;
+    z-index: 100;
+  }
+
+  .nav-brand {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .nav-brand h1 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .nav-brand p {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 12px 20px 6px;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    font-weight: 500;
+  }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-dim); }
+
+  nav a .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted); flex-shrink: 0;
+  }
+  nav a.py .dot { background: var(--py); }
+  nav a.js .dot { background: var(--js); }
+  nav a.both .dot { background: var(--accent); }
+
+  /* ─── CONTENT ─── */
+  main {
+    margin-left: var(--gutter);
+    flex: 1;
+    max-width: 900px;
+    padding: 56px 56px 100px;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    margin-bottom: 72px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .badge-row {
+    display: flex; gap: 8px; margin-bottom: 20px;
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  .badge.py { background: #1a3d22; color: var(--py); border: 1px solid var(--py-dim); }
+  .badge.js { background: #332a0a; color: var(--js); border: 1px solid var(--js-dim); }
+  .badge.nivel { background: var(--accent-dim); color: var(--accent); border: 1px solid #2a4a6b; }
+
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  .hero h1 span.hl-py { color: var(--py); }
+  .hero h1 span.hl-js { color: var(--js); }
+
+  .hero p {
+    font-size: 16px;
+    color: var(--text-dim);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    margin-bottom: 72px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-tag::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 28px 0 10px;
+  }
+  p { color: var(--text-dim); margin-bottom: 14px; }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* ─── CALLOUTS ─── */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--bg3);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .callout.py { border-color: var(--py); }
+  .callout.js { border-color: var(--js); }
+  .callout.warn { border-color: var(--red); }
+  .callout.purple { border-color: var(--purple); }
+  .callout .callout-title {
+    font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .callout.py .callout-title { color: var(--py); }
+  .callout.js .callout-title { color: var(--js); }
+  .callout.warn .callout-title { color: var(--red); }
+  .callout.purple .callout-title { color: var(--purple); }
+
+  /* ─── CODE BLOCKS ─── */
+  .code-wrap {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: #0f1420;
+  }
+  .code-header .lang {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .lang.py { color: var(--py); }
+  .lang.js { color: var(--js); }
+  .lang.bash { color: var(--cyan); }
+  .lang.http { color: var(--purple); }
+  .code-dots { display:flex; gap:5px; }
+  .code-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  /* Syntax highlight classes */
+  .kw { color: #ff7b72; }     /* keywords */
+  .fn { color: #d2a8ff; }     /* functions/decorators */
+  .str { color: #a5d6ff; }    /* strings */
+  .num { color: #79c0ff; }    /* numbers */
+  .cmt { color: #8b949e; font-style: italic; } /* comments */
+  .var { color: #ffa657; }    /* variables/params */
+  .cls { color: #7ee787; }    /* class names */
+  .op { color: #cdd9e5; }     /* operators */
+  .route { color: var(--py); }
+  .route-js { color: var(--js); }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    flex-shrink: 0;
+  }
+  .flow-node {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+    color: #fff;
+  }
+  .flow-connector {
+    width: 2px;
+    flex: 1;
+    min-height: 24px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+  .flow-content {
+    padding: 6px 0 28px;
+    flex: 1;
+  }
+  .flow-content h4 {
+    font-size: 14px; font-weight: 700; color: #fff;
+    margin-bottom: 4px;
+  }
+  .flow-content p {
+    font-size: 13px; margin: 0; color: var(--text-dim);
+  }
+  .flow-content code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--accent);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── COMPARE TABLE ─── */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .compare-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .compare-card .compare-header {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-card.py .compare-header { color: var(--py); background: #0e2218; }
+  .compare-card.js .compare-header { color: var(--js); background: #1f1a08; }
+  .compare-card ul {
+    list-style: none;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .compare-card ul li { padding: 4px 0; display: flex; gap: 8px; }
+  .compare-card ul li::before { content: '→'; color: var(--text-muted); flex-shrink:0; }
+
+  /* ─── INLINE CODE ─── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg3);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    color: var(--accent);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── CHIP ROW ─── */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text-dim);
+  }
+
+  /* ─── ANALOGY BOX ─── */
+  .analogy {
+    background: linear-gradient(135deg, #0f1a2e 0%, #121a2c 100%);
+    border: 1px solid #1e3050;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .analogy::before {
+    content: '💡';
+    position: absolute;
+    top: 16px; right: 20px;
+    font-size: 28px;
+    opacity: 0.3;
+  }
+  .analogy h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+  .analogy p { margin: 0; font-size: 14px; }
+
+  /* ─── STATUS INDICATOR ─── */
+  .status-demo {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  .status-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  }
+  .pulse-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    position: relative; flex-shrink: 0;
+  }
+  .pulse-dot::after {
+    content: '';
+    position: absolute;
+    top: -3px; left: -3px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid;
+    animation: pulse 1.5s ease-out infinite;
+  }
+  .pulse-dot.green { background: var(--py); }
+  .pulse-dot.green::after { border-color: var(--py); }
+  .pulse-dot.red { background: var(--red); animation: none; }
+  .pulse-dot.red::after { display: none; }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  .status-row span { font-size: 13px; color: var(--text-dim); }
+  .status-row strong { color: var(--text); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+
+  /* ─── TABLE ─── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 20px 0;
+  }
+  th {
+    background: var(--bg3);
+    color: var(--text-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  tr:nth-child(even) td { background: #0e1220; }
+  td code { font-size: 12px; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav id="sidebar">
+  <div class="nav-brand">
+    <h1>APIs desde Cero</h1>
+    <p>// Python & Express · BIT</p>
+  </div>
+
+  <div class="nav-section-label">Fundamentos</div>
+  <a href="#intro" class="both"><span class="dot"></span> ¿Qué es una API?</a>
+  <a href="#estatica-vs-dinamica" class="both"><span class="dot"></span> Estática vs Dinámica</a>
+  <a href="#encendida" class="both"><span class="dot"></span> ¿Qué significa "estar arriba"?</a>
+
+  <div class="nav-section-label">Python — Flask</div>
+  <a href="#python-hello" class="py"><span class="dot"></span> Tu primera API en Python</a>
+  <a href="#endpoint-py" class="py"><span class="dot"></span> ¿Qué es un Endpoint?</a>
+  <a href="#controller-py" class="py"><span class="dot"></span> ¿Qué es un Controlador?</a>
+  <a href="#flujo-py" class="py"><span class="dot"></span> Flujo de una petición</a>
+  <a href="#metodos-py" class="py"><span class="dot"></span> GET, POST, PUT, DELETE</a>
+
+  <div class="nav-section-label">Express — Node.js</div>
+  <a href="#js-hello" class="js"><span class="dot"></span> Tu primera API en Express</a>
+  <a href="#endpoint-js" class="js"><span class="dot"></span> Endpoints en Express</a>
+  <a href="#controller-js" class="js"><span class="dot"></span> Controladores en Express</a>
+  <a href="#flujo-js" class="js"><span class="dot"></span> Flujo de una petición</a>
+
+  <div class="nav-section-label">Comparativa</div>
+  <a href="#comparativa" class="both"><span class="dot"></span> Python vs Express</a>
+  <a href="#conceptos" class="both"><span class="dot"></span> Glosario esencial</a>
+</nav>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge-row">
+      <span class="badge py">Python / Flask</span>
+      <span class="badge js">Node.js / Express</span>
+      <span class="badge nivel">Nivel: Principiante</span>
+    </div>
+    <h1>Construye tu primera<br><span class="hl-py">API</span> desde <span class="hl-js">cero</span></h1>
+    <p>Entiende <strong>qué es un endpoint</strong>, qué significa que una API esté "arriba", cómo fluye cada petición, y por qué todo esto es diferente a una página web estática. Con Python primero, luego Express.</p>
+  </div>
+
+  <!-- ═══ SECCIÓN 1: QUÉ ES UNA API ═══ -->
+  <section id="intro">
+    <div class="section-tag">Fundamento 01</div>
+    <h2>¿Qué es una API?</h2>
+    <p><strong>API</strong> significa <strong>Application Programming Interface</strong> — Interfaz de Programación de Aplicaciones. En términos simples: es un programa que <strong>escucha peticiones</strong> y devuelve respuestas. No tiene pantalla, no tiene botones. Solo recibe datos y responde datos.</p>
+
+    <div class="analogy">
+      <h4>Analogía: El mesero del restaurante</h4>
+      <p>Tú (el cliente) le dices al mesero (la API) qué quieres. El mesero va a la cocina (la base de datos / lógica), consigue lo que pediste, y te lo trae de vuelta. Tú nunca entras a la cocina. El mesero es el intermediario.</p>
+    </div>
+
+    <p>Las APIs son la base de todo internet moderno. Cuando abres Twitter, una app en tu celular le <strong>hace peticiones a una API</strong> de Twitter que devuelve los tweets en formato JSON. El celular se encarga de mostrarlos bonito.</p>
+
+    <h3>¿Cómo se "habla" con una API?</h3>
+    <p>A través del protocolo <strong>HTTP</strong>, el mismo que usas cuando navegas en Chrome. Una petición tiene:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang http">HTTP Request</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">GET</span> <span class="route">/usuarios/42</span> HTTP/1.1
+Host: api.miapp.com
+Content-Type: application/json</pre>
+    </div>
+
+    <p>Y la API responde:</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang http">HTTP Response</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="num">200</span> OK
+Content-Type: application/json
+
+{
+  <span class="str">"id"</span>: <span class="num">42</span>,
+  <span class="str">"nombre"</span>: <span class="str">"Gabriel Niño"</span>,
+  <span class="str">"rol"</span>: <span class="str">"CEO"</span>
+}</pre>
+    </div>
+  </section>
+
+  <!-- ═══ SECCIÓN 2: ESTÁTICA VS DINÁMICA ═══ -->
+  <section id="estatica-vs-dinamica">
+    <div class="section-tag">Fundamento 02</div>
+    <h2>App Estática vs App con API</h2>
+
+    <p>Esta es una diferencia clave que confunde a muchos principiantes. ¿Por qué necesito un servidor corriendo si ya tengo un archivo HTML?</p>
+
+    <div class="compare">
+      <div class="compare-card py">
+        <div class="compare-header">🗂️ App Estática</div>
+        <ul>
+          <li>Son archivos: <code>.html</code>, <code>.css</code>, <code>.js</code></li>
+          <li>Viven en un disco o CDN</li>
+          <li>No tienen lógica del lado del servidor</li>
+          <li>Todos ven exactamente lo mismo</li>
+          <li>No leen bases de datos</li>
+          <li>No se puede "iniciar sesión" sin una API</li>
+          <li>Ejemplo: currículum en línea, landing page</li>
+        </ul>
+      </div>
+      <div class="compare-card js">
+        <div class="compare-header">⚙️ App con API (Dinámica)</div>
+        <ul>
+          <li>Hay un <strong>proceso corriendo</strong> en un servidor</li>
+          <li>Responde diferente según quien pregunta</li>
+          <li>Puede conectarse a bases de datos</li>
+          <li>Puede autenticar usuarios</li>
+          <li>Puede recibir y guardar datos</li>
+          <li>Necesita un puerto abierto (ej: <code>:3000</code>)</li>
+          <li>Ejemplo: Twitter, Netflix, WhatsApp</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-title">⚠️ Diferencia clave</div>
+      Un archivo HTML estático <strong>no escucha</strong>. Una API sí escucha. Es como la diferencia entre un letrero pegado en la pared (estático) y un recepcionista sentado en un escritorio (API) que responde preguntas en tiempo real.
+    </div>
+
+    <table>
+      <tr>
+        <th>Característica</th>
+        <th>Sitio Estático</th>
+        <th>API / App Dinámica</th>
+      </tr>
+      <tr>
+        <td>¿Necesita proceso corriendo?</td>
+        <td>❌ No</td>
+        <td>✅ Sí, siempre</td>
+      </tr>
+      <tr>
+        <td>¿Lee base de datos?</td>
+        <td>❌ No</td>
+        <td>✅ Sí</td>
+      </tr>
+      <tr>
+        <td>¿Respuesta personalizada?</td>
+        <td>❌ Igual para todos</td>
+        <td>✅ Distinta por usuario</td>
+      </tr>
+      <tr>
+        <td>¿Puerto abierto?</td>
+        <td>❌ No necesario</td>
+        <td>✅ Obligatorio</td>
+      </tr>
+      <tr>
+        <td>¿Consume memoria RAM?</td>
+        <td>Casi nada</td>
+        <td>Sí, mientras está activa</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ═══ SECCIÓN 3: ESTAR ARRIBA ═══ -->
+  <section id="encendida">
+    <div class="section-tag">Fundamento 03</div>
+    <h2>¿Qué significa que una API esté "arriba" o "encendida"?</h2>
+
+    <p>Cuando dices que una API está <strong>"arriba"</strong>, significa que hay un <strong>proceso activo en un servidor</strong> que está constantemente escuchando en un puerto específico, esperando que alguien haga una petición.</p>
+
+    <div class="status-demo">
+      <div class="status-row">
+        <div class="pulse-dot green"></div>
+        <span><strong>API Corriendo</strong> — proceso activo escuchando en <code>localhost:5000</code></span>
+      </div>
+      <div class="status-row">
+        <div class="pulse-dot red"></div>
+        <span><strong>API Apagada</strong> — nadie escucha, cualquier petición dará error de conexión</span>
+      </div>
+    </div>
+
+    <h3>El concepto de Puerto (Port)</h3>
+    <p>Un <strong>puerto</strong> es como una "puerta numerada" en tu computador. Hay 65,535 puertas posibles. Cuando dices <code>localhost:5000</code>, estás diciendo: "quiero entrar por la puerta número 5000 de esta máquina". Si nadie está "parado" en esa puerta, la conexión falla.</p>
+
+    <div class="analogy">
+      <h4>Analogía: El edificio de apartamentos</h4>
+      <p>La dirección IP es el <strong>edificio</strong>. El puerto es el <strong>número de apartamento</strong>. Si vas al apartamento 5000 y nadie vive ahí (la API está apagada), nadie te abre. Si la API está corriendo, hay alguien ahí que contesta.</p>
+    </div>
+
+    <h3>¿Por qué hay que tenerla "encendida" siempre?</h3>
+    <p>Porque HTTP es <strong>sincrono y sin estado</strong>. El cliente hace una petición, la API responde, y la conexión se cierra. Pero el proceso que gestiona esas conexiones <strong>debe existir permanentemente</strong> para estar listo cuando llegue la próxima petición. Si apagas el proceso, nadie puede hacer peticiones.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Terminal — API encendida</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="cmt"># Cuando inicias la API, ves algo así:</span>
+$ python app.py
+
+ * Running on http://127.0.0.1:<span class="num">5000</span>
+ * Debug mode: <span class="kw">on</span>
+<span class="cmt"># ↑ Esto significa: "Estoy escuchando. Puedes hablarme."</span>
+<span class="cmt"># El proceso NO termina. Se queda esperando peticiones.</span></pre>
+    </div>
+
+    <div class="callout purple">
+      <div class="callout-title">🔌 En producción</div>
+      En un servidor real (AWS, DigitalOcean, etc.) la API vive en un proceso manejado por herramientas como <code>pm2</code>, <code>gunicorn</code>, o <code>systemd</code>, que la reinician automáticamente si se cae. Así garantizan que siempre esté "arriba".
+    </div>
+  </section>
+
+  <!-- ═══════════ PYTHON ═══════════ -->
+
+  <!-- SECCIÓN 4: PRIMERA API PYTHON -->
+  <section id="python-hello">
+    <div class="section-tag">Python / Flask — 01</div>
+    <h2>Tu primera API en Python con Flask</h2>
+
+    <p>Flask es un <strong>microframework</strong> de Python para crear APIs web. "Micro" no significa pequeño, significa que viene con lo esencial y tú agregas lo que necesites.</p>
+
+    <h3>Instalar Flask</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Terminal</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre>pip install flask</pre>
+    </div>
+
+    <h3>La API más pequeña del mundo</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang py">Python — app.py</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">from</span> flask <span class="kw">import</span> Flask
+
+app = <span class="cls">Flask</span>(<span class="var">__name__</span>)     <span class="cmt"># 1. Crear la aplicación</span>
+
+<span class="fn">@app.route</span>(<span class="str">'/'</span>)           <span class="cmt"># 2. Definir un endpoint en la ruta "/"</span>
+<span class="kw">def</span> <span class="fn">inicio</span>():             <span class="cmt"># 3. Función que maneja esa ruta</span>
+    <span class="kw">return</span> <span class="str">'¡Hola, mundo!'</span>  <span class="cmt"># 4. Lo que devuelve</span>
+
+<span class="kw">if</span> <span class="var">__name__</span> == <span class="str">'__main__'</span>:
+    app.run(<span class="var">debug</span>=<span class="kw">True</span>)     <span class="cmt"># 5. Encender el servidor</span></pre>
+    </div>
+
+    <h3>Ejecutar la API</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Terminal</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre>$ python app.py
+
+ * Running on http://127.0.0.1:<span class="num">5000</span>
+ * Debug mode: <span class="kw">on</span></pre>
+    </div>
+
+    <p>Ahora puedes abrir tu navegador en <code>http://localhost:5000</code> y verás <strong>"¡Hola, mundo!"</strong>. Tu API está arriba y respondiendo.</p>
+  </section>
+
+  <!-- SECCIÓN 5: ENDPOINTS PYTHON -->
+  <section id="endpoint-py">
+    <div class="section-tag">Python / Flask — 02</div>
+    <h2>¿Qué es un Endpoint?</h2>
+
+    <p>Un <strong>endpoint</strong> es una <strong>URL específica</strong> que tu API expone y que hace algo concreto cuando la llaman. Es el punto de contacto entre el cliente y tu lógica.</p>
+
+    <div class="analogy">
+      <h4>Analogía: Los cajeros del banco</h4>
+      <p>El banco (tu API) tiene varios cajeros (endpoints). El cajero de la ventanilla 1 (<code>/depositar</code>) recibe depósitos. El de la ventanilla 2 (<code>/retirar</code>) da dinero. El de la 3 (<code>/saldo</code>) informa tu saldo. Cada ventanilla tiene una función específica.</p>
+    </div>
+
+    <h3>Múltiples endpoints en Flask</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang py">Python — app.py</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify
+
+app = <span class="cls">Flask</span>(<span class="var">__name__</span>)
+
+<span class="cmt"># Endpoint 1: ruta raíz</span>
+<span class="fn">@app.route</span>(<span class="str">'/'</span>)
+<span class="kw">def</span> <span class="fn">inicio</span>():
+    <span class="kw">return</span> <span class="fn">jsonify</span>({ <span class="str">'mensaje'</span>: <span class="str">'API funcionando'</span> })
+
+<span class="cmt"># Endpoint 2: lista de usuarios</span>
+<span class="fn">@app.route</span>(<span class="str">'/usuarios'</span>)
+<span class="kw">def</span> <span class="fn">obtener_usuarios</span>():
+    usuarios = [
+        { <span class="str">'id'</span>: <span class="num">1</span>, <span class="str">'nombre'</span>: <span class="str">'Ana'</span> },
+        { <span class="str">'id'</span>: <span class="num">2</span>, <span class="str">'nombre'</span>: <span class="str">'Luis'</span> }
+    ]
+    <span class="kw">return</span> <span class="fn">jsonify</span>(usuarios)
+
+<span class="cmt"># Endpoint 3: un usuario por ID (parámetro dinámico)</span>
+<span class="fn">@app.route</span>(<span class="str">'/usuarios/&lt;int:id&gt;'</span>)
+<span class="kw">def</span> <span class="fn">obtener_usuario</span>(<span class="var">id</span>):
+    <span class="kw">return</span> <span class="fn">jsonify</span>({ <span class="str">'id'</span>: <span class="var">id</span>, <span class="str">'nombre'</span>: <span class="str">'Ana'</span> })</pre>
+    </div>
+
+    <p>Ahora tu API tiene 3 endpoints distintos. Cada URL hace algo diferente:</p>
+
+    <div class="chips">
+      <span class="chip">GET /</span>
+      <span class="chip">GET /usuarios</span>
+      <span class="chip">GET /usuarios/1</span>
+      <span class="chip">GET /usuarios/42</span>
+    </div>
+
+    <div class="callout py">
+      <div class="callout-title">🐍 El decorador @app.route</div>
+      La línea <code>@app.route('/usuarios')</code> es un <strong>decorador</strong> de Python. Le dice a Flask: "registra la función que viene abajo para que se ejecute cuando alguien haga una petición a <code>/usuarios</code>". Es el mecanismo que conecta una URL con una función.
+    </div>
+  </section>
+
+  <!-- SECCIÓN 6: CONTROLADOR PYTHON -->
+  <section id="controller-py">
+    <div class="section-tag">Python / Flask — 03</div>
+    <h2>¿Qué es un Controlador?</h2>
+
+    <p>Un <strong>controlador</strong> es la función (o clase) que se encarga de <strong>manejar la petición</strong>: recibir los datos que llegaron, llamar a la lógica de negocio (o base de datos), y preparar la respuesta. Es el "cerebro" que decide qué hacer con cada petición.</p>
+
+    <p>En Flask básico, el controlador es directamente la función decorada con <code>@app.route</code>. En proyectos más grandes, los controladores viven en archivos separados.</p>
+
+    <h3>Estructura sin separar (principiante)</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang py">Python — todo en un archivo</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="fn">@app.route</span>(<span class="str">'/productos'</span>)
+<span class="kw">def</span> <span class="fn">listar_productos</span>():          <span class="cmt"># ← Este ES el controlador</span>
+    <span class="cmt"># 1. Obtener datos (simulando base de datos)</span>
+    productos = [
+        {<span class="str">'id'</span>: <span class="num">1</span>, <span class="str">'nombre'</span>: <span class="str">'Laptop'</span>, <span class="str">'precio'</span>: <span class="num">2500000</span>},
+        {<span class="str">'id'</span>: <span class="num">2</span>, <span class="str">'nombre'</span>: <span class="str">'Mouse'</span>,  <span class="str">'precio'</span>: <span class="num">45000</span>},
+    ]
+    <span class="cmt"># 2. Preparar y retornar la respuesta</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>(productos)</pre>
+    </div>
+
+    <h3>Estructura separada (recomendada en proyectos reales)</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Estructura de archivos</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre>mi_api/
+├── app.py                  <span class="cmt"># Punto de entrada, define la app</span>
+├── routes/
+│   └── productos_routes.py <span class="cmt"># Define las rutas (URLs)</span>
+└── controllers/
+    └── productos_ctrl.py   <span class="cmt"># Contiene la lógica del controlador</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang py">controllers/productos_ctrl.py</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">from</span> flask <span class="kw">import</span> jsonify, request
+
+<span class="cmt"># El controlador: solo lógica, sin saber de rutas</span>
+<span class="kw">def</span> <span class="fn">obtener_todos</span>():
+    productos = [
+        {<span class="str">'id'</span>: <span class="num">1</span>, <span class="str">'nombre'</span>: <span class="str">'Laptop'</span>},
+        {<span class="str">'id'</span>: <span class="num">2</span>, <span class="str">'nombre'</span>: <span class="str">'Mouse'</span>},
+    ]
+    <span class="kw">return</span> <span class="fn">jsonify</span>(productos), <span class="num">200</span>
+
+<span class="kw">def</span> <span class="fn">crear_producto</span>():
+    datos = request.<span class="fn">get_json</span>()       <span class="cmt"># Leer el body de la petición</span>
+    nombre = datos.get(<span class="str">'nombre'</span>)
+    <span class="cmt"># Aquí iría: guardar en base de datos</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="str">'mensaje'</span>: <span class="str">f'Producto {nombre} creado'</span>}), <span class="num">201</span></pre>
+    </div>
+
+    <div class="callout py">
+      <div class="callout-title">💡 Regla de oro</div>
+      <strong>La ruta define el "dónde"</strong> (la URL). <strong>El controlador define el "qué"</strong> (la lógica). Separar estas responsabilidades hace tu código más fácil de mantener y testear.
+    </div>
+  </section>
+
+  <!-- SECCIÓN 7: FLUJO PYTHON -->
+  <section id="flujo-py">
+    <div class="section-tag">Python / Flask — 04</div>
+    <h2>Flujo completo de una petición</h2>
+
+    <p>Cuando alguien hace <code>GET /usuarios/5</code> a tu API en Flask, esto es exactamente lo que ocurre, paso a paso:</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#1a3d22; color:var(--py);">1</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>El cliente hace la petición</h4>
+          <p>Un navegador, Postman, o una app hace <code>GET http://localhost:5000/usuarios/5</code>. Esto genera un paquete HTTP que viaja por la red.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#1a3d22; color:var(--py);">2</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Flask recibe en el puerto 5000</h4>
+          <p>El proceso de Flask, que está escuchando en el puerto 5000, detecta la petición entrante. El servidor WSGI (Werkzeug en desarrollo) la captura.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#1a3d22; color:var(--py);">3</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Router: encontrar el endpoint correcto</h4>
+          <p>Flask revisa su tabla de rutas registradas. Ve que <code>/usuarios/&lt;int:id&gt;</code> coincide con <code>/usuarios/5</code>. Extrae el parámetro <code>id = 5</code>.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#1a3d22; color:var(--py);">4</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Se ejecuta el controlador</h4>
+          <p>Flask llama a la función <code>obtener_usuario(id=5)</code>. Aquí vive tu lógica: puede consultar una base de datos, hacer cálculos, etc.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#1a3d22; color:var(--py);">5</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Se prepara la respuesta</h4>
+          <p>El controlador retorna <code>jsonify({...})</code>. Flask convierte ese dict de Python en texto JSON y arma el paquete HTTP de respuesta con código <code>200 OK</code>.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#1a3d22; color:var(--py);">6</div>
+        </div>
+        <div class="flow-content">
+          <h4>Respuesta enviada al cliente</h4>
+          <p>El paquete viaja de vuelta. El cliente recibe el JSON. La conexión se cierra. Flask sigue escuchando para la próxima petición.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang py">Python — Ejemplo completo del flujo</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify
+
+app = <span class="cls">Flask</span>(<span class="var">__name__</span>)
+
+<span class="cmt"># Simulamos una "base de datos" en memoria</span>
+usuarios_db = {
+    <span class="num">1</span>: {<span class="str">'nombre'</span>: <span class="str">'Ana García'</span>,  <span class="str">'email'</span>: <span class="str">'ana@email.com'</span>},
+    <span class="num">2</span>: {<span class="str">'nombre'</span>: <span class="str">'Luis Mora'</span>,   <span class="str">'email'</span>: <span class="str">'luis@email.com'</span>},
+    <span class="num">5</span>: {<span class="str">'nombre'</span>: <span class="str">'Sofía Ruiz'</span>,  <span class="str">'email'</span>: <span class="str">'sofia@email.com'</span>},
+}
+
+<span class="fn">@app.route</span>(<span class="str">'/usuarios/&lt;int:id&gt;'</span>)
+<span class="kw">def</span> <span class="fn">obtener_usuario</span>(<span class="var">id</span>):
+    usuario = usuarios_db.get(<span class="var">id</span>)       <span class="cmt"># Buscar en la "BD"</span>
+
+    <span class="kw">if not</span> usuario:                      <span class="cmt"># Si no existe...</span>
+        <span class="kw">return</span> <span class="fn">jsonify</span>({
+            <span class="str">'error'</span>: <span class="str">'Usuario no encontrado'</span>
+        }), <span class="num">404</span>                          <span class="cmt"># ...código 404</span>
+
+    <span class="kw">return</span> <span class="fn">jsonify</span>({                     <span class="cmt"># Si existe...</span>
+        <span class="str">'id'</span>: <span class="var">id</span>,
+        <span class="op">**</span>usuario
+    }), <span class="num">200</span>                             <span class="cmt"># ...código 200 OK</span>
+
+<span class="kw">if</span> <span class="var">__name__</span> == <span class="str">'__main__'</span>:
+    app.run(<span class="var">debug</span>=<span class="kw">True</span>)</pre>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 8: MÉTODOS HTTP PYTHON -->
+  <section id="metodos-py">
+    <div class="section-tag">Python / Flask — 05</div>
+    <h2>GET, POST, PUT, DELETE</h2>
+
+    <p>HTTP define <strong>verbos</strong> (métodos) que indican la <strong>intención</strong> de la petición. No es solo una convención: es un estándar que todos entienden.</p>
+
+    <table>
+      <tr>
+        <th>Método</th>
+        <th>Significado</th>
+        <th>Analogía</th>
+        <th>Código típico</th>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td>Obtener / Leer</td>
+        <td>Consultar el menú del restaurante</td>
+        <td><code>200 OK</code></td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td>Crear algo nuevo</td>
+        <td>Hacer un pedido nuevo</td>
+        <td><code>201 Created</code></td>
+      </tr>
+      <tr>
+        <td><code>PUT</code></td>
+        <td>Reemplazar completo</td>
+        <td>Cambiar todo el pedido</td>
+        <td><code>200 OK</code></td>
+      </tr>
+      <tr>
+        <td><code>PATCH</code></td>
+        <td>Modificar parcial</td>
+        <td>Cambiar solo el postre</td>
+        <td><code>200 OK</code></td>
+      </tr>
+      <tr>
+        <td><code>DELETE</code></td>
+        <td>Eliminar</td>
+        <td>Cancelar el pedido</td>
+        <td><code>204 No Content</code></td>
+      </tr>
+    </table>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang py">Python — CRUD completo de productos</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify, request
+
+app = <span class="cls">Flask</span>(<span class="var">__name__</span>)
+productos = []
+
+<span class="cmt"># GET — listar todos</span>
+<span class="fn">@app.route</span>(<span class="str">'/productos'</span>, <span class="var">methods</span>=[<span class="str">'GET'</span>])
+<span class="kw">def</span> <span class="fn">listar</span>():
+    <span class="kw">return</span> <span class="fn">jsonify</span>(productos), <span class="num">200</span>
+
+<span class="cmt"># POST — crear uno nuevo</span>
+<span class="fn">@app.route</span>(<span class="str">'/productos'</span>, <span class="var">methods</span>=[<span class="str">'POST'</span>])
+<span class="kw">def</span> <span class="fn">crear</span>():
+    datos = request.<span class="fn">get_json</span>()          <span class="cmt"># Leer JSON del body</span>
+    nuevo = {
+        <span class="str">'id'</span>: <span class="fn">len</span>(productos) + <span class="num">1</span>,
+        <span class="str">'nombre'</span>: datos[<span class="str">'nombre'</span>],
+        <span class="str">'precio'</span>: datos[<span class="str">'precio'</span>]
+    }
+    productos.<span class="fn">append</span>(nuevo)
+    <span class="kw">return</span> <span class="fn">jsonify</span>(nuevo), <span class="num">201</span>          <span class="cmt"># 201 = Creado</span>
+
+<span class="cmt"># DELETE — eliminar por ID</span>
+<span class="fn">@app.route</span>(<span class="str">'/productos/&lt;int:id&gt;'</span>, <span class="var">methods</span>=[<span class="str">'DELETE'</span>])
+<span class="kw">def</span> <span class="fn">eliminar</span>(<span class="var">id</span>):
+    global productos
+    productos = [p <span class="kw">for</span> p <span class="kw">in</span> productos <span class="kw">if</span> p[<span class="str">'id'</span>] != <span class="var">id</span>]
+    <span class="kw">return</span> <span class="str">''</span>, <span class="num">204</span>                       <span class="cmt"># 204 = Sin contenido</span></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════ EXPRESS ═══════════ -->
+
+  <!-- SECCIÓN 9: PRIMERA API EXPRESS -->
+  <section id="js-hello">
+    <div class="section-tag">Express / Node.js — 01</div>
+    <h2>Tu primera API en Express</h2>
+
+    <p>Express es un framework minimalista para <strong>Node.js</strong>. Node.js te permite ejecutar JavaScript fuera del navegador — en el servidor. Express agrega el manejo de rutas y peticiones HTTP encima de Node.</p>
+
+    <h3>Instalar Node.js y Express</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Terminal</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="cmt"># Crear proyecto e instalar Express</span>
+npm init -y
+npm install express</pre>
+    </div>
+
+    <h3>La API más pequeña en Express</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang js">JavaScript — index.js</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)   <span class="cmt">// 1. Importar Express</span>
+<span class="kw">const</span> <span class="var">app</span>     = <span class="fn">express</span>()              <span class="cmt">// 2. Crear la aplicación</span>
+
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {         <span class="cmt">// 3. Definir endpoint GET /</span>
+    <span class="var">res</span>.<span class="fn">json</span>({ <span class="str">mensaje</span>: <span class="str">'¡Hola!'</span> })   <span class="cmt">// 4. Responder con JSON</span>
+})
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="num">3000</span>, () => {              <span class="cmt">// 5. Encender en puerto 3000</span>
+    <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'API en puerto 3000'</span>)
+})</pre>
+    </div>
+
+    <h3>Ejecutar</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Terminal</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre>$ node index.js
+API en puerto <span class="num">3000</span>
+<span class="cmt"># El proceso no termina → está escuchando</span></pre>
+    </div>
+
+    <div class="callout js">
+      <div class="callout-title">⚡ req y res</div>
+      En Express, cada handler recibe dos objetos: <code>req</code> (request = la petición que llegó, con todos sus datos) y <code>res</code> (response = el objeto con el que mandas tu respuesta). Todo gira alrededor de estos dos.
+    </div>
+  </section>
+
+  <!-- SECCIÓN 10: ENDPOINTS EXPRESS -->
+  <section id="endpoint-js">
+    <div class="section-tag">Express / Node.js — 02</div>
+    <h2>Endpoints en Express</h2>
+
+    <p>En Express, los endpoints se definen con <code>app.get()</code>, <code>app.post()</code>, <code>app.put()</code>, <code>app.delete()</code>, etc. El primer argumento es la ruta, el segundo es el handler (la función que maneja la petición).</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang js">JavaScript — múltiples endpoints</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>())              <span class="cmt">// Middleware: parsear JSON</span>
+
+<span class="cmt">// Endpoint 1: raíz</span>
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="var">res</span>.<span class="fn">json</span>({ <span class="str">status</span>: <span class="str">'ok'</span> })
+})
+
+<span class="cmt">// Endpoint 2: lista de usuarios</span>
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/usuarios'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="var">res</span>.<span class="fn">json</span>([
+        { <span class="str">id</span>: <span class="num">1</span>, <span class="str">nombre</span>: <span class="str">'Ana'</span> },
+        { <span class="str">id</span>: <span class="num">2</span>, <span class="str">nombre</span>: <span class="str">'Luis'</span> }
+    ])
+})
+
+<span class="cmt">// Endpoint 3: usuario por ID (parámetro dinámico)</span>
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/usuarios/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="kw">const</span> { <span class="var">id</span> } = <span class="var">req</span>.params        <span class="cmt">// Extraer :id de la URL</span>
+    <span class="var">res</span>.<span class="fn">json</span>({ <span class="var">id</span>: <span class="fn">parseInt</span>(<span class="var">id</span>), <span class="str">nombre</span>: <span class="str">'Ana'</span> })
+})
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="num">3000</span>)</pre>
+    </div>
+
+    <p>Nota el <code>:id</code> en Express — equivale al <code>&lt;int:id&gt;</code> de Flask. Es el parámetro dinámico de la URL, accesible en <code>req.params.id</code>.</p>
+  </section>
+
+  <!-- SECCIÓN 11: CONTROLADORES EXPRESS -->
+  <section id="controller-js">
+    <div class="section-tag">Express / Node.js — 03</div>
+    <h2>Controladores en Express</h2>
+
+    <p>Al igual que en Flask, en Express puedes (y debes) separar los controladores en archivos propios. La ruta y la lógica van separadas.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang bash">Estructura de proyecto</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre>mi-api/
+├── index.js                    <span class="cmt"># Punto de entrada</span>
+├── routes/
+│   └── productosRoutes.js      <span class="cmt"># Define las rutas</span>
+└── controllers/
+    └── productosController.js  <span class="cmt"># Contiene la lógica</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang js">controllers/productosController.js</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">const</span> <span class="var">productos</span> = [
+    { <span class="str">id</span>: <span class="num">1</span>, <span class="str">nombre</span>: <span class="str">'Laptop'</span>, <span class="str">precio</span>: <span class="num">2500000</span> },
+    { <span class="str">id</span>: <span class="num">2</span>, <span class="str">nombre</span>: <span class="str">'Mouse'</span>,  <span class="str">precio</span>: <span class="num">45000</span>  },
+]
+
+<span class="cmt">// Controlador: obtener todos los productos</span>
+<span class="kw">const</span> <span class="fn">obtenerTodos</span> = (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="var">res</span>.<span class="fn">status</span>(<span class="num">200</span>).<span class="fn">json</span>(<span class="var">productos</span>)
+}
+
+<span class="cmt">// Controlador: crear un producto</span>
+<span class="kw">const</span> <span class="fn">crearProducto</span> = (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="kw">const</span> { <span class="var">nombre</span>, <span class="var">precio</span> } = <span class="var">req</span>.body    <span class="cmt">// Datos del body</span>
+    <span class="kw">const</span> <span class="var">nuevo</span> = {
+        <span class="var">id</span>: <span class="var">productos</span>.length + <span class="num">1</span>,
+        <span class="var">nombre</span>,
+        <span class="var">precio</span>
+    }
+    <span class="var">productos</span>.<span class="fn">push</span>(<span class="var">nuevo</span>)
+    <span class="var">res</span>.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>(<span class="var">nuevo</span>)
+}
+
+module.exports = { <span class="var">obtenerTodos</span>, <span class="var">crearProducto</span> }</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang js">routes/productosRoutes.js</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">const</span> <span class="var">express</span>    = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">router</span>     = express.<span class="fn">Router</span>()
+<span class="kw">const</span> ctrl       = <span class="fn">require</span>(<span class="str">'../controllers/productosController'</span>)
+
+<span class="var">router</span>.<span class="fn">get</span>(<span class="str">'/'</span>,  ctrl.<span class="var">obtenerTodos</span>)   <span class="cmt">// GET  /productos</span>
+<span class="var">router</span>.<span class="fn">post</span>(<span class="str">'/'</span>, ctrl.<span class="var">crearProducto</span>)  <span class="cmt">// POST /productos</span>
+
+module.exports = <span class="var">router</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="lang js">index.js — punto de entrada</span>
+        <div class="code-dots"><span style="background:#f85149"></span><span style="background:#f7c948"></span><span style="background:#3fb950"></span></div>
+      </div>
+      <pre><span class="kw">const</span> <span class="var">express</span>         = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">productosRoutes</span> = <span class="fn">require</span>(<span class="str">'./routes/productosRoutes'</span>)
+
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>())
+
+<span class="cmt">// Montar las rutas bajo el prefijo /productos</span>
+<span class="var">app</span>.<span class="fn">use</span>(<span class="str">'/productos'</span>, <span class="var">productosRoutes</span>)
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="num">3000</span>, () => <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'🚀 Servidor en :3000'</span>))</pre>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 12: FLUJO EXPRESS -->
+  <section id="flujo-js">
+    <div class="section-tag">Express / Node.js — 04</div>
+    <h2>Flujo de una petición en Express</h2>
+
+    <p>El flujo es similar a Flask pero con una pieza extra importante: el <strong>Middleware</strong>. En Express, las peticiones pasan por una cadena de middleware antes de llegar al controlador.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#332a0a; color:var(--js);">1</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Cliente hace <code>POST /productos</code> con body JSON</h4>
+          <p>La petición incluye un body: <code>{"nombre": "Teclado", "precio": 120000}</code></p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#332a0a; color:var(--js);">2</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Express recibe en el puerto 3000</h4>
+          <p>Node.js tiene su propio servidor HTTP. Express lo usa. La petición llega al proceso activo.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#332a0a; color:var(--js);">3</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Middleware: <code>express.json()</code></h4>
+          <p>Antes de que llegue al controlador, el middleware parsea el body de texto JSON a un objeto JavaScript. Sin esto, <code>req.body</code> estaría vacío.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#332a0a; color:var(--js);">4</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Router encuentra la ruta correcta</h4>
+          <p>Express ve que <code>POST /productos</code> coincide con <code>router.post('/')</code> montado en <code>/productos</code>.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#332a0a; color:var(--js);">5</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <h4>Se ejecuta el controlador <code>crearProducto</code></h4>
+          <p>La función recibe <code>req</code> (con <code>req.body.nombre</code> y <code>req.body.precio</code>) y <code>res</code> para responder.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-node" style="background:#332a0a; color:var(--js);">6</div>
+        </div>
+        <div class="flow-content">
+          <h4>Respuesta <code>201 Created</code> con el nuevo objeto</h4>
+          <p>El cliente recibe el JSON del producto creado. Express continúa escuchando nuevas peticiones.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout js">
+      <div class="callout-title">🔗 ¿Qué es Middleware?</div>
+      Un middleware es una función que se ejecuta <strong>entre</strong> que llega la petición y que llega al controlador. Puede leer/modificar <code>req</code> y <code>res</code>, o decidir si continúa o no. <code>express.json()</code> es un middleware que convierte el body de texto a objeto JS. Puedes tener tantos como necesites: logging, autenticación, validación, etc.
+    </div>
+  </section>
+
+  <!-- ═══ COMPARATIVA ═══ -->
+  <section id="comparativa">
+    <div class="section-tag">Comparativa Final</div>
+    <h2>Python (Flask) vs Express (Node.js)</h2>
+
+    <table>
+      <tr>
+        <th>Aspecto</th>
+        <th>🐍 Python / Flask</th>
+        <th>⚡ JS / Express</th>
+      </tr>
+      <tr>
+        <td>Lenguaje</td>
+        <td>Python</td>
+        <td>JavaScript</td>
+      </tr>
+      <tr>
+        <td>Instalación</td>
+        <td><code>pip install flask</code></td>
+        <td><code>npm install express</code></td>
+      </tr>
+      <tr>
+        <td>Endpoint básico</td>
+        <td><code>@app.route('/ruta')</code></td>
+        <td><code>app.get('/ruta', fn)</code></td>
+      </tr>
+      <tr>
+        <td>Parámetro URL</td>
+        <td><code>&lt;int:id&gt;</code> → <code>id</code></td>
+        <td><code>:id</code> → <code>req.params.id</code></td>
+      </tr>
+      <tr>
+        <td>Body de petición</td>
+        <td><code>request.get_json()</code></td>
+        <td><code>req.body</code></td>
+      </tr>
+      <tr>
+        <td>Respuesta JSON</td>
+        <td><code>jsonify({...})</code></td>
+        <td><code>res.json({...})</code></td>
+      </tr>
+      <tr>
+        <td>Puerto por defecto</td>
+        <td><code>5000</code></td>
+        <td><code>3000</code></td>
+      </tr>
+      <tr>
+        <td>Async/await nativo</td>
+        <td>Con <code>asyncio</code> o FastAPI</td>
+        <td>✅ Nativo en Node.js</td>
+      </tr>
+      <tr>
+        <td>Ecosistema ML/AI</td>
+        <td>✅ Enorme (NumPy, TensorFlow...)</td>
+        <td>Limitado</td>
+      </tr>
+      <tr>
+        <td>Uso en frontend</td>
+        <td>❌ Solo backend</td>
+        <td>✅ Full-stack posible</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">🎯 ¿Cuál usar?</div>
+      Ambas son excelentes. Si vas a hacer <strong>machine learning, data science, o integraciones con IA</strong> → Python. Si el equipo ya maneja JavaScript o quieres <strong>full-stack con Node</strong> → Express. Los conceptos (endpoints, controladores, flujo HTTP) son idénticos.
+    </div>
+  </section>
+
+  <!-- ═══ GLOSARIO ═══ -->
+  <section id="conceptos">
+    <div class="section-tag">Glosario</div>
+    <h2>Conceptos esenciales</h2>
+
+    <h3>📌 API</h3>
+    <p>Programa que escucha peticiones HTTP y devuelve respuestas. No tiene interfaz visual. Habla en JSON.</p>
+
+    <h3>📌 Endpoint</h3>
+    <p>Una URL específica que tu API expone. Ejemplo: <code>/usuarios</code>, <code>/productos/5</code>. Cada endpoint hace exactamente una cosa.</p>
+
+    <h3>📌 Controlador</h3>
+    <p>La función que maneja lo que sucede cuando llega una petición a un endpoint. Contiene la lógica de negocio.</p>
+
+    <h3>📌 Puerto (Port)</h3>
+    <p>Canal numérico por donde entra el tráfico. <code>5000</code> para Flask, <code>3000</code> para Express. La API "escucha" en ese puerto.</p>
+
+    <h3>📌 HTTP Method (Verbo)</h3>
+    <p>La intención de la petición: <code>GET</code> (leer), <code>POST</code> (crear), <code>PUT</code> (reemplazar), <code>PATCH</code> (modificar), <code>DELETE</code> (eliminar).</p>
+
+    <h3>📌 JSON</h3>
+    <p>JavaScript Object Notation. El formato estándar en que las APIs devuelven datos. Es texto plano que representa objetos y listas.</p>
+
+    <h3>📌 Middleware</h3>
+    <p>Función que procesa la petición <em>antes</em> de que llegue al controlador. Puede parsear JSON, verificar autenticación, registrar logs, etc.</p>
+
+    <h3>📌 Request (req)</h3>
+    <p>El objeto que contiene todo sobre la petición entrante: URL, método, headers, body, parámetros, cookies.</p>
+
+    <h3>📌 Response (res)</h3>
+    <p>El objeto con el que construyes y envías tu respuesta al cliente: código de estado, headers, cuerpo.</p>
+
+    <h3>📌 Código de estado HTTP</h3>
+    <p><code>200</code> OK · <code>201</code> Creado · <code>400</code> Petición inválida · <code>404</code> No encontrado · <code>500</code> Error del servidor.</p>
+
+    <h3>📌 localhost</h3>
+    <p>Dirección que apunta a tu propia máquina. <code>localhost:5000</code> = "en este computador, puerto 5000".</p>
+  </section>
+
+  <footer>
+    <p>// APIs desde Cero · Python & Express · BIT — TuringTec SAS</p>
+    <p style="margin-top:6px; color: #2a3040;">Generado para uso académico · 2025</p>
+  </footer>
+
+</main>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('section[id], .hero');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const id = entry.target.id || 'intro';
+        const active = document.querySelector(`nav a[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '-80px 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

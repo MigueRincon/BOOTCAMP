@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autenticación en APIs — Clase Completa</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #0f1419;
+    color: #e1e8ed;
+    line-height: 1.7;
+}
+
+.container { display: flex; }
+
+/* SIDEBAR */
+.sidebar {
+    width: 300px;
+    background: #1a1f26;
+    border-right: 1px solid #2d3139;
+    overflow-y: auto;
+    padding: 24px 0;
+    position: fixed;
+    height: 100vh;
+    left: 0; top: 0;
+}
+.sidebar-brand {
+    padding: 0 24px 20px;
+    border-bottom: 1px solid #2d3139;
+    margin-bottom: 16px;
+}
+.sidebar-brand h2 { font-size: 16px; color: #58a6ff; margin-bottom: 4px; }
+.sidebar-brand p { font-size: 12px; color: #8b92a1; }
+.sidebar-section { padding: 12px 24px 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6e7681; letter-spacing: 0.7px; }
+.nav-item {
+    padding: 9px 24px; cursor: pointer; border-left: 3px solid transparent;
+    transition: all 0.15s; font-size: 13.5px; color: #a8b1be; display: flex; gap: 8px; align-items: center;
+}
+.nav-item:hover { background: #242b34; color: #e1e8ed; }
+.nav-item.active { border-left-color: #58a6ff; background: #1f2937; color: #58a6ff; font-weight: 500; }
+.nav-num { font-size: 11px; color: #6e7681; min-width: 20px; }
+.nav-item.active .nav-num { color: #58a6ff; }
+
+/* MAIN */
+.main { margin-left: 300px; flex: 1; padding: 48px 56px; max-width: 1000px; }
+.section { display: none; animation: fade 0.3s ease; }
+.section.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.eyebrow { color: #58a6ff; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+h1 { font-size: 32px; color: #f0f6fc; margin-bottom: 12px; line-height: 1.3; }
+h2 { font-size: 22px; color: #f0f6fc; margin: 40px 0 16px; padding-bottom: 10px; border-bottom: 1px solid #2d3139; }
+h3 { font-size: 17px; color: #d0d8e0; margin: 28px 0 12px; }
+h4 { font-size: 15px; color: #c0c8d0; margin: 20px 0 10px; }
+p { color: #a8b1be; margin-bottom: 14px; font-size: 15px; }
+ul, ol { margin: 0 0 16px 24px; }
+li { color: #a8b1be; margin-bottom: 8px; font-size: 15px; }
+strong { color: #e1e8ed; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+code:not(.hljs) { background: #1f2630; color: #79c0ff; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px; }
+
+.lead { font-size: 17px; color: #c0c8d0; margin-bottom: 24px; }
+
+/* CODE BLOCK */
+.code-block { background: #0d1117; border: 1px solid #2d3139; border-radius: 8px; overflow: hidden; margin: 16px 0 24px; }
+.code-header { background: #1a1f26; padding: 10px 16px; border-bottom: 1px solid #2d3139; display: flex; justify-content: space-between; align-items: center; }
+.code-filename { font-size: 12px; color: #8b92a1; font-family: 'Courier New', monospace; font-weight: 600; }
+.copy-btn { background: #238636; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background 0.2s; }
+.copy-btn:hover { background: #2ea043; }
+pre { margin: 0; padding: 16px; overflow-x: auto; }
+code.hljs { font-family: 'Courier New', monospace; font-size: 13px; background: transparent !important; }
+
+/* CALLOUTS */
+.note, .alert, .success, .tip { padding: 16px 18px; margin: 20px 0; border-radius: 6px; border-left: 4px solid; }
+.note { background: #142028; border-color: #58a6ff; }
+.note p { color: #a8c5e0; margin: 0; }
+.alert { background: #2d1d1b; border-color: #da3633; }
+.alert p { color: #ff9c96; margin: 0; }
+.success { background: #14231a; border-color: #3fb950; }
+.success p { color: #7ee787; margin: 0; }
+.tip { background: #251f10; border-color: #d29922; }
+.tip p { color: #e3b341; margin: 0; }
+.note strong, .alert strong, .success strong, .tip strong { color: inherit; }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+th { background: #1a1f26; color: #d0d8e0; text-align: left; padding: 12px 14px; border: 1px solid #2d3139; font-weight: 600; }
+td { padding: 11px 14px; border: 1px solid #2d3139; color: #a8b1be; vertical-align: top; }
+tr:nth-child(even) td { background: #161b22; }
+
+/* DIAGRAM */
+.diagram { background: #11161d; border: 1px solid #2d3139; border-radius: 10px; padding: 28px 24px; margin: 24px 0; }
+.flow { display: flex; flex-direction: column; gap: 0; }
+.flow-step { display: flex; align-items: stretch; gap: 16px; }
+.flow-actor { min-width: 110px; padding: 14px 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.actor-client { background: #1f2d3d; color: #79c0ff; border: 1px solid #2f4863; }
+.actor-server { background: #2d2438; color: #d2a8ff; border: 1px solid #4a3a5e; }
+.actor-db { background: #14231a; color: #7ee787; border: 1px solid #2a4a35; }
+.flow-msg { flex: 1; padding: 12px 16px; background: #161b22; border: 1px solid #2d3139; border-radius: 8px; font-size: 13.5px; color: #c0c8d0; }
+.flow-msg .arrow { color: #58a6ff; font-weight: 700; margin-right: 6px; }
+.flow-connector { height: 18px; border-left: 2px dashed #3d444d; margin-left: 55px; }
+
+/* JWT ANATOMY */
+.jwt-display { font-family: 'Courier New', monospace; font-size: 14px; word-break: break-all; line-height: 2; background: #0d1117; border: 1px solid #2d3139; border-radius: 8px; padding: 20px; margin: 16px 0; }
+.jwt-header { color: #ff7b72; }
+.jwt-payload { color: #d2a8ff; }
+.jwt-signature { color: #79c0ff; }
+.jwt-dot { color: #6e7681; }
+.jwt-legend { display: flex; gap: 20px; flex-wrap: wrap; margin: 12px 0 20px; }
+.jwt-legend span { font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+/* CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+.card { background: #161b22; border: 1px solid #2d3139; border-radius: 8px; padding: 18px; }
+.card h4 { margin-top: 0; color: #f0f6fc; }
+.card p { font-size: 13.5px; margin-bottom: 0; }
+.card .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; font-weight: 600; }
+.tag-simple { background: #14231a; color: #7ee787; }
+.tag-medium { background: #251f10; color: #e3b341; }
+.tag-complex { background: #2d1d1b; color: #ff9c96; }
+
+/* EXERCISE */
+.exercise { background: #131a13; border: 1px solid #2a3a2a; border-radius: 10px; padding: 22px 24px; margin: 24px 0; }
+.exercise-label { display: inline-block; background: #238636; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.exercise h3 { margin-top: 0; color: #7ee787; }
+.exercise .goal { color: #b8e0b8; font-size: 14px; }
+
+/* STEP BADGE */
+.step-badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: #58a6ff; color: #0d1117; border-radius: 50%; font-weight: 700; font-size: 14px; margin-right: 10px; }
+
+.method { font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+.m-get { background: #14231a; color: #7ee787; }
+.m-post { background: #1f2d3d; color: #79c0ff; }
+.m-put { background: #251f10; color: #e3b341; }
+.m-del { background: #2d1d1b; color: #ff9c96; }
+
+/* PROGRESS / NAV BTNS */
+.section-nav { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid #2d3139; }
+.nav-btn { background: #1a1f26; border: 1px solid #2d3139; color: #c0c8d0; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.nav-btn:hover { background: #242b34; border-color: #58a6ff; color: #58a6ff; }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: #0f1419; }
+::-webkit-scrollbar-thumb { background: #3d444d; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #545d66; }
+
+@media (max-width: 900px) {
+    .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #2d3139; }
+    .main { margin-left: 0; padding: 24px 20px; }
+    .flow-step { flex-direction: column; gap: 8px; }
+    .flow-connector { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <h2>Autenticación en APIs</h2>
+        <p>Clase completa · Node + Express + MongoDB</p>
+    </div>
+
+    <div class="sidebar-section">Fundamentos</div>
+    <div class="nav-item active" onclick="go('s1', this)"><span class="nav-num">1</span> Introducción</div>
+    <div class="nav-item" onclick="go('s2', this)"><span class="nav-num">2</span> Authn vs Authz</div>
+    <div class="nav-item" onclick="go('s3', this)"><span class="nav-num">3</span> ¿Por qué autenticar?</div>
+    <div class="nav-item" onclick="go('s4', this)"><span class="nav-num">4</span> Tipos de autenticación</div>
+
+    <div class="sidebar-section">Cómo funciona</div>
+    <div class="nav-item" onclick="go('s5', this)"><span class="nav-num">5</span> Frontend vs Backend</div>
+    <div class="nav-item" onclick="go('s6', this)"><span class="nav-num">6</span> Anatomía de un JWT</div>
+    <div class="nav-item" onclick="go('s7', this)"><span class="nav-num">7</span> Diagramas de flujo</div>
+    <div class="nav-item" onclick="go('s8', this)"><span class="nav-num">8</span> En el mundo real</div>
+
+    <div class="sidebar-section">Implementación</div>
+    <div class="nav-item" onclick="go('s9', this)"><span class="nav-num">9</span> Preparación</div>
+    <div class="nav-item" onclick="go('s10', this)"><span class="nav-num">10</span> Hashing de contraseñas</div>
+    <div class="nav-item" onclick="go('s11', this)"><span class="nav-num">11</span> Registro</div>
+    <div class="nav-item" onclick="go('s12', this)"><span class="nav-num">12</span> Login</div>
+    <div class="nav-item" onclick="go('s13', this)"><span class="nav-num">13</span> Middleware de protección</div>
+    <div class="nav-item" onclick="go('s14', this)"><span class="nav-num">14</span> Rutas protegidas</div>
+
+    <div class="sidebar-section">Práctica y cierre</div>
+    <div class="nav-item" onclick="go('s15', this)"><span class="nav-num">15</span> Ejercicios progresivos</div>
+    <div class="nav-item" onclick="go('s16', this)"><span class="nav-num">16</span> Otras opciones</div>
+    <div class="nav-item" onclick="go('s17', this)"><span class="nav-num">17</span> Seguridad y buenas prácticas</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ============ S1: INTRODUCCIÓN ============ -->
+<div id="s1" class="section active">
+    <div class="eyebrow">Módulo 1 · Fundamentos</div>
+    <h1>Introducción a la autenticación</h1>
+    <p class="lead">Tenemos una API en Node + Express que se conecta a MongoDB. Funciona: podemos crear, leer, actualizar y borrar datos. Pero hay un problema enorme que todavía no hemos resuelto.</p>
+
+    <h2>El problema</h2>
+    <p>Ahora mismo, <strong>cualquier persona en el mundo</strong> que conozca la URL de nuestra API puede:</p>
+    <ul>
+        <li>Ver todos los usuarios con <code>GET /api/users</code></li>
+        <li>Borrar cualquier producto con <code>DELETE /api/products/:id</code></li>
+        <li>Modificar datos que no le pertenecen</li>
+        <li>Crear miles de registros basura</li>
+    </ul>
+    <p>No hay ninguna puerta, ningún candado, ningún portero. Es como tener una casa sin cerraduras donde cualquiera entra, toca tus cosas y se va.</p>
+
+    <div class="alert">
+        <p><strong>Esto es exactamente lo que NO queremos en producción.</strong> Una API sin autenticación es una API insegura, y ninguna empresa la pondría en internet con datos reales.</p>
+    </div>
+
+    <h2>¿Qué vamos a aprender hoy?</h2>
+    <p>Al final de esta clase vas a entender y haber construido un sistema completo donde:</p>
+    <ul>
+        <li>Un usuario se <strong>registra</strong> con email y contraseña</li>
+        <li>La contraseña se guarda <strong>cifrada</strong> (nunca en texto plano)</li>
+        <li>El usuario hace <strong>login</strong> y recibe un <strong>token</strong></li>
+        <li>Ese token le sirve de "pase" para acceder a rutas protegidas</li>
+        <li>Las rutas privadas <strong>rechazan</strong> a quien no tenga un token válido</li>
+    </ul>
+
+    <h2>Una analogía para todo el curso</h2>
+    <p>Vamos a usar la analogía de un <strong>hotel</strong> durante toda la clase, porque encaja perfecto:</p>
+    <div class="card-grid">
+        <div class="card">
+            <h4>🛎️ Recepción (Login)</h4>
+            <p>Muestras tu identificación. Si eres quien dices ser, te dan una tarjeta-llave.</p>
+        </div>
+        <div class="card">
+            <h4>🎫 Tarjeta-llave (Token)</h4>
+            <p>No es tu identificación. Es un pase temporal que abre ciertas puertas.</p>
+        </div>
+        <div class="card">
+            <h4>🚪 Puertas (Rutas protegidas)</h4>
+            <p>Cada puerta verifica tu tarjeta antes de abrirse. Sin tarjeta válida, no entras.</p>
+        </div>
+    </div>
+    <p>Ten esta imagen en mente. Cuando lleguemos al código, vas a reconocer cada pieza.</p>
+
+    <div class="note">
+        <p><strong>📌 Importante:</strong> No vamos a instalar nada todavía ni a escribir código en esta primera parte. Primero entendemos los conceptos. El código viene después, y cuando llegue, ya sabrás <em>por qué</em> hacemos cada cosa.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" disabled>← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s2')">Siguiente: Authn vs Authz →</button>
+    </div>
+</div>
+
+<!-- ============ S2: AUTHN VS AUTHZ ============ -->
+<div id="s2" class="section">
+    <div class="eyebrow">Módulo 2 · Fundamentos</div>
+    <h1>Autenticación vs Autorización</h1>
+    <p class="lead">Dos palabras que se parecen, se confunden todo el tiempo, y significan cosas muy distintas. Si entiendes la diferencia, ya tienes media batalla ganada.</p>
+
+    <h2>Definiciones simples</h2>
+    <table>
+        <tr><th>Concepto</th><th>Pregunta que responde</th><th>Ejemplo en el hotel</th></tr>
+        <tr><td><strong>Autenticación</strong><br>(Authentication / Authn)</td><td>¿<strong>Quién eres</strong>?</td><td>Muestras tu cédula en recepción para probar tu identidad.</td></tr>
+        <tr><td><strong>Autorización</strong><br>(Authorization / Authz)</td><td>¿<strong>Qué puedes hacer</strong>?</td><td>Tu tarjeta abre tu habitación, pero NO el cuarto de mantenimiento ni la suite presidencial.</td></tr>
+    </table>
+
+    <h2>La regla de oro</h2>
+    <div class="note">
+        <p><strong>Primero autenticas, luego autorizas.</strong> No puedes saber qué puede hacer alguien (autorización) si primero no sabes quién es (autenticación). El orden siempre es ese.</p>
+    </div>
+
+    <h2>Ejemplo concreto en nuestra API</h2>
+    <p>Imagina que tenemos usuarios con dos roles: <code>usuario</code> y <code>admin</code>.</p>
+
+    <h3>Autenticación</h3>
+    <p>María hace login con su email y contraseña. El sistema confirma: "Sí, eres María". Eso es <strong>autenticación</strong>. Ya sabemos quién es.</p>
+
+    <h3>Autorización</h3>
+    <p>Ahora María intenta borrar un producto: <code>DELETE /api/products/123</code>. El sistema revisa: "María es rol <code>usuario</code>, no <code>admin</code>. Borrar productos requiere ser admin. <strong>Permiso denegado.</strong>" Eso es <strong>autorización</strong>.</p>
+
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">María</div>
+                <div class="flow-msg"><span class="arrow">1.</span> "Soy María, esta es mi contraseña" → <strong>Autenticación</strong></div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">API</div>
+                <div class="flow-msg"><span class="arrow">2.</span> "Confirmado, eres María. Toma tu token."</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-client">María</div>
+                <div class="flow-msg"><span class="arrow">3.</span> "Quiero borrar este producto" → <strong>Autorización</strong></div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">API</div>
+                <div class="flow-msg"><span class="arrow">4.</span> "Eres María, pero NO eres admin. ❌ Denegado."</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tip">
+        <p><strong>💡 Truco para recordar:</strong> Auth<strong>N</strong> = "who you are" (i<strong>N</strong>dentidad). Auth<strong>Z</strong> = "what you can do" (autori<strong>Z</strong>ación de acciones).</p>
+    </div>
+
+    <h2>En esta clase</h2>
+    <p>Nos vamos a enfocar principalmente en <strong>autenticación</strong> (probar quién eres) porque es el fundamento. Tocaremos autorización al final con un ejemplo de roles, pero lo importante hoy es: registro, login, tokens y proteger rutas.</p>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s1')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s3')">Siguiente: ¿Por qué autenticar? →</button>
+    </div>
+</div>
+
+<!-- ============ S3: POR QUÉ AUTENTICAR ============ -->
+<div id="s3" class="section">
+    <div class="eyebrow">Módulo 3 · Fundamentos</div>
+    <h1>¿Por qué necesitamos autenticar APIs?</h1>
+    <p class="lead">Antes de aprender el "cómo", entendamos bien el "por qué". Una API es una puerta a tus datos, y las puertas necesitan control.</p>
+
+    <h2>El problema del estado en HTTP</h2>
+    <p>HTTP es un protocolo <strong>sin estado</strong> (stateless). Esto significa algo crucial:</p>
+    <div class="alert">
+        <p><strong>El servidor NO recuerda peticiones anteriores.</strong> Cada petición que llega es como si fuera la primera vez que ve a ese cliente. No tiene memoria de que "este usuario ya se identificó hace 2 minutos".</p>
+    </div>
+    <p>Esto genera un reto: si el servidor no recuerda nada, ¿cómo sabe en la petición #2 que eres el mismo que se autenticó en la petición #1? La respuesta es: el cliente debe <strong>probar su identidad en cada petición</strong>, normalmente enviando un token.</p>
+
+    <h2>Qué protege la autenticación</h2>
+    <div class="card-grid">
+        <div class="card">
+            <h4>🔒 Datos privados</h4>
+            <p>Que solo tú veas tu información: tu perfil, tus pedidos, tus mensajes.</p>
+        </div>
+        <div class="card">
+            <h4>🛡️ Acciones peligrosas</h4>
+            <p>Que no cualquiera borre, modifique o cree registros sin permiso.</p>
+        </div>
+        <div class="card">
+            <h4>📊 Identidad para el negocio</h4>
+            <p>Saber quién hace qué: auditoría, historial, personalización.</p>
+        </div>
+        <div class="card">
+            <h4>⚖️ Cumplimiento legal</h4>
+            <p>Leyes de protección de datos (GDPR, Habeas Data en Colombia) exigen controlar el acceso.</p>
+        </div>
+    </div>
+
+    <h2>Rutas públicas vs privadas</h2>
+    <p>No todo necesita autenticación. Una API típica mezcla ambas:</p>
+    <table>
+        <tr><th>Tipo</th><th>Ejemplo</th><th>¿Necesita token?</th></tr>
+        <tr><td>Pública</td><td><span class="method m-post">POST</span> <code>/api/auth/register</code></td><td>No (todavía no tienes cuenta)</td></tr>
+        <tr><td>Pública</td><td><span class="method m-post">POST</span> <code>/api/auth/login</code></td><td>No (es donde obtienes el token)</td></tr>
+        <tr><td>Pública</td><td><span class="method m-get">GET</span> <code>/api/products</code></td><td>Opcional (ver catálogo)</td></tr>
+        <tr><td>Privada</td><td><span class="method m-get">GET</span> <code>/api/users/me</code></td><td>Sí (tu perfil)</td></tr>
+        <tr><td>Privada</td><td><span class="method m-post">POST</span> <code>/api/products</code></td><td>Sí (crear producto)</td></tr>
+        <tr><td>Privada</td><td><span class="method m-del">DELETE</span> <code>/api/products/:id</code></td><td>Sí (acción destructiva)</td></tr>
+    </table>
+
+    <div class="tip">
+        <p><strong>💡 Pregunta de clase:</strong> ¿Por qué <code>/login</code> y <code>/register</code> NO pueden requerir token? Piénsalo: si necesitaras un token para hacer login... ¿de dónde sacarías el token antes de tener cuenta? Es un huevo y la gallina. Esas rutas <em>tienen</em> que ser públicas.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s2')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s4')">Siguiente: Tipos de autenticación →</button>
+    </div>
+</div>
+
+<!-- ============ S4: TIPOS ============ -->
+<div id="s4" class="section">
+    <div class="eyebrow">Módulo 4 · Fundamentos</div>
+    <h1>Tipos de autenticación para APIs</h1>
+    <p class="lead">No existe un solo método. Cada uno tiene ventajas, desventajas y un escenario donde brilla. Vamos del más simple al más sofisticado.</p>
+
+    <h2>Panorama general</h2>
+    <div class="card-grid">
+        <div class="card">
+            <span class="tag tag-simple">Simple</span>
+            <h4>Basic Auth</h4>
+            <p>Usuario y contraseña codificados en cada petición. Fácil pero limitado.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-simple">Simple</span>
+            <h4>API Keys</h4>
+            <p>Una clave secreta que identifica a la aplicación. Común entre servicios.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-medium">Intermedio</span>
+            <h4>Session-based</h4>
+            <p>El servidor crea una sesión y guarda un ID en una cookie.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-medium">Intermedio</span>
+            <h4>Token-based (JWT)</h4>
+            <p>El cliente guarda un token firmado. El estándar moderno para APIs.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-complex">Avanzado</span>
+            <h4>OAuth 2.0</h4>
+            <p>"Iniciar sesión con Google". Delegas la autenticación a un tercero.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-complex">Avanzado</span>
+            <h4>OpenID Connect</h4>
+            <p>Capa de identidad sobre OAuth 2.0. Lo que usan las grandes empresas.</p>
+        </div>
+    </div>
+
+    <h2>1. Basic Authentication</h2>
+    <p>El cliente envía <code>usuario:contraseña</code> codificado en Base64 en el header de cada petición.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Header de la petición</span></div>
+        <pre><code class="language-http">Authorization: Basic bWFyaWE6bWlDb250cmFzZW5hMTIz</code></pre>
+    </div>
+    <p><strong>Problema grave:</strong> Base64 NO es cifrado, es solo codificación. Cualquiera puede decodificarlo. Solo es seguro sobre HTTPS, y aún así envías la contraseña en cada petición. Casi nadie lo usa hoy para apps reales.</p>
+
+    <h2>2. API Keys</h2>
+    <p>Una cadena larga y secreta que identifica a quien hace la petición. Muy usada para comunicación <strong>entre servidores</strong> o para APIs públicas con límites de uso.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Header de la petición</span></div>
+        <pre><code class="language-http">x-api-key: sk_live_4eC39HqLyjWDarjtT1zdp7dc</code></pre>
+    </div>
+    <p>Identifica a la <em>aplicación</em>, no necesariamente a un <em>usuario</em>. Piensa en la API de OpenAI o Stripe: te dan una API key.</p>
+
+    <h2>3. Session-based (sesiones con cookies)</h2>
+    <p>El enfoque clásico de las páginas web tradicionales:</p>
+    <ol>
+        <li>Haces login.</li>
+        <li>El servidor crea una "sesión" y la guarda <strong>en su memoria o base de datos</strong>.</li>
+        <li>Te devuelve un <code>sessionId</code> en una cookie.</li>
+        <li>El navegador envía esa cookie automáticamente en cada petición.</li>
+        <li>El servidor busca el sessionId en su almacén y sabe quién eres.</li>
+    </ol>
+    <p><strong>Característica clave:</strong> el <em>estado</em> vive en el servidor. Esto se llama ser <strong>stateful</strong>.</p>
+
+    <h2>4. Token-based con JWT</h2>
+    <p>El enfoque moderno para APIs, y el que vamos a implementar hoy:</p>
+    <ol>
+        <li>Haces login.</li>
+        <li>El servidor genera un <strong>token firmado</strong> (un JWT) con tu información dentro.</li>
+        <li>Te devuelve el token. El servidor <strong>no guarda nada</strong>.</li>
+        <li>El cliente guarda el token y lo envía en cada petición.</li>
+        <li>El servidor verifica la firma del token y sabe quién eres, sin consultar ninguna base de datos de sesiones.</li>
+    </ol>
+    <p><strong>Característica clave:</strong> el servidor no guarda estado. Esto se llama ser <strong>stateless</strong>. Por eso JWT escala tan bien.</p>
+
+    <h2>Comparación: Sesiones vs JWT</h2>
+    <table>
+        <tr><th></th><th>Sesiones (stateful)</th><th>JWT (stateless)</th></tr>
+        <tr><td>¿Dónde vive el estado?</td><td>En el servidor</td><td>En el cliente (el token)</td></tr>
+        <tr><td>Escalabilidad</td><td>Más difícil (hay que compartir sesiones entre servidores)</td><td>Fácil (cualquier servidor verifica el token)</td></tr>
+        <tr><td>Cerrar sesión</td><td>Inmediato (borras la sesión)</td><td>Más complejo (el token sigue válido hasta expirar)</td></tr>
+        <tr><td>Ideal para</td><td>Webs tradicionales con servidor</td><td>APIs, móviles, microservicios</td></tr>
+    </table>
+
+    <h2>5. OAuth 2.0 y OpenID Connect</h2>
+    <p>Es lo que pasa cuando ves "Iniciar sesión con Google / GitHub / Facebook". En vez de manejar tú las contraseñas, le delegas la autenticación a un proveedor confiable. Google confirma quién eres y te da un token. Es potente pero más complejo, y lo veremos a fondo en la sección de "Otras opciones".</p>
+
+    <div class="success">
+        <p><strong>✅ Decisión para esta clase:</strong> Vamos a implementar <strong>autenticación basada en JWT</strong>, porque es el estándar para APIs modernas, encaja perfecto con Node/Express/MongoDB, y entenderlo te da la base para todo lo demás.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s3')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s5')">Siguiente: Frontend vs Backend →</button>
+    </div>
+</div>
+
+<!-- ============ S5: FRONTEND VS BACKEND ============ -->
+<div id="s5" class="section">
+    <div class="eyebrow">Módulo 5 · Cómo funciona</div>
+    <h1>¿Qué hace el frontend y qué hace el backend?</h1>
+    <p class="lead">La autenticación es un trabajo de equipo entre dos partes. Confundir quién hace qué es la causa #1 de errores de seguridad en estudiantes (y en profesionales).</p>
+
+    <h2>Reparto de responsabilidades</h2>
+    <table>
+        <tr><th>Tarea</th><th>¿Quién?</th><th>Detalle</th></tr>
+        <tr><td>Mostrar formulario de login</td><td>Frontend</td><td>Inputs de email y contraseña</td></tr>
+        <tr><td>Enviar credenciales</td><td>Frontend</td><td>POST a <code>/api/auth/login</code></td></tr>
+        <tr><td>Verificar credenciales</td><td><strong>Backend</strong></td><td>Comparar contra la base de datos</td></tr>
+        <tr><td>Cifrar/comparar contraseña</td><td><strong>Backend</strong></td><td>Con bcrypt. NUNCA en el frontend.</td></tr>
+        <tr><td>Generar el token</td><td><strong>Backend</strong></td><td>Firmar el JWT con la clave secreta</td></tr>
+        <tr><td>Guardar el token</td><td>Frontend</td><td>En memoria, localStorage o cookie</td></tr>
+        <tr><td>Enviar token en cada petición</td><td>Frontend</td><td>En el header <code>Authorization</code></td></tr>
+        <tr><td>Verificar el token</td><td><strong>Backend</strong></td><td>En el middleware, antes de la ruta</td></tr>
+        <tr><td>Decidir qué puede hacer</td><td><strong>Backend</strong></td><td>Autorización por roles</td></tr>
+    </table>
+
+    <div class="alert">
+        <p><strong>⚠️ Regla absoluta de seguridad:</strong> El frontend NUNCA decide si tienes permiso. El frontend solo <em>pide</em> y <em>muestra</em>. La verificación SIEMPRE ocurre en el backend. ¿Por qué? Porque el frontend corre en el navegador del usuario, y el usuario puede modificarlo. Nunca confíes en el cliente.</p>
+    </div>
+
+    <h2>El frontend "miente bien", el backend "no confía"</h2>
+    <p>Una forma de entenderlo:</p>
+    <ul>
+        <li>El <strong>frontend</strong> puede ocultar el botón de "Borrar" si no eres admin. Pero eso es solo cosmética, para que la interfaz se vea bien.</li>
+        <li>El <strong>backend</strong> igual debe rechazar el DELETE aunque el botón esté oculto. Porque un usuario malicioso puede llamar a la API directamente con Postman, saltándose tu interfaz por completo.</li>
+    </ul>
+    <div class="note">
+        <p><strong>📌 Frase para recordar:</strong> "La seguridad del frontend es una sugerencia. La seguridad del backend es la ley."</p>
+    </div>
+
+    <h2>¿Dónde guarda el frontend el token?</h2>
+    <table>
+        <tr><th>Lugar</th><th>Ventaja</th><th>Riesgo</th></tr>
+        <tr><td>Memoria (variable JS)</td><td>Más seguro contra robo</td><td>Se pierde al recargar la página</td></tr>
+        <tr><td>localStorage</td><td>Persiste, fácil de usar</td><td>Vulnerable a ataques XSS</td></tr>
+        <tr><td>Cookie httpOnly</td><td>JavaScript no puede leerla (protege de XSS)</td><td>Vulnerable a CSRF si no se configura bien</td></tr>
+    </table>
+    <p>Para empezar a aprender, usaremos el header <code>Authorization</code> y dejaremos que el cliente (Postman al inicio) maneje el token. La decisión de dónde guardarlo en una app real depende del contexto.</p>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s4')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s6')">Siguiente: Anatomía de un JWT →</button>
+    </div>
+</div>
+
+<!-- ============ S6: ANATOMÍA JWT ============ -->
+<div id="s6" class="section">
+    <div class="eyebrow">Módulo 6 · Cómo funciona</div>
+    <h1>Anatomía de un token JWT</h1>
+    <p class="lead">JWT significa <strong>JSON Web Token</strong>. Es el corazón de nuestra autenticación. Vamos a abrirlo y ver exactamente qué tiene dentro.</p>
+
+    <h2>Cómo se ve un JWT</h2>
+    <p>Un JWT es una cadena larga de texto dividida en <strong>tres partes separadas por puntos</strong>:</p>
+    <div class="jwt-display">
+        <span class="jwt-header">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span><span class="jwt-dot">.</span><span class="jwt-payload">eyJpZCI6IjY1YTNmIiwibm9tYnJlIjoiTWFyaWEiLCJyb2wiOiJ1c3VhcmlvIn0</span><span class="jwt-dot">.</span><span class="jwt-signature">dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk</span>
+    </div>
+    <div class="jwt-legend">
+        <span><span class="legend-dot" style="background:#ff7b72"></span> Header (rojo)</span>
+        <span><span class="legend-dot" style="background:#d2a8ff"></span> Payload (morado)</span>
+        <span><span class="legend-dot" style="background:#79c0ff"></span> Signature (azul)</span>
+    </div>
+
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#2d1f1f;color:#ff7b72;border:1px solid #5e3a3a">HEADER</div>
+                <div class="flow-msg">Dice <strong>qué algoritmo</strong> se usó para firmar y que es de tipo JWT.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#2d2438;color:#d2a8ff;border:1px solid #4a3a5e">PAYLOAD</div>
+                <div class="flow-msg">Los <strong>datos</strong> (claims): id del usuario, nombre, rol, fecha de expiración.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#1f2d3d;color:#79c0ff;border:1px solid #2f4863">SIGNATURE</div>
+                <div class="flow-msg">La <strong>firma</strong> que garantiza que nadie modificó el token.</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Parte 1: El Header</h2>
+    <p>Si decodificamos la primera parte (es Base64, no cifrado), obtenemos:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Header decodificado</span></div>
+        <pre><code class="language-json">{
+  "alg": "HS256",
+  "typ": "JWT"
+}</code></pre>
+    </div>
+    <p><code>alg</code> es el algoritmo de firma (HS256 es muy común). <code>typ</code> es el tipo de token.</p>
+
+    <h2>Parte 2: El Payload</h2>
+    <p>Aquí van los datos que queremos transportar. Cada dato se llama un <strong>claim</strong>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Payload decodificado</span></div>
+        <pre><code class="language-json">{
+  "id": "65a3f...",
+  "nombre": "Maria",
+  "rol": "usuario",
+  "iat": 1705320000,
+  "exp": 1705406400
+}</code></pre>
+    </div>
+    <p>Algunos claims son estándar:</p>
+    <ul>
+        <li><code>iat</code> (issued at): cuándo se creó el token.</li>
+        <li><code>exp</code> (expiration): cuándo expira. ¡Muy importante para seguridad!</li>
+        <li><code>sub</code> (subject): a quién pertenece el token.</li>
+    </ul>
+
+    <div class="alert">
+        <p><strong>⚠️ ENORME advertencia de seguridad:</strong> El payload NO está cifrado, solo codificado en Base64. Cualquiera puede leerlo. <strong>NUNCA pongas contraseñas, números de tarjeta o datos sensibles en el payload.</strong> Pon solo lo necesario: id, rol, quizá el nombre.</p>
+    </div>
+
+    <h2>Parte 3: La Signature (la magia)</h2>
+    <p>Esta es la parte que hace que un JWT sea confiable. Se calcula así:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Cómo se genera la firma (concepto)</span></div>
+        <pre><code class="language-javascript">firma = HMAC_SHA256(
+  base64(header) + "." + base64(payload),
+  CLAVE_SECRETA   // ← solo el servidor la conoce
+)</code></pre>
+    </div>
+    <p>La firma se genera usando el header, el payload y una <strong>clave secreta que solo el servidor conoce</strong>.</p>
+
+    <h3>¿Por qué esto es seguro?</h3>
+    <p>Imagina que un atacante intercepta tu token y cambia el payload de <code>"rol": "usuario"</code> a <code>"rol": "admin"</code>. ¿Qué pasa?</p>
+    <ol>
+        <li>El atacante puede cambiar el payload fácilmente (es solo Base64).</li>
+        <li>PERO la firma ya no coincidirá, porque la firma se calculó con el payload original.</li>
+        <li>Para recalcular la firma correcta, necesitaría la <strong>clave secreta</strong>... que no tiene.</li>
+        <li>Cuando el servidor recibe el token, recalcula la firma. No coincide → <strong>token rechazado.</strong></li>
+    </ol>
+
+    <div class="success">
+        <p><strong>✅ La idea clave:</strong> No importa que cualquiera pueda LEER el token. Lo que importa es que nadie puede MODIFICARLO sin la clave secreta. La firma es un sello a prueba de manipulación.</p>
+    </div>
+
+    <div class="tip">
+        <p><strong>💡 Para explorar en clase:</strong> Entra a <a href="https://jwt.io" target="_blank">jwt.io</a>, pega un token y míralo desarmado en sus tres partes. Es la mejor forma de que los estudiantes "vean" lo que estamos explicando.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s5')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s7')">Siguiente: Diagramas de flujo →</button>
+    </div>
+</div>
+
+<!-- ============ S7: DIAGRAMAS ============ -->
+<div id="s7" class="section">
+    <div class="eyebrow">Módulo 7 · Cómo funciona</div>
+    <h1>Diagramas de flujo completos</h1>
+    <p class="lead">Ahora juntamos todo lo aprendido en tres diagramas: registro, login y acceso a una ruta protegida. Estos diagramas son el mapa de lo que vamos a programar.</p>
+
+    <h2>Flujo 1: Registro (Sign Up)</h2>
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Cliente</div>
+                <div class="flow-msg"><span class="arrow">1.</span> <span class="method m-post">POST</span> /api/auth/register<br>Envía: { nombre, email, contraseña }</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Backend</div>
+                <div class="flow-msg"><span class="arrow">2.</span> ¿El email ya existe? Si sí → error. Si no, continúa.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Backend</div>
+                <div class="flow-msg"><span class="arrow">3.</span> Cifra la contraseña con bcrypt (hash + salt).</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-db">MongoDB</div>
+                <div class="flow-msg"><span class="arrow">4.</span> Guarda el usuario con la contraseña YA cifrada.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Backend</div>
+                <div class="flow-msg"><span class="arrow">5.</span> Responde 201: "Usuario creado". (Sin devolver la contraseña.)</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Flujo 2: Login (Sign In)</h2>
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Cliente</div>
+                <div class="flow-msg"><span class="arrow">1.</span> <span class="method m-post">POST</span> /api/auth/login<br>Envía: { email, contraseña }</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-db">MongoDB</div>
+                <div class="flow-msg"><span class="arrow">2.</span> Backend busca el usuario por email.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Backend</div>
+                <div class="flow-msg"><span class="arrow">3.</span> Compara la contraseña enviada con el hash guardado (bcrypt.compare).</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Backend</div>
+                <div class="flow-msg"><span class="arrow">4.</span> ¿Coincide? Si no → 401 "Credenciales inválidas". Si sí, continúa.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Backend</div>
+                <div class="flow-msg"><span class="arrow">5.</span> Genera un JWT firmado con { id, rol } y la clave secreta.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Cliente</div>
+                <div class="flow-msg"><span class="arrow">6.</span> Recibe el token y lo guarda. ¡Ya está autenticado!</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Flujo 3: Acceder a una ruta protegida</h2>
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Cliente</div>
+                <div class="flow-msg"><span class="arrow">1.</span> <span class="method m-get">GET</span> /api/users/me<br>Header: Authorization: Bearer &lt;token&gt;</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Middleware</div>
+                <div class="flow-msg"><span class="arrow">2.</span> Extrae el token del header. ¿Existe? Si no → 401.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Middleware</div>
+                <div class="flow-msg"><span class="arrow">3.</span> Verifica la firma con la clave secreta. ¿Válida y no expirada? Si no → 401.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Middleware</div>
+                <div class="flow-msg"><span class="arrow">4.</span> Extrae el id del payload y lo pone en req.usuario. Llama a next().</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Controlador</div>
+                <div class="flow-msg"><span class="arrow">5.</span> Ahora sabe quién es. Busca y devuelve los datos del usuario.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="note">
+        <p><strong>📌 Fíjate en el patrón:</strong> El middleware es el "portero". Se ejecuta ANTES del controlador. Si el token no sirve, ni siquiera llegamos al controlador. Esa separación es elegante: el controlador asume que, si llegó hasta él, el usuario ya está verificado.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s6')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s8')">Siguiente: En el mundo real →</button>
+    </div>
+</div>
+
+<!-- ============ S8: MUNDO REAL ============ -->
+<div id="s8" class="section">
+    <div class="eyebrow">Módulo 8 · Cómo funciona</div>
+    <h1>¿Qué hacen las empresas en el mundo real?</h1>
+    <p class="lead">Lo que vamos a construir hoy es la base. Pero es bueno saber hacia dónde escala esto cuando trabajas en una empresa grande.</p>
+
+    <h2>El espectro de la complejidad</h2>
+    <table>
+        <tr><th>Etapa</th><th>Qué usan</th><th>Ejemplo</th></tr>
+        <tr><td>Proyecto pequeño / MVP</td><td>JWT propio (lo de hoy)</td><td>Un startup validando una idea</td></tr>
+        <tr><td>Producto en crecimiento</td><td>JWT + refresh tokens + roles</td><td>Una app con miles de usuarios</td></tr>
+        <tr><td>Empresa mediana</td><td>OAuth 2.0 + OpenID Connect</td><td>"Login con Google" integrado</td></tr>
+        <tr><td>Empresa grande</td><td>Proveedores de identidad gestionados</td><td>Auth0, Okta, AWS Cognito, Firebase Auth</td></tr>
+    </table>
+
+    <h2>Proveedores de identidad (Identity Providers)</h2>
+    <p>Las empresas grandes rara vez programan su propia autenticación desde cero. ¿Por qué? Porque la seguridad es difícil y un error cuesta carísimo. En lugar de eso, usan servicios especializados:</p>
+    <div class="card-grid">
+        <div class="card">
+            <h4>Auth0 / Okta</h4>
+            <p>Plataformas completas de identidad. Login social, MFA, gestión de usuarios, todo gestionado.</p>
+        </div>
+        <div class="card">
+            <h4>AWS Cognito</h4>
+            <p>El servicio de identidad de Amazon. Se integra con el ecosistema AWS.</p>
+        </div>
+        <div class="card">
+            <h4>Firebase Auth</h4>
+            <p>De Google. Muy popular en apps móviles y proyectos pequeños/medianos.</p>
+        </div>
+        <div class="card">
+            <h4>Keycloak</h4>
+            <p>Open source y autohospedado. Para empresas que quieren control total.</p>
+        </div>
+    </div>
+
+    <h2>Técnicas que añaden las empresas serias</h2>
+    <h3>1. Refresh Tokens</h3>
+    <p>Un problema de JWT: si el token dura mucho y lo roban, el atacante tiene acceso por mucho tiempo. La solución: tokens de acceso <strong>cortos</strong> (15 minutos) más un <strong>refresh token</strong> de larga duración que sirve solo para pedir nuevos tokens de acceso. Lo vemos en la sección 16.</p>
+
+    <h3>2. MFA (Autenticación Multifactor)</h3>
+    <p>Algo que sabes (contraseña) + algo que tienes (código en tu celular) + algo que eres (huella). Las empresas lo exigen cada vez más. El típico "código de 6 dígitos" es MFA.</p>
+
+    <h3>3. Rate limiting</h3>
+    <p>Limitar cuántos intentos de login puede hacer alguien. Bloquea ataques de fuerza bruta donde un bot prueba miles de contraseñas.</p>
+
+    <h3>4. Rotación de claves secretas</h3>
+    <p>Cambiar la clave que firma los tokens periódicamente, para que un secreto filtrado no sirva para siempre.</p>
+
+    <div class="note">
+        <p><strong>📌 Mensaje para los estudiantes:</strong> No se asusten con esta lista. Empezamos por lo fundamental: JWT propio. Una vez entiendes el concepto base, todas estas técnicas son variaciones del mismo principio. Caminamos antes de correr.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s7')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s9')">Siguiente: Empezamos a programar →</button>
+    </div>
+</div>
+
+<!-- ============ S9: PREPARACIÓN ============ -->
+<div id="s9" class="section">
+    <div class="eyebrow">Módulo 9 · Implementación</div>
+    <h1>Preparación del proyecto</h1>
+    <p class="lead">Suficiente teoría. Vamos al código. Partimos de la API que ya tenemos (Express + MongoDB) y le añadimos autenticación pieza por pieza.</p>
+
+    <h2>Punto de partida</h2>
+    <p>Asumimos que ya tienes funcionando la estructura de las clases anteriores:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Estructura actual</span></div>
+        <pre><code class="language-text">proyecto/
+├── models/
+│   └── User.js
+├── routes/
+│   └── userRoutes.js
+├── controllers/
+│   └── userController.js
+├── config/
+│   └── db.js
+├── server.js
+├── package.json
+└── .env</code></pre>
+    </div>
+
+    <h2>Paso 1: Instalar las dependencias nuevas</h2>
+    <p>Necesitamos dos librerías:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">npm install bcryptjs jsonwebtoken</code></pre>
+    </div>
+    <table>
+        <tr><th>Librería</th><th>Para qué sirve</th></tr>
+        <tr><td><code>bcryptjs</code></td><td>Cifrar (hashear) las contraseñas antes de guardarlas, y compararlas en el login.</td></tr>
+        <tr><td><code>jsonwebtoken</code></td><td>Generar y verificar los tokens JWT.</td></tr>
+    </table>
+
+    <h2>Paso 2: Añadir la clave secreta al .env</h2>
+    <p>El token se firma con una clave secreta. Esta clave NUNCA va en el código, va en variables de entorno.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">.env</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">MONGODB_URI=mongodb://localhost:27017/miapp
+PORT=3000
+NODE_ENV=development
+
+# Clave secreta para firmar tokens (debe ser larga y aleatoria)
+JWT_SECRET=mi_clave_super_secreta_y_larga_que_nadie_adivina_2024
+JWT_EXPIRES_IN=1d</code></pre>
+    </div>
+
+    <div class="alert">
+        <p><strong>⚠️ Crítico:</strong> El archivo <code>.env</code> NUNCA se sube a Git. Añádelo a <code>.gitignore</code>. Si tu clave secreta se filtra, cualquiera puede falsificar tokens y hacerse pasar por cualquier usuario.</p>
+    </div>
+
+    <h2>Paso 3: Carpeta para el middleware</h2>
+    <p>Vamos a crear una carpeta nueva para nuestro "portero":</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Estructura objetivo (final de la clase)</span></div>
+        <pre><code class="language-text">proyecto/
+├── models/
+│   └── User.js              ← lo modificaremos (campo password + rol)
+├── routes/
+│   ├── userRoutes.js
+│   └── authRoutes.js        ← NUEVO (register, login)
+├── controllers/
+│   ├── userController.js
+│   └── authController.js    ← NUEVO (lógica de auth)
+├── middleware/
+│   └── auth.js              ← NUEVO (el portero/verificador)
+├── config/
+│   └── db.js
+├── server.js
+└── .env</code></pre>
+    </div>
+
+    <div class="success">
+        <p><strong>✅ Checklist antes de seguir:</strong> ¿Instalaste bcryptjs y jsonwebtoken? ¿Añadiste JWT_SECRET al .env? ¿Tu API actual arranca sin errores con <code>npm run dev</code>? Si todo está ✅, seguimos.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s8')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s10')">Siguiente: Hashing de contraseñas →</button>
+    </div>
+</div>
+
+<!-- ============ S10: HASHING ============ -->
+<div id="s10" class="section">
+    <div class="eyebrow">Módulo 10 · Implementación</div>
+    <h1><span class="step-badge">1</span>Hashing de contraseñas</h1>
+    <p class="lead">La regla #1 de seguridad: <strong>NUNCA guardes contraseñas en texto plano.</strong> Si tu base de datos se filtra, no debe revelar las contraseñas reales de nadie.</p>
+
+    <h2>¿Qué es el hashing?</h2>
+    <p>El hashing convierte la contraseña en una cadena irreversible. De <code>"miClave123"</code> obtienes algo como <code>$2a$10$N9qo8uLOickgx2ZMRZoMy...</code>. Es un proceso de <strong>una sola dirección</strong>: puedes convertir la contraseña en hash, pero NO puedes recuperar la contraseña desde el hash.</p>
+
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">"miClave123"</div>
+                <div class="flow-msg"><span class="arrow">→</span> bcrypt convierte (hash) <span class="arrow">→</span> <code>$2a$10$N9qo8uLOick...</code></div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#2d1d1b;color:#ff9c96;border:1px solid #5e3a3a">Reverso</div>
+                <div class="flow-msg"><span class="arrow">✗</span> NO existe forma de volver del hash a "miClave123". Imposible.</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>¿Cómo se verifica el login entonces?</h2>
+    <p>Si no podemos recuperar la contraseña, ¿cómo comparamos en el login? Sencillo: hasheamos la contraseña que el usuario escribe al hacer login, y comparamos los dos hashes. bcrypt tiene una función <code>compare</code> que hace exactamente eso.</p>
+
+    <h2>El "salt": por qué bcrypt es especial</h2>
+    <p>bcrypt añade un valor aleatorio llamado <strong>salt</strong> a cada contraseña antes de hashearla. Esto significa que dos usuarios con la misma contraseña <code>"123456"</code> tendrán hashes <strong>diferentes</strong>. Esto bloquea ataques con tablas precalculadas (rainbow tables).</p>
+
+    <h2>Modificar el modelo User</h2>
+    <p>Primero, añadimos el campo <code>password</code> al esquema, y usamos un "hook" de Mongoose para cifrar automáticamente antes de guardar.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">models/User.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const userSchema = new mongoose.Schema({
+  nombre: {
+    type: String,
+    required: [true, 'El nombre es requerido'],
+    trim: true
+  },
+  email: {
+    type: String,
+    required: [true, 'El email es requerido'],
+    unique: true,
+    lowercase: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido']
+  },
+  password: {
+    type: String,
+    required: [true, 'La contraseña es requerida'],
+    minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
+    select: false   // ← no se devuelve en las consultas por defecto
+  },
+  rol: {
+    type: String,
+    enum: ['usuario', 'admin'],
+    default: 'usuario'
+  }
+}, { timestamps: true });
+
+// HOOK: se ejecuta ANTES de guardar (pre 'save')
+userSchema.pre('save', async function (next) {
+  // Solo hashear si la contraseña fue modificada
+  if (!this.isModified('password')) {
+    return next();
+  }
+  // Generar el salt y hashear
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// MÉTODO: comparar contraseña en el login
+userSchema.methods.compararPassword = async function (passwordIngresada) {
+  return await bcrypt.compare(passwordIngresada, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);</code></pre>
+    </div>
+
+    <h3>Desglose de lo nuevo</h3>
+    <ul>
+        <li><code>select: false</code>: por defecto, las consultas NO devolverán la contraseña, ni siquiera cifrada. Buena práctica.</li>
+        <li><code>userSchema.pre('save', ...)</code>: un <strong>hook</strong> que corre justo antes de guardar. Aquí cifrramos automáticamente.</li>
+        <li><code>if (!this.isModified('password'))</code>: solo re-hasheamos si la contraseña cambió. Si no, al actualizar otros campos volveríamos a hashear un hash. Mal.</li>
+        <li><code>compararPassword</code>: un método que añadimos al modelo para usarlo cómodamente en el login.</li>
+    </ul>
+
+    <div class="tip">
+        <p><strong>💡 La belleza del hook:</strong> Como el cifrado vive en el modelo, cualquier lugar donde guardes un usuario cifrará la contraseña automáticamente. No tienes que acordarte de hacerlo manualmente en cada controlador. El modelo se protege solo.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s9')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s11')">Siguiente: Registro →</button>
+    </div>
+</div>
+
+<!-- ============ S11: REGISTRO ============ -->
+<div id="s11" class="section">
+    <div class="eyebrow">Módulo 11 · Implementación</div>
+    <h1><span class="step-badge">2</span>Registro de usuarios</h1>
+    <p class="lead">Construimos el endpoint donde un usuario nuevo crea su cuenta. Recuerda el flujo del diagrama 1: validar email, cifrar contraseña (automático por el hook), guardar.</p>
+
+    <h2>El controlador de autenticación</h2>
+    <p>Creamos un archivo nuevo para toda la lógica de auth.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">controllers/authController.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+
+// Función auxiliar: generar un token JWT
+const generarToken = (usuario) => {
+  return jwt.sign(
+    { id: usuario._id, rol: usuario.rol },   // payload
+    process.env.JWT_SECRET,                   // clave secreta
+    { expiresIn: process.env.JWT_EXPIRES_IN } // expiración
+  );
+};
+
+// POST /api/auth/register
+exports.registrar = async (req, res) => {
+  try {
+    const { nombre, email, password } = req.body;
+
+    // 1. Validar que vengan los datos
+    if (!nombre || !email || !password) {
+      return res.status(400).json({
+        exitoso: false,
+        mensaje: 'Nombre, email y contraseña son requeridos'
+      });
+    }
+
+    // 2. Verificar si el email ya está registrado
+    const usuarioExiste = await User.findOne({ email });
+    if (usuarioExiste) {
+      return res.status(400).json({
+        exitoso: false,
+        mensaje: 'Este email ya está registrado'
+      });
+    }
+
+    // 3. Crear el usuario (el hook cifra la contraseña solo)
+    const usuario = await User.create({ nombre, email, password });
+
+    // 4. Generar token para que entre directo sin re-login
+    const token = generarToken(usuario);
+
+    // 5. Responder (sin enviar la contraseña)
+    res.status(201).json({
+      exitoso: true,
+      mensaje: 'Usuario registrado exitosamente',
+      token,
+      usuario: {
+        id: usuario._id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al registrar usuario',
+      error: error.message
+    });
+  }
+};</code></pre>
+    </div>
+
+    <h2>Las rutas de autenticación</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">routes/authRoutes.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const express = require('express');
+const router = express.Router();
+const { registrar } = require('../controllers/authController');
+
+// POST - Registrar nuevo usuario
+router.post('/register', registrar);
+
+module.exports = router;</code></pre>
+    </div>
+
+    <h2>Registrar las rutas en server.js</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">server.js (fragmento)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const authRoutes = require('./routes/authRoutes');
+
+// ... después de app.use(express.json())
+app.use('/api/auth', authRoutes);</code></pre>
+    </div>
+
+    <h2>Probarlo</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal / Postman</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Maria",
+    "email": "maria@email.com",
+    "password": "miClave123"
+  }'</code></pre>
+    </div>
+    <p>Deberías recibir un token y los datos del usuario. Ahora abre MongoDB y mira el documento: la contraseña está cifrada, no en texto plano. ¡Ese era el objetivo!</p>
+
+    <div class="success">
+        <p><strong>✅ Comprobación:</strong> Intenta registrar el mismo email dos veces. La segunda vez debe responder "Este email ya está registrado". Si funciona, tu validación está correcta.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s10')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s12')">Siguiente: Login →</button>
+    </div>
+</div>
+
+<!-- ============ S12: LOGIN ============ -->
+<div id="s12" class="section">
+    <div class="eyebrow">Módulo 12 · Implementación</div>
+    <h1><span class="step-badge">3</span>Login</h1>
+    <p class="lead">El usuario ya existe y su contraseña está cifrada. Ahora construimos el login: verificar credenciales y entregar el token. Sigue el diagrama 2 paso a paso.</p>
+
+    <h2>El controlador de login</h2>
+    <p>Lo añadimos al mismo <code>authController.js</code>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">controllers/authController.js (añadir)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">// POST /api/auth/login
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 1. Validar datos
+    if (!email || !password) {
+      return res.status(400).json({
+        exitoso: false,
+        mensaje: 'Email y contraseña son requeridos'
+      });
+    }
+
+    // 2. Buscar el usuario INCLUYENDO el password
+    //    (recuerda que pusimos select: false en el modelo)
+    const usuario = await User.findOne({ email }).select('+password');
+
+    // 3. Si no existe, error genérico (no revelar qué falló)
+    if (!usuario) {
+      return res.status(401).json({
+        exitoso: false,
+        mensaje: 'Credenciales inválidas'
+      });
+    }
+
+    // 4. Comparar la contraseña con el método del modelo
+    const passwordCorrecta = await usuario.compararPassword(password);
+    if (!passwordCorrecta) {
+      return res.status(401).json({
+        exitoso: false,
+        mensaje: 'Credenciales inválidas'
+      });
+    }
+
+    // 5. Todo bien: generar token
+    const token = generarToken(usuario);
+
+    // 6. Responder con el token
+    res.status(200).json({
+      exitoso: true,
+      mensaje: 'Login exitoso',
+      token,
+      usuario: {
+        id: usuario._id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al iniciar sesión',
+      error: error.message
+    });
+  }
+};</code></pre>
+    </div>
+
+    <h2>Añadir la ruta de login</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">routes/authRoutes.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const { registrar, login } = require('../controllers/authController');
+
+router.post('/register', registrar);
+router.post('/login', login);   // ← nueva ruta</code></pre>
+    </div>
+
+    <h2>Probarlo</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal / Postman</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "maria@email.com",
+    "password": "miClave123"
+  }'</code></pre>
+    </div>
+    <p>Recibes un token. <strong>Cópialo</strong>, lo necesitarás en la siguiente sección para acceder a rutas protegidas.</p>
+
+    <div class="alert">
+        <p><strong>⚠️ Detalle de seguridad importante:</strong> Fíjate que tanto si el email no existe COMO si la contraseña es incorrecta, devolvemos el mismo mensaje genérico: "Credenciales inválidas". ¿Por qué? Para no darle pistas a un atacante. Si dijéramos "el email no existe", estaría confirmando qué emails SÍ están registrados. Mensaje vago = más seguro.</p>
+    </div>
+
+    <div class="tip">
+        <p><strong>💡 Para entender:</strong> Pega el token que recibiste en <a href="https://jwt.io" target="_blank">jwt.io</a> y mira su payload. Verás el <code>id</code> y el <code>rol</code> que pusimos, más <code>iat</code> y <code>exp</code> que jsonwebtoken añadió solo.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s11')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s13')">Siguiente: Middleware de protección →</button>
+    </div>
+</div>
+
+<!-- ============ S13: MIDDLEWARE ============ -->
+<div id="s13" class="section">
+    <div class="eyebrow">Módulo 13 · Implementación</div>
+    <h1><span class="step-badge">4</span>Middleware de protección</h1>
+    <p class="lead">Este es el "portero" del hotel. Una función que se ejecuta ANTES de las rutas protegidas, verifica el token, y solo deja pasar si es válido. Es la pieza central de todo.</p>
+
+    <h2>¿Qué es un middleware en Express?</h2>
+    <p>Un middleware es una función que recibe <code>(req, res, next)</code> y se ejecuta en medio del camino entre la petición y el controlador. Puede:</p>
+    <ul>
+        <li>Inspeccionar o modificar la petición (<code>req</code>).</li>
+        <li>Cortar el flujo respondiendo directamente (<code>res</code>).</li>
+        <li>O dejar pasar al siguiente paso llamando a <code>next()</code>.</li>
+    </ul>
+
+    <h2>El middleware de autenticación</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">middleware/auth.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+// Middleware: proteger rutas (verifica el token)
+exports.proteger = async (req, res, next) => {
+  try {
+    let token;
+
+    // 1. Buscar el token en el header Authorization
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      // El header viene como: "Bearer eyJhbGc..."
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    // 2. Si no hay token, denegar acceso
+    if (!token) {
+      return res.status(401).json({
+        exitoso: false,
+        mensaje: 'No autorizado, no hay token'
+      });
+    }
+
+    // 3. Verificar el token (lanza error si firma inválida o expiró)
+    const decodificado = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 4. Buscar el usuario y adjuntarlo a la petición
+    const usuario = await User.findById(decodificado.id);
+    if (!usuario) {
+      return res.status(401).json({
+        exitoso: false,
+        mensaje: 'El usuario de este token ya no existe'
+      });
+    }
+
+    // 5. Guardar el usuario en req para los siguientes pasos
+    req.usuario = usuario;
+
+    // 6. Dejar pasar al controlador
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      exitoso: false,
+      mensaje: 'Token inválido o expirado'
+    });
+  }
+};</code></pre>
+    </div>
+
+    <h3>Desglose paso a paso</h3>
+    <table>
+        <tr><th>Paso</th><th>Qué hace</th></tr>
+        <tr><td>1</td><td>Lee el header <code>Authorization</code> y extrae el token de "Bearer &lt;token&gt;".</td></tr>
+        <tr><td>2</td><td>Si no hay token → 401 y se acaba aquí. No llega al controlador.</td></tr>
+        <tr><td>3</td><td><code>jwt.verify</code> revisa la firma y la expiración. Si algo está mal, lanza error y caemos al catch.</td></tr>
+        <tr><td>4</td><td>Con el id del payload, busca el usuario real en la base de datos.</td></tr>
+        <tr><td>5</td><td>Pone el usuario en <code>req.usuario</code> para que el controlador sepa quién es.</td></tr>
+        <tr><td>6</td><td><code>next()</code> = "puedes pasar". Cede el control al controlador.</td></tr>
+    </table>
+
+    <h2>Bonus: middleware de autorización por rol</h2>
+    <p>Recuerda Authn vs Authz. Ya verificamos quién eres. Ahora un middleware extra para qué puedes hacer:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">middleware/auth.js (añadir)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">// Middleware: autorizar solo ciertos roles
+exports.autorizar = (...rolesPermitidos) => {
+  return (req, res, next) => {
+    // req.usuario ya existe porque 'proteger' corrió antes
+    if (!rolesPermitidos.includes(req.usuario.rol)) {
+      return res.status(403).json({
+        exitoso: false,
+        mensaje: `El rol '${req.usuario.rol}' no tiene permiso para esta acción`
+      });
+    }
+    next();
+  };
+};</code></pre>
+    </div>
+    <p>Fíjate que esto es una función que <strong>devuelve</strong> otra función. Eso permite usarla así: <code>autorizar('admin')</code>. Lo veremos en acción en la siguiente sección.</p>
+
+    <div class="note">
+        <p><strong>📌 Diferencia clave de códigos:</strong> <code>401 Unauthorized</code> = "no sé quién eres" (falló authn). <code>403 Forbidden</code> = "sé quién eres, pero no puedes hacer esto" (falló authz). Usar el código correcto es buena práctica profesional.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s12')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s14')">Siguiente: Rutas protegidas →</button>
+    </div>
+</div>
+
+<!-- ============ S14: RUTAS PROTEGIDAS ============ -->
+<div id="s14" class="section">
+    <div class="eyebrow">Módulo 14 · Implementación</div>
+    <h1><span class="step-badge">5</span>Proteger rutas</h1>
+    <p class="lead">Ya tenemos el portero. Ahora lo ponemos a trabajar: aplicamos el middleware a las rutas que queremos proteger. Aquí todo cobra sentido.</p>
+
+    <h2>Cómo se aplica un middleware a una ruta</h2>
+    <p>En Express, pones el middleware ANTES del controlador en la definición de la ruta. Express los ejecuta en orden.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">routes/userRoutes.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const express = require('express');
+const router = express.Router();
+const {
+  obtenerUsuarios,
+  obtenerUsuarioPorId,
+  eliminarUsuario
+} = require('../controllers/userController');
+const { proteger, autorizar } = require('../middleware/auth');
+
+// PÚBLICA: cualquiera puede ver (si así lo decides)
+router.get('/', obtenerUsuarios);
+
+// PROTEGIDA: requiere token válido
+router.get('/:id', proteger, obtenerUsuarioPorId);
+
+// PROTEGIDA + SOLO ADMIN: requiere token Y rol admin
+router.delete('/:id', proteger, autorizar('admin'), eliminarUsuario);
+
+module.exports = router;</code></pre>
+    </div>
+
+    <h3>Lee la cadena de izquierda a derecha</h3>
+    <p>En <code>router.delete('/:id', proteger, autorizar('admin'), eliminarUsuario)</code>:</p>
+    <ol>
+        <li>Llega la petición DELETE.</li>
+        <li><code>proteger</code> corre: ¿token válido? Si no → 401, fin.</li>
+        <li><code>autorizar('admin')</code> corre: ¿es admin? Si no → 403, fin.</li>
+        <li>Solo si ambos pasan, corre <code>eliminarUsuario</code>.</li>
+    </ol>
+
+    <h2>Una ruta clásica: "mi perfil"</h2>
+    <p>Vamos a crear <code>GET /api/auth/me</code> que devuelve los datos del usuario logueado. Es el ejemplo perfecto de por qué guardamos el usuario en <code>req.usuario</code>.</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">controllers/authController.js (añadir)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">// GET /api/auth/me (ruta protegida)
+exports.miPerfil = async (req, res) => {
+  // req.usuario lo puso el middleware 'proteger'
+  res.status(200).json({
+    exitoso: true,
+    usuario: {
+      id: req.usuario._id,
+      nombre: req.usuario.nombre,
+      email: req.usuario.email,
+      rol: req.usuario.rol
+    }
+  });
+};</code></pre>
+    </div>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">routes/authRoutes.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const { registrar, login, miPerfil } = require('../controllers/authController');
+const { proteger } = require('../middleware/auth');
+
+router.post('/register', registrar);
+router.post('/login', login);
+router.get('/me', proteger, miPerfil);   // ← protegida</code></pre>
+    </div>
+
+    <h2>Probar una ruta protegida</h2>
+    <p>Usa el token que copiaste en el login. Va en el header <code>Authorization</code> con el prefijo <code>Bearer</code>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal / Postman</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">curl http://localhost:3000/api/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6..."</code></pre>
+    </div>
+
+    <h2>Las dos pruebas que SIEMPRE debes hacer</h2>
+    <div class="card-grid">
+        <div class="card">
+            <span class="tag tag-simple">Debe funcionar</span>
+            <h4>Con token válido</h4>
+            <p>Envías un token bueno → recibes tus datos. ✅</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-complex">Debe fallar</span>
+            <h4>Sin token o con token falso</h4>
+            <p>No envías token, o mandas basura → 401. ✅ (Que falle es el éxito aquí.)</p>
+        </div>
+    </div>
+
+    <div class="success">
+        <p><strong>✅ ¡Lo lograste!</strong> Tienes un sistema completo: registro con contraseña cifrada, login que devuelve token, middleware que verifica tokens, y rutas protegidas por autenticación y por rol. Esto es exactamente lo que corre en producción en miles de APIs reales.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s13')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s15')">Siguiente: Ejercicios →</button>
+    </div>
+</div>
+
+<!-- ============ S15: EJERCICIOS ============ -->
+<div id="s15" class="section">
+    <div class="eyebrow">Módulo 15 · Práctica</div>
+    <h1>Ejercicios progresivos</h1>
+    <p class="lead">De lo más simple a la estructura completa. Haz uno, verifica que funcione, y solo entonces pasa al siguiente. La idea es construir confianza paso a paso.</p>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 0 · Calentamiento</span>
+        <h3>Decodifica un token a mano</h3>
+        <p class="goal"><strong>Meta:</strong> Entender que el payload es legible.</p>
+        <p>Haz login, copia el token, y pégalo en <a href="https://jwt.io" target="_blank">jwt.io</a>. Identifica las tres partes. Responde por escrito: ¿qué hay en el payload? ¿Por qué NO debes poner la contraseña ahí?</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 1 · Muy fácil</span>
+        <h3>Instala y configura</h3>
+        <p class="goal"><strong>Meta:</strong> Tener todo listo sin escribir lógica aún.</p>
+        <p>1. Instala <code>bcryptjs</code> y <code>jsonwebtoken</code>.<br>2. Añade <code>JWT_SECRET</code> y <code>JWT_EXPIRES_IN</code> al <code>.env</code>.<br>3. Crea las carpetas/archivos vacíos: <code>middleware/auth.js</code>, <code>controllers/authController.js</code>, <code>routes/authRoutes.js</code>.<br>4. Arranca el servidor y confirma que no hay errores.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 2 · Fácil</span>
+        <h3>Hashea una contraseña en un script suelto</h3>
+        <p class="goal"><strong>Meta:</strong> Ver bcrypt en acción aislado, sin Express.</p>
+        <p>Crea un archivo <code>prueba.js</code> y ejecuta <code>node prueba.js</code>:</p>
+        <div class="code-block">
+            <div class="code-header"><span class="code-filename">prueba.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+            <pre><code class="language-javascript">const bcrypt = require('bcryptjs');
+
+async function probar() {
+  const password = 'miClave123';
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(password, salt);
+
+  console.log('Original:', password);
+  console.log('Hash:', hash);
+
+  const coincide = await bcrypt.compare('miClave123', hash);
+  const noCoincide = await bcrypt.compare('claveMala', hash);
+
+  console.log('¿Coincide correcta?', coincide);   // true
+  console.log('¿Coincide incorrecta?', noCoincide); // false
+}
+
+probar();</code></pre>
+        </div>
+        <p>Ejecútalo dos veces. Observa: el hash es distinto cada vez (por el salt), pero la comparación sigue funcionando.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 3 · Fácil</span>
+        <h3>Modifica el modelo User</h3>
+        <p class="goal"><strong>Meta:</strong> Añadir password con cifrado automático.</p>
+        <p>Aplica los cambios de la sección 10 a tu <code>User.js</code>: campo <code>password</code> con <code>select: false</code>, el hook <code>pre('save')</code>, y el método <code>compararPassword</code>. Confirma que el servidor sigue arrancando.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 4 · Intermedio</span>
+        <h3>Construye el registro</h3>
+        <p class="goal"><strong>Meta:</strong> Primer endpoint de auth funcionando.</p>
+        <p>Implementa <code>POST /api/auth/register</code>. Pruébalo con Postman. Verifica en MongoDB que la contraseña quedó cifrada. Comprueba que registrar un email repetido da error.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 5 · Intermedio</span>
+        <h3>Construye el login</h3>
+        <p class="goal"><strong>Meta:</strong> Obtener un token real.</p>
+        <p>Implementa <code>POST /api/auth/login</code>. Prueba tres casos: contraseña correcta (recibe token), contraseña incorrecta (401), email inexistente (401). Confirma que los dos errores dan el mismo mensaje.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 6 · Intermedio</span>
+        <h3>El middleware portero</h3>
+        <p class="goal"><strong>Meta:</strong> Verificar tokens.</p>
+        <p>Crea <code>middleware/auth.js</code> con la función <code>proteger</code>. Aplícala a <code>GET /api/auth/me</code>. Prueba: con token válido funciona, sin token devuelve 401.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Ejercicio 7 · Avanzado</span>
+        <h3>Autorización por rol</h3>
+        <p class="goal"><strong>Meta:</strong> Que solo admins borren.</p>
+        <p>Añade el middleware <code>autorizar</code>. Protege <code>DELETE /api/users/:id</code> para que solo un admin pueda usarla. Crea dos usuarios (uno admin, uno normal) y comprueba que el normal recibe 403 al intentar borrar.</p>
+    </div>
+
+    <div class="exercise">
+        <span class="exercise-label">Reto final · Integrador</span>
+        <h3>Protege toda tu API de productos</h3>
+        <p class="goal"><strong>Meta:</strong> Aplicar todo a un recurso real.</p>
+        <p>Tomando tu API de productos de las clases anteriores:</p>
+        <ul style="margin-top:8px">
+            <li><code>GET /api/products</code> → pública (ver catálogo)</li>
+            <li><code>POST /api/products</code> → protegida (cualquier usuario logueado)</li>
+            <li><code>PUT /api/products/:id</code> → protegida</li>
+            <li><code>DELETE /api/products/:id</code> → protegida + solo admin</li>
+        </ul>
+        <p>Cuando todo funcione y hayas probado cada caso (con token, sin token, con rol correcto, con rol incorrecto), habrás dominado la autenticación de APIs.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s14')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s16')">Siguiente: Otras opciones →</button>
+    </div>
+</div>
+
+<!-- ============ S16: OTRAS OPCIONES ============ -->
+<div id="s16" class="section">
+    <div class="eyebrow">Módulo 16 · Cierre</div>
+    <h1>Otras opciones y hacia dónde seguir</h1>
+    <p class="lead">Ya dominas la base. Estas son las extensiones naturales que verás cuando trabajes en proyectos más grandes. No para implementar hoy, sino para que sepas que existen.</p>
+
+    <h2>Refresh Tokens</h2>
+    <p>El problema: un token de larga duración robado da acceso por mucho tiempo. La solución de dos tokens:</p>
+    <table>
+        <tr><th>Token</th><th>Duración</th><th>Para qué</th></tr>
+        <tr><td>Access token</td><td>Corto (15 min)</td><td>Acceder a rutas. Si lo roban, expira rápido.</td></tr>
+        <tr><td>Refresh token</td><td>Largo (7 días)</td><td>Pedir nuevos access tokens sin re-login.</td></tr>
+    </table>
+    <p>Cuando el access token expira, el cliente usa el refresh token para obtener uno nuevo, todo en segundo plano. El usuario ni se entera.</p>
+
+    <h2>Logout con JWT</h2>
+    <p>Aquí hay un detalle interesante: como JWT es stateless, el servidor no puede "invalidar" un token. Soluciones comunes:</p>
+    <ul>
+        <li><strong>Tokens cortos:</strong> si expira pronto, el logout es casi instantáneo de facto.</li>
+        <li><strong>Blocklist:</strong> guardar tokens "cerrados" en Redis hasta que expiren. (Esto reintroduce algo de estado.)</li>
+        <li><strong>Borrar el token del cliente:</strong> en muchos casos, simplemente borrar el token del frontend es suficiente.</li>
+    </ul>
+
+    <h2>OAuth 2.0 / "Login con Google"</h2>
+    <p>Delegas la autenticación a un proveedor. El flujo simplificado:</p>
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Usuario</div>
+                <div class="flow-msg"><span class="arrow">1.</span> Click en "Iniciar sesión con Google".</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#2d2438;color:#d2a8ff;border:1px solid #4a3a5e">Google</div>
+                <div class="flow-msg"><span class="arrow">2.</span> Google pide login y permiso. El usuario acepta.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#2d2438;color:#d2a8ff;border:1px solid #4a3a5e">Google</div>
+                <div class="flow-msg"><span class="arrow">3.</span> Google le confirma a tu API quién es el usuario.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Tu API</div>
+                <div class="flow-msg"><span class="arrow">4.</span> Creas/buscas el usuario y emites tu propio JWT.</div>
+            </div>
+        </div>
+    </div>
+    <p>Ventaja: no manejas contraseñas, el usuario confía en Google. En Node, librerías como <strong>Passport.js</strong> facilitan esto enormemente.</p>
+
+    <h2>Librerías que te ahorran trabajo</h2>
+    <div class="card-grid">
+        <div class="card">
+            <h4>Passport.js</h4>
+            <p>El estándar en Node para estrategias de autenticación (local, Google, GitHub, etc.).</p>
+        </div>
+        <div class="card">
+            <h4>express-validator</h4>
+            <p>Validación robusta de los datos de entrada antes de procesarlos.</p>
+        </div>
+        <div class="card">
+            <h4>helmet</h4>
+            <p>Añade headers de seguridad HTTP automáticamente. Una línea, mucha protección.</p>
+        </div>
+        <div class="card">
+            <h4>express-rate-limit</h4>
+            <p>Limita intentos por IP. Esencial contra fuerza bruta en el login.</p>
+        </div>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s15')">← Anterior</button>
+        <button class="nav-btn" onclick="goNext('s17')">Siguiente: Seguridad →</button>
+    </div>
+</div>
+
+<!-- ============ S17: SEGURIDAD ============ -->
+<div id="s17" class="section">
+    <div class="eyebrow">Módulo 17 · Cierre</div>
+    <h1>Seguridad y buenas prácticas</h1>
+    <p class="lead">La autenticación es donde un error se paga caro. Esta es la lista de comprobación que todo backend debe respetar. Imprímela y pégala en la pared.</p>
+
+    <h2>Las reglas de oro</h2>
+    <table>
+        <tr><th>Regla</th><th>Por qué</th></tr>
+        <tr><td>NUNCA guardes contraseñas en texto plano</td><td>Si filtran la BD, todas las cuentas caen. Siempre hashea con bcrypt.</td></tr>
+        <tr><td>NUNCA pongas datos sensibles en el payload del JWT</td><td>El payload es legible por cualquiera. Solo id, rol, datos no sensibles.</td></tr>
+        <tr><td>SIEMPRE usa HTTPS en producción</td><td>Sin HTTPS, el token viaja en texto plano y puede ser interceptado.</td></tr>
+        <tr><td>SIEMPRE pon expiración a los tokens</td><td>Un token eterno robado es acceso eterno. Usa <code>expiresIn</code>.</td></tr>
+        <tr><td>La JWT_SECRET debe ser larga y aleatoria</td><td>Una clave débil se puede adivinar y permite falsificar tokens.</td></tr>
+        <tr><td>NUNCA subas el .env a Git</td><td>Filtrarías tu clave secreta. Añádelo a .gitignore siempre.</td></tr>
+        <tr><td>Mensajes de error genéricos en login</td><td>"Credenciales inválidas" no revela si el email existe.</td></tr>
+        <tr><td>Verifica SIEMPRE en el backend</td><td>El frontend se puede manipular. La seguridad real vive en el servidor.</td></tr>
+        <tr><td>Valida y limpia toda entrada del usuario</td><td>Previene inyecciones y datos corruptos.</td></tr>
+        <tr><td>Limita los intentos de login (rate limiting)</td><td>Frena ataques de fuerza bruta.</td></tr>
+    </table>
+
+    <h2>Errores comunes de principiantes</h2>
+    <div class="alert">
+        <p><strong>❌ Error 1:</strong> Hashear la contraseña en el frontend. NO. El hashing va en el backend. Si lo haces en el front, el hash se convierte en "la contraseña real" y pierdes toda la protección.</p>
+    </div>
+    <div class="alert">
+        <p><strong>❌ Error 2:</strong> Devolver la contraseña (aunque sea cifrada) en las respuestas de la API. Usa <code>select: false</code> y nunca la incluyas en el JSON de respuesta.</p>
+    </div>
+    <div class="alert">
+        <p><strong>❌ Error 3:</strong> Confiar en que el frontend ocultó un botón. Un atacante llama tu API directo con Postman. La verificación SIEMPRE en el backend.</p>
+    </div>
+    <div class="alert">
+        <p><strong>❌ Error 4:</strong> Poner la JWT_SECRET directamente en el código (<code>"miclave123"</code>). Siempre en variables de entorno, nunca hardcodeada.</p>
+    </div>
+
+    <h2>Checklist final del proyecto</h2>
+    <div class="success">
+        <p><strong>Tu API tiene autenticación bien hecha si:</strong></p>
+        <p>☑ Las contraseñas se guardan cifradas con bcrypt<br>
+        ☑ El login devuelve un JWT con expiración<br>
+        ☑ Las rutas privadas están protegidas con middleware<br>
+        ☑ Los roles controlan acciones sensibles (autorización)<br>
+        ☑ La JWT_SECRET está en .env y .env está en .gitignore<br>
+        ☑ Los errores de login son genéricos<br>
+        ☑ Probaste cada ruta con y sin token<br>
+        ☑ Ningún endpoint devuelve la contraseña</p>
+    </div>
+
+    <h2>Cierre de la clase</h2>
+    <p>Recorrimos el camino completo: desde "¿por qué necesito esto?" hasta una API protegida y funcionando. Entendiste qué es un token, cómo se compone, qué hace el frontend y qué hace el backend, qué usan las empresas, y construiste cada pieza con tus manos.</p>
+    <p>La autenticación deja de ser magia cuando ves que es solo: <strong>cifrar contraseñas, firmar tokens, y verificar esos tokens en un portero</strong>. Todo lo demás (refresh tokens, OAuth, MFA) son variaciones de estos mismos principios.</p>
+
+    <div class="note">
+        <p><strong>📌 Próximos pasos sugeridos:</strong> validación con express-validator, refresh tokens, y un pequeño frontend (HTML + fetch) que consuma tu API protegida para cerrar el círculo completo.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s16')">← Anterior</button>
+        <button class="nav-btn" disabled>Fin del curso ✓</button>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function go(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (el) el.classList.add('active');
+    document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.main').scrollTop = 0;
+}
+
+function goNext(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const items = document.querySelectorAll('.nav-item');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const map = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15','s16','s17'];
+    const idx = map.indexOf(id);
+    if (idx >= 0 && items[idx]) items[idx].classList.add('active');
+    document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cp(btn) {
+    const code = btn.parentElement.nextElementSibling.querySelector('code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = '✓ Copiado';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+    });
+}
+
+document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+</script>
+</body>
+</html>
