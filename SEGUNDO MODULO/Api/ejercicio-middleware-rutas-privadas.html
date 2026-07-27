@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ejercicio: Middleware y Rutas Privadas — JWT en acción</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #0f1419;
+    color: #e1e8ed;
+    line-height: 1.7;
+}
+
+.container { display: flex; }
+
+/* SIDEBAR */
+.sidebar {
+    width: 300px;
+    background: #1a1f26;
+    border-right: 1px solid #2d3139;
+    overflow-y: auto;
+    padding: 24px 0;
+    position: fixed;
+    height: 100vh;
+    left: 0; top: 0;
+}
+.sidebar-brand {
+    padding: 0 24px 20px;
+    border-bottom: 1px solid #2d3139;
+    margin-bottom: 16px;
+}
+.sidebar-brand h2 { font-size: 16px; color: #58a6ff; margin-bottom: 4px; }
+.sidebar-brand p { font-size: 12px; color: #8b92a1; }
+.sidebar-section { padding: 12px 24px 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6e7681; letter-spacing: 0.7px; }
+.nav-item {
+    padding: 9px 24px; cursor: pointer; border-left: 3px solid transparent;
+    transition: all 0.15s; font-size: 13.5px; color: #a8b1be; display: flex; gap: 8px; align-items: center;
+}
+.nav-item:hover { background: #242b34; color: #e1e8ed; }
+.nav-item.active { border-left-color: #58a6ff; background: #1f2937; color: #58a6ff; font-weight: 500; }
+.nav-num { font-size: 11px; color: #6e7681; min-width: 20px; }
+.nav-item.active .nav-num { color: #58a6ff; }
+
+/* MAIN */
+.main { margin-left: 300px; flex: 1; padding: 48px 56px; max-width: 1000px; }
+.section { display: none; animation: fade 0.3s ease; }
+.section.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.eyebrow { color: #58a6ff; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+h1 { font-size: 32px; color: #f0f6fc; margin-bottom: 12px; line-height: 1.3; }
+h2 { font-size: 22px; color: #f0f6fc; margin: 40px 0 16px; padding-bottom: 10px; border-bottom: 1px solid #2d3139; }
+h3 { font-size: 17px; color: #d0d8e0; margin: 28px 0 12px; }
+h4 { font-size: 15px; color: #c0c8d0; margin: 20px 0 10px; }
+p { color: #a8b1be; margin-bottom: 14px; font-size: 15px; }
+ul, ol { margin: 0 0 16px 24px; }
+li { color: #a8b1be; margin-bottom: 8px; font-size: 15px; }
+strong { color: #e1e8ed; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+code:not(.hljs) { background: #1f2630; color: #79c0ff; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px; }
+
+.lead { font-size: 17px; color: #c0c8d0; margin-bottom: 24px; }
+
+/* CODE BLOCK */
+.code-block { background: #0d1117; border: 1px solid #2d3139; border-radius: 8px; overflow: hidden; margin: 16px 0 24px; }
+.code-header { background: #1a1f26; padding: 10px 16px; border-bottom: 1px solid #2d3139; display: flex; justify-content: space-between; align-items: center; }
+.code-filename { font-size: 12px; color: #8b92a1; font-family: 'Courier New', monospace; font-weight: 600; }
+.copy-btn { background: #238636; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background 0.2s; }
+.copy-btn:hover { background: #2ea043; }
+pre { margin: 0; padding: 16px; overflow-x: auto; }
+code.hljs { font-family: 'Courier New', monospace; font-size: 13px; background: transparent !important; }
+
+/* CALLOUTS */
+.note, .alert, .success, .tip { padding: 16px 18px; margin: 20px 0; border-radius: 6px; border-left: 4px solid; }
+.note { background: #142028; border-color: #58a6ff; }
+.note p { color: #a8c5e0; margin: 0; }
+.alert { background: #2d1d1b; border-color: #da3633; }
+.alert p { color: #ff9c96; margin: 0; }
+.success { background: #14231a; border-color: #3fb950; }
+.success p { color: #7ee787; margin: 0; }
+.tip { background: #251f10; border-color: #d29922; }
+.tip p { color: #e3b341; margin: 0; }
+.note strong, .alert strong, .success strong, .tip strong { color: inherit; }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+th { background: #1a1f26; color: #d0d8e0; text-align: left; padding: 12px 14px; border: 1px solid #2d3139; font-weight: 600; }
+td { padding: 11px 14px; border: 1px solid #2d3139; color: #a8b1be; vertical-align: top; }
+tr:nth-child(even) td { background: #161b22; }
+
+/* DIAGRAM */
+.diagram { background: #11161d; border: 1px solid #2d3139; border-radius: 10px; padding: 28px 24px; margin: 24px 0; }
+.flow { display: flex; flex-direction: column; gap: 0; }
+.flow-step { display: flex; align-items: stretch; gap: 16px; }
+.flow-actor { min-width: 110px; padding: 14px 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+.actor-client { background: #1f2d3d; color: #79c0ff; border: 1px solid #2f4863; }
+.actor-server { background: #2d2438; color: #d2a8ff; border: 1px solid #4a3a5e; }
+.actor-db { background: #14231a; color: #7ee787; border: 1px solid #2a4a35; }
+.flow-msg { flex: 1; padding: 12px 16px; background: #161b22; border: 1px solid #2d3139; border-radius: 8px; font-size: 13.5px; color: #c0c8d0; }
+.flow-msg .arrow { color: #58a6ff; font-weight: 700; margin-right: 6px; }
+.flow-connector { height: 18px; border-left: 2px dashed #3d444d; margin-left: 55px; }
+
+/* CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+.card { background: #161b22; border: 1px solid #2d3139; border-radius: 8px; padding: 18px; }
+.card h4 { margin-top: 0; color: #f0f6fc; }
+.card p { font-size: 13.5px; margin-bottom: 0; }
+.card .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; font-weight: 600; }
+.tag-simple { background: #14231a; color: #7ee787; }
+.tag-medium { background: #251f10; color: #e3b341; }
+.tag-complex { background: #2d1d1b; color: #ff9c96; }
+
+/* EXERCISE */
+.exercise { background: #131a13; border: 1px solid #2a3a2a; border-radius: 10px; padding: 22px 24px; margin: 24px 0; }
+.exercise-label { display: inline-block; background: #238636; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.exercise h3 { margin-top: 0; color: #7ee787; }
+.exercise .goal { color: #b8e0b8; font-size: 14px; }
+
+/* STEP BADGE */
+.step-badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: #58a6ff; color: #0d1117; border-radius: 50%; font-weight: 700; font-size: 14px; margin-right: 10px; }
+
+.method { font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+.m-get { background: #14231a; color: #7ee787; }
+.m-post { background: #1f2d3d; color: #79c0ff; }
+.m-put { background: #251f10; color: #e3b341; }
+.m-del { background: #2d1d1b; color: #ff9c96; }
+
+/* PROGRESS / NAV BTNS */
+.section-nav { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 24px; border-top: 1px solid #2d3139; }
+.nav-btn { background: #1a1f26; border: 1px solid #2d3139; color: #c0c8d0; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.nav-btn:hover { background: #242b34; border-color: #58a6ff; color: #58a6ff; }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* POSTMAN SCREENSHOT STYLE */
+.postman-mock { background: #1a1f26; border: 1px solid #2d3139; border-radius: 10px; overflow: hidden; margin: 20px 0; }
+.postman-bar { background: #242b34; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #2d3139; }
+.postman-method { font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 4px; }
+.postman-url { font-family: 'Courier New', monospace; font-size: 13px; color: #c0c8d0; flex: 1; }
+.postman-send { background: #58a6ff; color: #0d1117; border: none; padding: 6px 16px; border-radius: 4px; font-weight: 700; font-size: 12px; }
+.postman-tabs { display: flex; gap: 0; background: #1a1f26; border-bottom: 1px solid #2d3139; }
+.postman-tab { padding: 8px 16px; font-size: 12px; color: #6e7681; border-bottom: 2px solid transparent; }
+.postman-tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+.postman-body { padding: 16px; }
+
+/* CHECKLIST */
+.checklist { list-style: none; margin-left: 0; padding-left: 0; }
+.checklist li { padding: 8px 0; border-bottom: 1px solid #1f2630; display: flex; align-items: center; gap: 10px; }
+.checklist li::before { content: ''; width: 18px; height: 18px; border: 2px solid #3d444d; border-radius: 4px; flex-shrink: 0; }
+
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: #0f1419; }
+::-webkit-scrollbar-thumb { background: #3d444d; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #545d66; }
+
+@media (max-width: 900px) {
+    .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #2d3139; }
+    .main { margin-left: 0; padding: 24px 20px; }
+    .flow-step { flex-direction: column; gap: 8px; }
+    .flow-connector { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <h2>Middleware y Rutas Privadas</h2>
+        <p>Ejercicio guiado · JWT en accion</p>
+    </div>
+
+    <div class="sidebar-section">Contexto</div>
+    <div class="nav-item active" onclick="go('s1', this)"><span class="nav-num">1</span> Donde estamos</div>
+    <div class="nav-item" onclick="go('s2', this)"><span class="nav-num">2</span> Que vamos a construir</div>
+    <div class="nav-item" onclick="go('s3', this)"><span class="nav-num">3</span> Asi funciona el portero</div>
+
+    <div class="sidebar-section">Preparacion</div>
+    <div class="nav-item" onclick="go('s4', this)"><span class="nav-num">4</span> Verificar punto de partida</div>
+    <div class="nav-item" onclick="go('s5', this)"><span class="nav-num">5</span> Obtener un token</div>
+
+    <div class="sidebar-section">Construccion</div>
+    <div class="nav-item" onclick="go('s6', this)"><span class="nav-num">6</span> Crear el middleware</div>
+    <div class="nav-item" onclick="go('s7', this)"><span class="nav-num">7</span> Crear la ruta privada</div>
+    <div class="nav-item" onclick="go('s8', this)"><span class="nav-num">8</span> Crear el controlador</div>
+    <div class="nav-item" onclick="go('s9', this)"><span class="nav-num">9</span> Conectar todo en server.js</div>
+
+    <div class="sidebar-section">Pruebas</div>
+    <div class="nav-item" onclick="go('s10', this)"><span class="nav-num">10</span> Prueba 1: Sin token</div>
+    <div class="nav-item" onclick="go('s11', this)"><span class="nav-num">11</span> Prueba 2: Token invalido</div>
+    <div class="nav-item" onclick="go('s12', this)"><span class="nav-num">12</span> Prueba 3: Token valido</div>
+    <div class="nav-item" onclick="go('s13', this)"><span class="nav-num">13</span> Prueba 4: Token expirado</div>
+
+    <div class="sidebar-section">Reto extra</div>
+    <div class="nav-item" onclick="go('s14', this)"><span class="nav-num">14</span> Proteger tus CRUD</div>
+    <div class="nav-item" onclick="go('s15', this)"><span class="nav-num">15</span> Resumen y checklist</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ============ S1: DONDE ESTAMOS ============ -->
+<div id="s1" class="section active">
+    <div class="eyebrow">Contexto</div>
+    <h1>Donde estamos</h1>
+    <p class="lead">Ya construiste la mitad del sistema de autenticacion. Tienes register y login funcionando. Pero hay un problema: <strong>todavia no usas el token para nada.</strong></p>
+
+    <h2>Lo que ya tienes</h2>
+    <p>En las clases anteriores construiste dos endpoints que funcionan:</p>
+    <table>
+        <tr><th>Endpoint</th><th>Que hace</th><th>Estado</th></tr>
+        <tr><td><span class="method m-post">POST</span> <code>/api/auth/register</code></td><td>Crea un usuario con la contrasena cifrada</td><td>Funcionando</td></tr>
+        <tr><td><span class="method m-post">POST</span> <code>/api/auth/login</code></td><td>Verifica credenciales y devuelve un JWT</td><td>Funcionando</td></tr>
+    </table>
+
+    <h2>El problema</h2>
+    <p>El login te devuelve un token... pero no lo usas para nada. Es como si el hotel te diera la tarjeta-llave y no hubiera ninguna puerta que la necesite. Todas las puertas estan abiertas.</p>
+
+    <div class="alert">
+        <p><strong>Ahora mismo, cualquiera puede entrar a tus rutas sin loguearse.</strong> Tu <code>GET /api/users</code>, tu <code>DELETE /api/users/:id</code>... todo esta abierto. El token que generas en el login no sirve de nada si no hay un portero que lo pida.</p>
+    </div>
+
+    <h2>Tu estructura actual</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Estructura de tu proyecto ahora</span></div>
+        <pre><code class="language-text">proyecto/
+├── models/
+│   └── User.js              ← con password cifrado (bcrypt)
+├── routes/
+│   ├── userRoutes.js         ← rutas CRUD (todas publicas)
+│   └── authRoutes.js         ← register y login
+├── controllers/
+│   ├── userController.js     ← logica CRUD
+│   └── authController.js     ← logica register y login
+├── config/
+│   └── db.js                 ← conexion a MongoDB
+├── server.js
+├── package.json
+└── .env                      ← con JWT_SECRET</code></pre>
+    </div>
+
+    <div class="note">
+        <p><strong>Si no tienes esta estructura, detente.</strong> Este ejercicio asume que register y login ya funcionan. Si no los tienes, primero completa esos pasos de la clase anterior. No puedes construir el portero si no tienes la recepcion del hotel.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" disabled>Anterior</button>
+        <button class="nav-btn" onclick="goNext('s2')">Siguiente: Que vamos a construir &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S2: QUE VAMOS A CONSTRUIR ============ -->
+<div id="s2" class="section">
+    <div class="eyebrow">Contexto</div>
+    <h1>Que vamos a construir</h1>
+    <p class="lead">En este ejercicio vas a construir tres piezas nuevas y hacer cuatro pruebas. Al terminar, tu API tendra puertas con cerradura que solo se abren con el token correcto.</p>
+
+    <h2>Las tres piezas nuevas</h2>
+    <div class="card-grid">
+        <div class="card">
+            <span class="tag tag-medium">Pieza 1</span>
+            <h4>El middleware (el portero)</h4>
+            <p>Una funcion que revisa si la peticion trae un token valido. Si no lo trae, bloquea el acceso. Si lo trae, deja pasar.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-medium">Pieza 2</span>
+            <h4>La ruta privada</h4>
+            <p>Un endpoint <code>GET /api/privada/dashboard</code> que solo funciona si estas logueado. Es la "puerta con cerradura".</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-medium">Pieza 3</span>
+            <h4>El controlador privado</h4>
+            <p>La logica que se ejecuta SOLO cuando el portero deja pasar. Devuelve datos personalizados del usuario.</p>
+        </div>
+    </div>
+
+    <h2>Las cuatro pruebas</h2>
+    <p>Una vez construido todo, vas a probar en Postman estos cuatro escenarios:</p>
+    <table>
+        <tr><th>#</th><th>Escenario</th><th>Resultado esperado</th></tr>
+        <tr><td>1</td><td>Llamar a la ruta <strong>sin enviar token</strong></td><td>401 - "No autorizado, no hay token"</td></tr>
+        <tr><td>2</td><td>Llamar con un <strong>token inventado</strong> (basura)</td><td>401 - "Token invalido o expirado"</td></tr>
+        <tr><td>3</td><td>Llamar con un <strong>token real y valido</strong> del login</td><td>200 - Datos del usuario</td></tr>
+        <tr><td>4</td><td>Llamar con un <strong>token expirado</strong></td><td>401 - "Token invalido o expirado"</td></tr>
+    </table>
+
+    <div class="success">
+        <p><strong>Al terminar este ejercicio vas a poder decir:</strong> "Mi API tiene rutas privadas protegidas con JWT. Se exactamente como funciona el middleware, como se envia el token desde el cliente, y como el servidor lo verifica."</p>
+    </div>
+
+    <h2>Estructura final del proyecto</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Lo que tendras al terminar (archivos nuevos marcados)</span></div>
+        <pre><code class="language-text">proyecto/
+├── models/
+│   └── User.js
+├── routes/
+│   ├── userRoutes.js
+│   ├── authRoutes.js
+│   └── privadaRoutes.js       ← NUEVO
+├── controllers/
+│   ├── userController.js
+│   ├── authController.js
+│   └── privadaController.js   ← NUEVO
+├── middleware/
+│   └── auth.js                ← NUEVO (el portero)
+├── config/
+│   └── db.js
+├── server.js                  ← modificado (registrar nuevas rutas)
+├── package.json
+└── .env</code></pre>
+    </div>
+
+    <div class="tip">
+        <p><strong>Son solo 3 archivos nuevos</strong> y una modificacion menor a <code>server.js</code>. Nada complicado. Vamos paso a paso.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s1')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s3')">Siguiente: Asi funciona el portero &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S3: ASI FUNCIONA EL PORTERO ============ -->
+<div id="s3" class="section">
+    <div class="eyebrow">Contexto</div>
+    <h1>Asi funciona el portero</h1>
+    <p class="lead">Antes de escribir codigo, entiende el flujo completo. Cuando el cliente intenta acceder a una ruta privada, esto es lo que pasa paso a paso:</p>
+
+    <h2>El flujo completo</h2>
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Cliente<br>(Postman)</div>
+                <div class="flow-msg"><span class="arrow">1.</span> Envia una peticion a <code>GET /api/privada/dashboard</code> con el header:<br><code>Authorization: Bearer eyJhbGciOiJI...</code></div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Middleware<br>(portero)</div>
+                <div class="flow-msg"><span class="arrow">2.</span> Revisa: "Hay un header <code>Authorization</code>? Empieza con <code>Bearer</code>?" Si no, responde <strong>401</strong> y aqui se acaba todo.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Middleware<br>(portero)</div>
+                <div class="flow-msg"><span class="arrow">3.</span> Extrae el token (lo que viene despues de "Bearer ") y lo verifica con <code>jwt.verify()</code> usando la clave secreta. Si la firma no coincide o el token expiro, responde <strong>401</strong>.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-db">MongoDB</div>
+                <div class="flow-msg"><span class="arrow">4.</span> Con el <code>id</code> que viene dentro del token, busca al usuario en la base de datos para confirmar que sigue existiendo.</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Middleware<br>(portero)</div>
+                <div class="flow-msg"><span class="arrow">5.</span> Guarda los datos del usuario en <code>req.usuario</code> y llama a <code>next()</code>. "Puedes pasar."</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#14231a;color:#7ee787;border:1px solid #2a4a35">Controlador<br>(la habitacion)</div>
+                <div class="flow-msg"><span class="arrow">6.</span> El controlador se ejecuta. Gracias a <code>req.usuario</code>, sabe exactamente quien esta pidiendo los datos. Responde con <strong>200</strong> y la informacion personalizada.</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>La analogia del hotel, una vez mas</h2>
+    <div class="card-grid">
+        <div class="card">
+            <h4>Tu (el huesped)</h4>
+            <p>Eres el <strong>cliente</strong> (Postman). Llegas a una puerta con tu tarjeta-llave (el token).</p>
+        </div>
+        <div class="card">
+            <h4>La cerradura electronica</h4>
+            <p>Es el <strong>middleware</strong>. Lee tu tarjeta, verifica si es valida, y decide si abre la puerta o no.</p>
+        </div>
+        <div class="card">
+            <h4>La habitacion</h4>
+            <p>Es el <strong>controlador</strong>. Solo llegas a ella si la cerradura acepto tu tarjeta. Aqui estan tus cosas (tus datos).</p>
+        </div>
+    </div>
+
+    <div class="note">
+        <p><strong>La idea clave del middleware:</strong> Se ejecuta ANTES del controlador. Si el token no sirve, el controlador <strong>nunca se ejecuta</strong>. El middleware corta el flujo y responde con error directamente. El controlador puede asumir tranquilamente que, si llego hasta el, el usuario ya esta verificado.</p>
+    </div>
+
+    <h2>Que es <code>req.usuario</code>?</h2>
+    <p>Cuando el middleware verifica el token exitosamente, necesita pasarle la informacion del usuario al controlador. Para eso, <strong>agrega una propiedad nueva al objeto <code>req</code></strong> (la peticion). Le pone los datos del usuario:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Lo que hace el middleware internamente</span></div>
+        <pre><code class="language-javascript">// El middleware pone esto en la peticion:
+req.usuario = {
+  _id: "65a3f...",
+  nombre: "Maria",
+  email: "maria@email.com",
+  rol: "usuario"
+};
+
+// Luego llama a next() y el controlador puede usar req.usuario</code></pre>
+    </div>
+    <p>Es como si el portero te pegara una calcomanía en la mano que dice tu nombre. Cualquier persona adentro del hotel puede verla y saber quién eres sin volver a pedirte la cédula.</p>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s2')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s4')">Siguiente: Verificar punto de partida &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S4: VERIFICAR PUNTO DE PARTIDA ============ -->
+<div id="s4" class="section">
+    <div class="eyebrow">Preparacion</div>
+    <h1><span class="step-badge">1</span>Verificar punto de partida</h1>
+    <p class="lead">Antes de construir nada nuevo, vamos a confirmar que todo lo anterior funciona. Si algo esta roto, es mejor descubrirlo ahora y no a mitad del ejercicio.</p>
+
+    <h2>Checklist de verificacion</h2>
+    <p>Abre tu terminal y ejecuta estos comandos uno por uno. Cada uno debe funcionar sin errores:</p>
+
+    <h3>1. El servidor arranca</h3>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">npm run dev</code></pre>
+    </div>
+    <p>Deberias ver un mensaje como <code>Servidor corriendo en puerto 3000</code> y <code>MongoDB conectado</code>. Si no, revisa tu <code>server.js</code> y tu <code>.env</code>.</p>
+
+    <h3>2. El .env tiene las variables de JWT</h3>
+    <p>Abre tu archivo <code>.env</code> y confirma que tiene estas dos lineas (ademas de MONGODB_URI y PORT):</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">.env</span></div>
+        <pre><code class="language-bash">JWT_SECRET=mi_clave_super_secreta_y_larga_que_nadie_adivina_2024
+JWT_EXPIRES_IN=1d</code></pre>
+    </div>
+
+    <h3>3. El register funciona</h3>
+    <p>En Postman, crea una peticion:</p>
+    <div class="postman-mock">
+        <div class="postman-bar">
+            <span class="postman-method" style="background:#1f2d3d;color:#79c0ff;">POST</span>
+            <span class="postman-url">http://localhost:3000/api/auth/register</span>
+            <span class="postman-send">Send</span>
+        </div>
+        <div class="postman-tabs">
+            <div class="postman-tab">Params</div>
+            <div class="postman-tab">Authorization</div>
+            <div class="postman-tab">Headers</div>
+            <div class="postman-tab active">Body</div>
+        </div>
+        <div class="postman-body">
+            <code style="font-size:13px; color: #a8b1be;">raw &bull; JSON</code>
+        </div>
+    </div>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Body (raw JSON)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-json">{
+  "nombre": "Estudiante Test",
+  "email": "estudiante@test.com",
+  "password": "clave123"
+}</code></pre>
+    </div>
+    <p>Deberias recibir un <code>201</code> con un token y los datos del usuario. Si el email ya existe, te dara error (eso esta bien, usa otro email).</p>
+
+    <h3>4. El login funciona</h3>
+    <div class="postman-mock">
+        <div class="postman-bar">
+            <span class="postman-method" style="background:#1f2d3d;color:#79c0ff;">POST</span>
+            <span class="postman-url">http://localhost:3000/api/auth/login</span>
+            <span class="postman-send">Send</span>
+        </div>
+        <div class="postman-tabs">
+            <div class="postman-tab">Params</div>
+            <div class="postman-tab">Authorization</div>
+            <div class="postman-tab">Headers</div>
+            <div class="postman-tab active">Body</div>
+        </div>
+        <div class="postman-body">
+            <code style="font-size:13px; color: #a8b1be;">raw &bull; JSON</code>
+        </div>
+    </div>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Body (raw JSON)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-json">{
+  "email": "estudiante@test.com",
+  "password": "clave123"
+}</code></pre>
+    </div>
+    <p>Deberias recibir un <code>200</code> con un token.</p>
+
+    <div class="success">
+        <p><strong>Si ambos funcionan, estas listo.</strong> Si algo fallo, para y arreglalo antes de continuar. Todo lo que viene depende de que register y login funcionen correctamente.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s3')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s5')">Siguiente: Obtener un token &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S5: OBTENER UN TOKEN ============ -->
+<div id="s5" class="section">
+    <div class="eyebrow">Preparacion</div>
+    <h1><span class="step-badge">2</span>Obtener un token</h1>
+    <p class="lead">Para probar rutas privadas necesitas un token. Vas a hacer login ahora y guardar ese token en Postman para usarlo despues.</p>
+
+    <h2>Paso 1: Haz login</h2>
+    <p>Envia un <span class="method m-post">POST</span> a <code>/api/auth/login</code> con las credenciales del usuario que registraste:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Body (raw JSON)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-json">{
+  "email": "estudiante@test.com",
+  "password": "clave123"
+}</code></pre>
+    </div>
+
+    <h2>Paso 2: Copia el token</h2>
+    <p>En la respuesta vas a ver algo como esto:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Respuesta del login</span></div>
+        <pre><code class="language-json">{
+  "exitoso": true,
+  "mensaje": "Login exitoso",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4M...",
+  "usuario": {
+    "id": "683f1a2b...",
+    "nombre": "Estudiante Test",
+    "email": "estudiante@test.com",
+    "rol": "usuario"
+  }
+}</code></pre>
+    </div>
+    <p><strong>Selecciona y copia todo el valor del campo <code>"token"</code></strong> (sin las comillas). Ese texto largo que empieza con <code>eyJ</code> es tu token JWT. Lo vas a necesitar en las pruebas.</p>
+
+    <div class="tip">
+        <p><strong>Consejo de Postman:</strong> Puedes pegar el token en una variable de entorno de Postman para no tener que copiarlo cada vez. Pero por ahora, con copiarlo al portapapeles y pegarlo cuando lo necesites es suficiente.</p>
+    </div>
+
+    <h2>Paso 3 (opcional): Miralo por dentro</h2>
+    <p>Entra a <a href="https://jwt.io" target="_blank">jwt.io</a> y pega tu token. Vas a ver las tres partes:</p>
+    <ul>
+        <li><strong>Header:</strong> El algoritmo (<code>HS256</code>).</li>
+        <li><strong>Payload:</strong> Tu <code>id</code>, tu <code>rol</code>, cuando se creo (<code>iat</code>) y cuando expira (<code>exp</code>).</li>
+        <li><strong>Signature:</strong> La firma que garantiza que nadie lo modifico.</li>
+    </ul>
+    <p>El <code>id</code> que ves en el payload es el <code>_id</code> de tu usuario en MongoDB. Ese es el dato que el middleware va a usar para saber quien eres.</p>
+
+    <div class="alert">
+        <p><strong>Recuerda:</strong> El token tiene fecha de expiracion (<code>JWT_EXPIRES_IN=1d</code> en tu <code>.env</code>). Si han pasado mas de 24 horas desde que lo generaste, ya no servira. Tendras que hacer login de nuevo para obtener uno fresco.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s4')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s6')">Siguiente: Crear el middleware &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S6: CREAR EL MIDDLEWARE ============ -->
+<div id="s6" class="section">
+    <div class="eyebrow">Construccion</div>
+    <h1><span class="step-badge">3</span>Crear el middleware</h1>
+    <p class="lead">Esta es la pieza mas importante del ejercicio. El middleware es la funcion que se pone "en medio" entre la peticion y el controlador. Es el portero del hotel.</p>
+
+    <h2>Paso 1: Crear la carpeta y el archivo</h2>
+    <p>En la raiz de tu proyecto, crea una carpeta <code>middleware</code> (si no existe) y dentro un archivo <code>auth.js</code>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">mkdir middleware
+touch middleware/auth.js</code></pre>
+    </div>
+
+    <h2>Paso 2: Escribir el middleware</h2>
+    <p>Abre <code>middleware/auth.js</code> y escribe este codigo <strong>completo</strong>. Lee cada comentario, cada uno explica una decision:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">middleware/auth.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const proteger = async (req, res, next) => {
+  try {
+    let token;
+
+    // PASO 1: Buscar el token en el header Authorization
+    // El cliente lo envia asi: "Bearer eyJhbGciOiJI..."
+    // Necesitamos extraer solo la parte del token (sin "Bearer ")
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      // split(' ') separa "Bearer eyJhbG..." en ["Bearer", "eyJhbG..."]
+      // [1] toma la segunda parte: el token puro
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    // PASO 2: Si no hay token, rechazar inmediatamente
+    if (!token) {
+      return res.status(401).json({
+        exitoso: false,
+        mensaje: 'No autorizado, no hay token'
+      });
+    }
+
+    // PASO 3: Verificar que el token sea valido
+    // jwt.verify() hace dos cosas:
+    //   - Verifica que la firma coincida (que nadie lo modifico)
+    //   - Verifica que no haya expirado
+    // Si algo falla, LANZA UN ERROR y caemos al catch
+    const decodificado = jwt.verify(token, process.env.JWT_SECRET);
+
+    // PASO 4: Buscar al usuario en la base de datos
+    // El token tiene el id del usuario en su payload
+    // Lo buscamos para confirmar que sigue existiendo
+    const usuario = await User.findById(decodificado.id);
+
+    if (!usuario) {
+      return res.status(401).json({
+        exitoso: false,
+        mensaje: 'El usuario de este token ya no existe'
+      });
+    }
+
+    // PASO 5: Adjuntar el usuario a la peticion
+    // Esto es lo que permite que el controlador sepa QUIEN esta pidiendo
+    req.usuario = usuario;
+
+    // PASO 6: Dejar pasar al siguiente paso (el controlador)
+    next();
+
+  } catch (error) {
+    // Si jwt.verify() fallo (firma invalida o token expirado),
+    // caemos aqui
+    return res.status(401).json({
+      exitoso: false,
+      mensaje: 'Token invalido o expirado'
+    });
+  }
+};
+
+module.exports = { proteger };</code></pre>
+    </div>
+
+    <h2>Entendiendo cada paso</h2>
+    <table>
+        <tr><th>Paso</th><th>Que hace</th><th>Si falla</th></tr>
+        <tr><td>1</td><td>Busca el header <code>Authorization</code> y extrae el token</td><td>El token queda como <code>undefined</code></td></tr>
+        <tr><td>2</td><td>Verifica que el token exista</td><td>Responde 401: "no hay token"</td></tr>
+        <tr><td>3</td><td><code>jwt.verify()</code> valida la firma y la expiracion</td><td>Lanza error &rarr; catch &rarr; 401</td></tr>
+        <tr><td>4</td><td>Busca al usuario en MongoDB con el <code>id</code> del payload</td><td>Responde 401: "usuario no existe"</td></tr>
+        <tr><td>5</td><td>Guarda al usuario en <code>req.usuario</code></td><td>-</td></tr>
+        <tr><td>6</td><td>Llama a <code>next()</code> para pasar al controlador</td><td>-</td></tr>
+    </table>
+
+    <div class="note">
+        <p><strong>Fijate en el patron:</strong> El middleware tiene MULTIPLES puntos de salida donde puede rechazar la peticion (3 return con 401). Solo si TODOS los chequeos pasan, llega al <code>next()</code>. Esto es seguridad por capas: cada paso es un filtro mas.</p>
+    </div>
+
+    <div class="tip">
+        <p><strong>Pregunta para pensar:</strong> Por que buscamos al usuario en la base de datos (paso 4) si el token ya tiene el id? Porque el usuario pudo haber sido eliminado DESPUES de que se genero el token. El token sigue siendo "valido" tecnicamente, pero el usuario ya no existe. Siempre hay que verificar contra la fuente de verdad: la base de datos.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s5')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s7')">Siguiente: Crear la ruta privada &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S7: CREAR LA RUTA PRIVADA ============ -->
+<div id="s7" class="section">
+    <div class="eyebrow">Construccion</div>
+    <h1><span class="step-badge">4</span>Crear la ruta privada</h1>
+    <p class="lead">Ahora creamos la "puerta con cerradura". Una ruta que usa el middleware como guardaespaldas: solo deja pasar si el token es valido.</p>
+
+    <h2>Paso 1: Crear el archivo de rutas</h2>
+    <p>Crea un nuevo archivo en tu carpeta <code>routes/</code>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">touch routes/privadaRoutes.js</code></pre>
+    </div>
+
+    <h2>Paso 2: Escribir las rutas</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">routes/privadaRoutes.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const express = require('express');
+const router = express.Router();
+
+// Importar el middleware (el portero)
+const { proteger } = require('../middleware/auth');
+
+// Importar el controlador
+const { dashboard, miPerfil } = require('../controllers/privadaController');
+
+// RUTA 1: Dashboard privado
+// Lee esta linea de izquierda a derecha:
+//   GET '/dashboard' --> primero pasa por 'proteger' --> si pasa, ejecuta 'dashboard'
+router.get('/dashboard', proteger, dashboard);
+
+// RUTA 2: Mi perfil
+// Misma logica: el middleware protege, el controlador responde
+router.get('/mi-perfil', proteger, miPerfil);
+
+module.exports = router;</code></pre>
+    </div>
+
+    <h2>La magia esta en el orden</h2>
+    <p>Mira esta linea con atencion:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Asi se lee</span></div>
+        <pre><code class="language-javascript">router.get('/dashboard', proteger, dashboard);
+//                        ^^^^^^^^  ^^^^^^^^^
+//                        PRIMERO   DESPUES
+//                        (portero) (controlador)</code></pre>
+    </div>
+    <p>Express ejecuta las funciones <strong>en el orden en que las pones</strong>. Primero corre <code>proteger</code> (el middleware). Si <code>proteger</code> llama a <code>next()</code>, entonces corre <code>dashboard</code> (el controlador). Si <code>proteger</code> responde con un error (401), <code>dashboard</code> <strong>nunca se ejecuta</strong>.</p>
+
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-client">Peticion<br>GET /dashboard</div>
+                <div class="flow-msg"><span class="arrow">&rarr;</span> Llega la peticion al servidor</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">proteger</div>
+                <div class="flow-msg"><span class="arrow">&rarr;</span> Token valido? <strong>SI</strong> &rarr; llama a <code>next()</code><br>Token invalido? <strong>NO</strong> &rarr; responde 401 y se acaba aqui</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#14231a;color:#7ee787;border:1px solid #2a4a35">dashboard</div>
+                <div class="flow-msg"><span class="arrow">&rarr;</span> Solo se ejecuta si el middleware dejo pasar. Usa <code>req.usuario</code> para saber quien es.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="note">
+        <p><strong>Compara con una ruta SIN proteccion:</strong><br>
+        <code>router.get('/productos', obtenerProductos);</code> &larr; no tiene middleware, cualquiera entra<br>
+        <code>router.get('/dashboard', proteger, dashboard);</code> &larr; tiene middleware, solo entran con token</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s6')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s8')">Siguiente: Crear el controlador &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S8: CREAR EL CONTROLADOR ============ -->
+<div id="s8" class="section">
+    <div class="eyebrow">Construccion</div>
+    <h1><span class="step-badge">5</span>Crear el controlador privado</h1>
+    <p class="lead">El controlador es la "habitacion del hotel". Es la logica que se ejecuta solo cuando el portero ya verifico que tienes un token valido. Aqui usamos <code>req.usuario</code> para responder con datos personalizados.</p>
+
+    <h2>Paso 1: Crear el archivo</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">touch controllers/privadaController.js</code></pre>
+    </div>
+
+    <h2>Paso 2: Escribir los controladores</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">controllers/privadaController.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">// =====================================================
+// CONTROLADORES PRIVADOS
+// Estas funciones SOLO se ejecutan si el middleware
+// 'proteger' verifico el token exitosamente.
+// En todas ellas, req.usuario ya existe y contiene
+// los datos del usuario logueado.
+// =====================================================
+
+// GET /api/privada/dashboard
+const dashboard = async (req, res) => {
+  try {
+    // req.usuario fue puesto por el middleware 'proteger'
+    // Contiene los datos del usuario que hizo login
+
+    res.status(200).json({
+      exitoso: true,
+      mensaje: `Bienvenido al dashboard, ${req.usuario.nombre}`,
+      datos: {
+        usuario: {
+          id: req.usuario._id,
+          nombre: req.usuario.nombre,
+          email: req.usuario.email,
+          rol: req.usuario.rol
+        },
+        info: 'Esta informacion solo la ves porque tienes un token valido',
+        timestamp: new Date().toLocaleString('es-CO', {
+          timeZone: 'America/Bogota'
+        })
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error en el dashboard',
+      error: error.message
+    });
+  }
+};
+
+// GET /api/privada/mi-perfil
+const miPerfil = async (req, res) => {
+  try {
+    // Aqui podriamos hacer consultas adicionales a MongoDB
+    // usando req.usuario._id para traer datos relacionados
+    // Por ahora devolvemos el perfil basico
+
+    res.status(200).json({
+      exitoso: true,
+      perfil: {
+        id: req.usuario._id,
+        nombre: req.usuario.nombre,
+        email: req.usuario.email,
+        rol: req.usuario.rol,
+        creadoEn: req.usuario.createdAt
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: 'Error al obtener perfil',
+      error: error.message
+    });
+  }
+};
+
+module.exports = { dashboard, miPerfil };</code></pre>
+    </div>
+
+    <h2>Lo importante: <code>req.usuario</code></h2>
+    <p>Fijate que en ningun momento el controlador verifica el token. No importa ni necesita hacerlo. Eso ya lo hizo el middleware. El controlador simplemente <strong>usa <code>req.usuario</code></strong> confiando en que si llego hasta aqui, el usuario es real y esta verificado.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <span class="tag tag-simple">Middleware</span>
+            <h4>Se encarga de la seguridad</h4>
+            <p>Verifica el token, busca al usuario, rechaza si algo falla. <strong>Separacion de responsabilidades.</strong></p>
+        </div>
+        <div class="card">
+            <span class="tag tag-simple">Controlador</span>
+            <h4>Se encarga de la logica</h4>
+            <p>Usa <code>req.usuario</code> para devolver datos personalizados. No sabe nada de tokens.</p>
+        </div>
+    </div>
+
+    <div class="tip">
+        <p><strong>Esto es un patron profesional:</strong> separar la autenticacion de la logica de negocio. En empresas reales, el middleware de auth se escribe UNA VEZ y se reutiliza en decenas o cientos de rutas. Cada controlador se enfoca solo en su trabajo.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s7')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s9')">Siguiente: Conectar todo en server.js &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S9: CONECTAR TODO ============ -->
+<div id="s9" class="section">
+    <div class="eyebrow">Construccion</div>
+    <h1><span class="step-badge">6</span>Conectar todo en server.js</h1>
+    <p class="lead">Ultimo paso de construccion: registrar las nuevas rutas en <code>server.js</code> para que Express sepa que existen. Son dos lineas.</p>
+
+    <h2>Que modificar</h2>
+    <p>Abre tu <code>server.js</code>. Busca donde ya tienes registradas tus otras rutas (donde ves los <code>app.use</code>) y agrega la linea resaltada:</p>
+
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">server.js</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const express = require('express');
+const dotenv = require('dotenv');
+const conectarDB = require('./config/db');
+
+// Cargar variables de entorno
+dotenv.config();
+
+// Conectar a MongoDB
+conectarDB();
+
+const app = express();
+
+// Middleware para leer JSON del body
+app.use(express.json());
+
+// ========== RUTAS ==========
+
+// Rutas de autenticacion (publicas)
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
+// Rutas de usuarios (las que ya tenias)
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+
+// *** NUEVO: Rutas privadas (protegidas por middleware) ***
+const privadaRoutes = require('./routes/privadaRoutes');
+app.use('/api/privada', privadaRoutes);
+
+// ========== SERVIDOR ==========
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});</code></pre>
+    </div>
+
+    <div class="note">
+        <p><strong>Fijate en la URL resultante:</strong> Como pusimos <code>app.use('/api/privada', privadaRoutes)</code> y dentro de privadaRoutes pusimos <code>router.get('/dashboard', ...)</code>, la URL final es <code>/api/privada/dashboard</code>. Express concatena ambas partes.</p>
+    </div>
+
+    <h2>Mapa completo de rutas</h2>
+    <p>Asi queda tu API con todas las rutas:</p>
+    <table>
+        <tr><th>Metodo</th><th>URL</th><th>Protegida?</th><th>Que hace</th></tr>
+        <tr><td><span class="method m-post">POST</span></td><td><code>/api/auth/register</code></td><td>No</td><td>Registrar usuario</td></tr>
+        <tr><td><span class="method m-post">POST</span></td><td><code>/api/auth/login</code></td><td>No</td><td>Login (devuelve token)</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td><code>/api/privada/dashboard</code></td><td><strong>SI</strong></td><td>Dashboard personalizado</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td><code>/api/privada/mi-perfil</code></td><td><strong>SI</strong></td><td>Perfil del usuario logueado</td></tr>
+        <tr><td><span class="method m-get">GET</span></td><td><code>/api/users</code></td><td>No (aun)</td><td>Listar usuarios</td></tr>
+    </table>
+
+    <h2>Reiniciar el servidor</h2>
+    <p>Si usas <code>nodemon</code> (con <code>npm run dev</code>), el servidor se reinicia solo al guardar. Si no, detenlo con <code>Ctrl+C</code> y vuelve a correrlo:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Terminal</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">npm run dev</code></pre>
+    </div>
+
+    <div class="success">
+        <p><strong>Todo listo.</strong> Tienes el middleware, las rutas privadas, los controladores y server.js actualizado. Ahora viene la parte divertida: las pruebas. Vamos a ver el portero en accion.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s8')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s10')">Siguiente: Prueba 1 &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S10: PRUEBA 1 ============ -->
+<div id="s10" class="section">
+    <div class="eyebrow">Prueba 1 de 4</div>
+    <h1>Sin token: acceso denegado</h1>
+    <p class="lead">La primera prueba es la mas basica: intentar entrar a una ruta protegida <strong>sin enviar ningun token</strong>. El portero deberia rechazarte inmediatamente.</p>
+
+    <h2>Que hacer en Postman</h2>
+    <div class="postman-mock">
+        <div class="postman-bar">
+            <span class="postman-method" style="background:#14231a;color:#7ee787;">GET</span>
+            <span class="postman-url">http://localhost:3000/api/privada/dashboard</span>
+            <span class="postman-send">Send</span>
+        </div>
+        <div class="postman-tabs">
+            <div class="postman-tab">Params</div>
+            <div class="postman-tab">Authorization</div>
+            <div class="postman-tab active">Headers</div>
+            <div class="postman-tab">Body</div>
+        </div>
+        <div class="postman-body">
+            <code style="font-size:13px; color: #6e7681;">No envies ningun header Authorization. Dejalo vacio.</code>
+        </div>
+    </div>
+
+    <p>Simplemente crea un <span class="method m-get">GET</span> a <code>http://localhost:3000/api/privada/dashboard</code> y dale <strong>Send</strong> sin agregar nada mas. Sin headers especiales, sin body, nada.</p>
+
+    <h2>Que deberias recibir</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Respuesta esperada (Status: 401 Unauthorized)</span></div>
+        <pre><code class="language-json">{
+  "exitoso": false,
+  "mensaje": "No autorizado, no hay token"
+}</code></pre>
+    </div>
+
+    <h2>Por que funciona asi</h2>
+    <p>Cuando no envias el header <code>Authorization</code>, el middleware cae en el <strong>paso 2</strong>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">middleware/auth.js - Lo que se ejecuto</span></div>
+        <pre><code class="language-javascript">// El header Authorization no existe, asi que token queda undefined
+if (!token) {
+  return res.status(401).json({
+    exitoso: false,
+    mensaje: 'No autorizado, no hay token'
+  });
+}
+// next() NUNCA se llama. El controlador NUNCA se ejecuta.</code></pre>
+    </div>
+
+    <div class="success">
+        <p><strong>Esto es exactamente lo que queremos.</strong> El middleware bloqueo la peticion. El controlador <code>dashboard</code> nunca llego a ejecutarse. El portero hizo su trabajo: "No tienes tarjeta-llave? No entras."</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s9')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s11')">Siguiente: Prueba 2 &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S11: PRUEBA 2 ============ -->
+<div id="s11" class="section">
+    <div class="eyebrow">Prueba 2 de 4</div>
+    <h1>Token inventado: acceso denegado</h1>
+    <p class="lead">Ahora vamos a intentar algo mas astuto: enviar un token, pero uno falso. Inventado. Basura. A ver si el portero se deja enganar.</p>
+
+    <h2>Que hacer en Postman</h2>
+    <p>Crea un <span class="method m-get">GET</span> a <code>http://localhost:3000/api/privada/dashboard</code>, pero esta vez agrega un header <code>Authorization</code> con un token falso:</p>
+
+    <div class="postman-mock">
+        <div class="postman-bar">
+            <span class="postman-method" style="background:#14231a;color:#7ee787;">GET</span>
+            <span class="postman-url">http://localhost:3000/api/privada/dashboard</span>
+            <span class="postman-send">Send</span>
+        </div>
+        <div class="postman-tabs">
+            <div class="postman-tab">Params</div>
+            <div class="postman-tab active">Authorization</div>
+            <div class="postman-tab">Headers</div>
+            <div class="postman-tab">Body</div>
+        </div>
+        <div class="postman-body">
+            <code style="font-size:13px; color: #a8b1be;">Type: Bearer Token &bull; Token: <span style="color:#ff7b72">estoEsUnTokenFalsoInventado123</span></code>
+        </div>
+    </div>
+
+    <h3>Como agregarlo en Postman (paso a paso)</h3>
+    <ol>
+        <li>Ve a la pestana <strong>Authorization</strong> de la peticion</li>
+        <li>En el dropdown <strong>Type</strong>, selecciona <strong>Bearer Token</strong></li>
+        <li>En el campo <strong>Token</strong>, escribe cualquier cosa: <code>estoEsUnTokenFalsoInventado123</code></li>
+        <li>Dale <strong>Send</strong></li>
+    </ol>
+
+    <div class="tip">
+        <p><strong>Alternativa sin la pestana Authorization:</strong> Tambien puedes ir a la pestana <strong>Headers</strong> y agregar manualmente:<br>
+        Key: <code>Authorization</code><br>
+        Value: <code>Bearer estoEsUnTokenFalsoInventado123</code><br>
+        Ambas formas hacen lo mismo. Postman agrega el header por ti cuando usas la pestana Authorization.</p>
+    </div>
+
+    <h2>Que deberias recibir</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Respuesta esperada (Status: 401 Unauthorized)</span></div>
+        <pre><code class="language-json">{
+  "exitoso": false,
+  "mensaje": "Token invalido o expirado"
+}</code></pre>
+    </div>
+
+    <h2>Por que funciona asi</h2>
+    <p>Esta vez el middleware llego mas lejos. Paso los pasos 1 y 2 (si encontro un token). Pero cayo en el <strong>paso 3</strong>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">middleware/auth.js - Lo que se ejecuto</span></div>
+        <pre><code class="language-javascript">// jwt.verify() intenta verificar el token falso
+// La firma NO coincide con la clave secreta del servidor
+// LANZA UN ERROR
+const decodificado = jwt.verify(token, process.env.JWT_SECRET);
+// ^^^ Error! La firma no es valida
+
+// Caemos al catch:
+catch (error) {
+  return res.status(401).json({
+    exitoso: false,
+    mensaje: 'Token invalido o expirado'
+  });
+}</code></pre>
+    </div>
+
+    <div class="alert">
+        <p><strong>Esto es la magia de JWT:</strong> Un atacante puede inventar cualquier token que quiera, pero sin la clave secreta (<code>JWT_SECRET</code>) no puede generar una firma valida. <code>jwt.verify()</code> detecta inmediatamente que la firma no coincide y lo rechaza. Es matematicamente imposible falsificar un token sin la clave.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s10')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s12')">Siguiente: Prueba 3 &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S12: PRUEBA 3 ============ -->
+<div id="s12" class="section">
+    <div class="eyebrow">Prueba 3 de 4</div>
+    <h1>Token valido: acceso concedido</h1>
+    <p class="lead">Ahora usamos un token real, el que obtuviste del login. Esta es la prueba donde todo funciona y ves tu nombre en la respuesta.</p>
+
+    <h2>Paso 1: Obtener un token fresco</h2>
+    <p>Si ya copiaste el token del login anterior, usalo. Si no, haz login de nuevo:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">POST /api/auth/login (Body raw JSON)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-json">{
+  "email": "estudiante@test.com",
+  "password": "clave123"
+}</code></pre>
+    </div>
+    <p>Copia el valor del campo <code>"token"</code> de la respuesta.</p>
+
+    <h2>Paso 2: Enviar la peticion con el token</h2>
+    <div class="postman-mock">
+        <div class="postman-bar">
+            <span class="postman-method" style="background:#14231a;color:#7ee787;">GET</span>
+            <span class="postman-url">http://localhost:3000/api/privada/dashboard</span>
+            <span class="postman-send">Send</span>
+        </div>
+        <div class="postman-tabs">
+            <div class="postman-tab">Params</div>
+            <div class="postman-tab active">Authorization</div>
+            <div class="postman-tab">Headers</div>
+            <div class="postman-tab">Body</div>
+        </div>
+        <div class="postman-body">
+            <code style="font-size:13px; color: #a8b1be;">Type: Bearer Token &bull; Token: <span style="color:#7ee787">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6...</span></code>
+        </div>
+    </div>
+
+    <h3>Como hacerlo en Postman</h3>
+    <ol>
+        <li>Crea un <span class="method m-get">GET</span> a <code>http://localhost:3000/api/privada/dashboard</code></li>
+        <li>Ve a la pestana <strong>Authorization</strong></li>
+        <li>En <strong>Type</strong>, selecciona <strong>Bearer Token</strong></li>
+        <li>En el campo <strong>Token</strong>, pega el token real que copiaste del login</li>
+        <li>Dale <strong>Send</strong></li>
+    </ol>
+
+    <h2>Que deberias recibir</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Respuesta esperada (Status: 200 OK)</span></div>
+        <pre><code class="language-json">{
+  "exitoso": true,
+  "mensaje": "Bienvenido al dashboard, Estudiante Test",
+  "datos": {
+    "usuario": {
+      "id": "683f1a2b...",
+      "nombre": "Estudiante Test",
+      "email": "estudiante@test.com",
+      "rol": "usuario"
+    },
+    "info": "Esta informacion solo la ves porque tienes un token valido",
+    "timestamp": "3/6/2026, 2:30:00 p. m."
+  }
+}</code></pre>
+    </div>
+
+    <h2>Que paso internamente</h2>
+    <div class="diagram">
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Paso 1-2</div>
+                <div class="flow-msg"><span class="arrow">&#10004;</span> Encontro el header Authorization y extrajo el token</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Paso 3</div>
+                <div class="flow-msg"><span class="arrow">&#10004;</span> <code>jwt.verify()</code> confirmo: la firma es valida y no ha expirado</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-db">Paso 4</div>
+                <div class="flow-msg"><span class="arrow">&#10004;</span> Busco al usuario en MongoDB por su id y lo encontro</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor actor-server">Paso 5-6</div>
+                <div class="flow-msg"><span class="arrow">&#10004;</span> Puso el usuario en <code>req.usuario</code> y llamo a <code>next()</code></div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="flow-actor" style="background:#14231a;color:#7ee787;border:1px solid #2a4a35">Controlador</div>
+                <div class="flow-msg"><span class="arrow">&#10004;</span> Uso <code>req.usuario.nombre</code> para personalizar la respuesta: "Bienvenido, Estudiante Test"</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="success">
+        <p><strong>Funciona!</strong> El token fue verificado, el middleware dejo pasar, y el controlador respondio con tus datos personalizados. Esto es exactamente como funcionan las APIs de Netflix, Spotify, Instagram... el mismo principio.</p>
+    </div>
+
+    <h2>Prueba tambien la otra ruta</h2>
+    <p>Con el mismo token, prueba <span class="method m-get">GET</span> <code>http://localhost:3000/api/privada/mi-perfil</code>. Deberia devolver tu perfil completo.</p>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s11')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s13')">Siguiente: Prueba 4 &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S13: PRUEBA 4 ============ -->
+<div id="s13" class="section">
+    <div class="eyebrow">Prueba 4 de 4</div>
+    <h1>Token expirado: acceso denegado</h1>
+    <p class="lead">La ultima prueba: que pasa cuando un token es real pero ya se le vencio el tiempo. Recordaras que en el <code>.env</code> pusimos <code>JWT_EXPIRES_IN=1d</code> (1 dia). Vamos a simular un token expirado.</p>
+
+    <h2>El problema: no vamos a esperar 24 horas</h2>
+    <p>Obviamente no vamos a sentarnos a esperar un dia entero. En lugar de eso, vamos a hacer un truco temporal para generar un token que expire rapidamente.</p>
+
+    <h2>Paso 1: Cambia la expiracion temporalmente</h2>
+    <p>En tu <code>.env</code>, cambia la linea de expiracion a <strong>10 segundos</strong>:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">.env (cambio temporal)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">JWT_EXPIRES_IN=10s</code></pre>
+    </div>
+
+    <div class="alert">
+        <p><strong>Importante:</strong> Esto es TEMPORAL, solo para esta prueba. Al terminar lo vuelves a poner en <code>1d</code>. Si usas nodemon, el servidor se reinicia automaticamente al guardar el <code>.env</code>. Si no, reinicialo manualmente.</p>
+    </div>
+
+    <h2>Paso 2: Haz login para obtener un token de 10 segundos</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">POST /api/auth/login (Body raw JSON)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-json">{
+  "email": "estudiante@test.com",
+  "password": "clave123"
+}</code></pre>
+    </div>
+    <p>Copia el token. Este token expira en 10 segundos.</p>
+
+    <h2>Paso 3: Espera 15 segundos y luego usa el token</h2>
+    <p>Espera al menos 15 segundos (para estar seguro) y luego envia el <span class="method m-get">GET</span> a <code>/api/privada/dashboard</code> con ese token.</p>
+
+    <h2>Que deberias recibir</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Respuesta esperada (Status: 401 Unauthorized)</span></div>
+        <pre><code class="language-json">{
+  "exitoso": false,
+  "mensaje": "Token invalido o expirado"
+}</code></pre>
+    </div>
+
+    <h2>Que paso</h2>
+    <p><code>jwt.verify()</code> reviso el campo <code>exp</code> (expiration) del token y encontro que la fecha ya paso. Lanzo un error de tipo <code>TokenExpiredError</code> y caimos al catch del middleware.</p>
+
+    <div class="tip">
+        <p><strong>Por que esto importa en la vida real:</strong> Si alguien roba un token (por ejemplo, interceptando la red), ese token no le sirve para siempre. Tiene fecha de vencimiento. Por eso en produccion se usan tokens de corta duracion (15 minutos, 1 hora) con refresh tokens para renovarlos automaticamente.</p>
+    </div>
+
+    <h2>Paso 4: Restaurar la expiracion</h2>
+    <div class="alert">
+        <p><strong>NO olvides este paso.</strong> Vuelve a poner la expiracion en 1 dia en tu <code>.env</code>:</p>
+    </div>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">.env (restaurar)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-bash">JWT_EXPIRES_IN=1d</code></pre>
+    </div>
+
+    <div class="success">
+        <p><strong>Las 4 pruebas completadas!</strong> Has probado todos los escenarios posibles:<br>
+        &#10004; Sin token &rarr; 401<br>
+        &#10004; Token falso &rarr; 401<br>
+        &#10004; Token valido &rarr; 200 (datos del usuario)<br>
+        &#10004; Token expirado &rarr; 401<br><br>
+        Tu middleware funciona correctamente en todos los casos.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s12')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s14')">Siguiente: Reto extra &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S14: RETO EXTRA ============ -->
+<div id="s14" class="section">
+    <div class="eyebrow">Reto extra</div>
+    <h1>Proteger tus rutas CRUD</h1>
+    <p class="lead">Ya sabes como funciona el middleware. Ahora el reto: aplica la proteccion a las rutas CRUD de usuarios (o productos) que ya tenias de clases anteriores.</p>
+
+    <h2>El reto</h2>
+    <p>Abre tu archivo <code>routes/userRoutes.js</code> (o el equivalente de tu proyecto). Ahora mismo, todas las rutas estan abiertas. Tu mision es decidir cuales proteger.</p>
+
+    <div class="exercise">
+        <span class="exercise-label">Reto</span>
+        <h3>Protege tus rutas con criterio</h3>
+        <p class="goal"><strong>Meta:</strong> No todas las rutas necesitan proteccion. Piensa cual deberia ser publica y cual privada.</p>
+        <p>Esta es una decision que tomaras constantemente en tu vida profesional. Usa esta guia:</p>
+    </div>
+
+    <table>
+        <tr><th>Ruta</th><th>Proteger?</th><th>Por que</th></tr>
+        <tr><td><span class="method m-get">GET</span> <code>/api/users</code></td><td>Depende</td><td>Ver listado puede ser publico (catalogo) o privado (panel admin)</td></tr>
+        <tr><td><span class="method m-get">GET</span> <code>/api/users/:id</code></td><td>Recomendado</td><td>Datos de un usuario especifico suelen ser privados</td></tr>
+        <tr><td><span class="method m-post">POST</span> <code>/api/users</code></td><td>Si</td><td>Crear registros deberia requerir estar logueado</td></tr>
+        <tr><td><span class="method m-put">PUT</span> <code>/api/users/:id</code></td><td>Si</td><td>Modificar datos es una accion que necesita verificacion</td></tr>
+        <tr><td><span class="method m-del">DELETE</span> <code>/api/users/:id</code></td><td>Si</td><td>Borrar es la accion mas peligrosa, siempre protegida</td></tr>
+    </table>
+
+    <h2>Como hacerlo</h2>
+    <p>Ya sabes el patron. Solo tienes que importar el middleware y agregarlo antes del controlador:</p>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">routes/userRoutes.js (ejemplo)</span><button class="copy-btn" onclick="cp(this)">Copiar</button></div>
+        <pre><code class="language-javascript">const express = require('express');
+const router = express.Router();
+const {
+  obtenerUsuarios,
+  obtenerUsuarioPorId,
+  crearUsuario,
+  actualizarUsuario,
+  eliminarUsuario
+} = require('../controllers/userController');
+
+// Importar el middleware
+const { proteger } = require('../middleware/auth');
+
+// PUBLICA: ver listado
+router.get('/', obtenerUsuarios);
+
+// PROTEGIDAS: requieren token
+router.get('/:id', proteger, obtenerUsuarioPorId);
+router.post('/', proteger, crearUsuario);
+router.put('/:id', proteger, actualizarUsuario);
+router.delete('/:id', proteger, eliminarUsuario);
+
+module.exports = router;</code></pre>
+    </div>
+
+    <h2>Prueba cada ruta</h2>
+    <p>Una vez que protejas las rutas, prueba cada una en Postman <strong>dos veces</strong>:</p>
+    <ol>
+        <li><strong>Sin token:</strong> Deberia devolver 401. Si lo hace, la proteccion funciona.</li>
+        <li><strong>Con token:</strong> Deberia funcionar normalmente. Si lo hace, no rompiste nada.</li>
+    </ol>
+
+    <div class="tip">
+        <p><strong>Regla de oro para proteger rutas:</strong> Si la ruta lee datos sensibles, los modifica, o los borra &rarr; protegela. Si la ruta muestra informacion publica que cualquier visitante deberia ver (como un catalogo de productos) &rarr; dejala abierta. En la duda, protege. Siempre es mas facil abrir una puerta que ya tenia cerradura que ponerle cerradura a una puerta que ya estaba abierta.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s13')">&larr; Anterior</button>
+        <button class="nav-btn" onclick="goNext('s15')">Siguiente: Resumen y checklist &rarr;</button>
+    </div>
+</div>
+
+<!-- ============ S15: RESUMEN Y CHECKLIST ============ -->
+<div id="s15" class="section">
+    <div class="eyebrow">Cierre</div>
+    <h1>Resumen y checklist final</h1>
+    <p class="lead">Recapitulemos todo lo que construiste en este ejercicio y asegurate de que no te falto nada.</p>
+
+    <h2>Lo que construiste</h2>
+    <div class="card-grid">
+        <div class="card">
+            <span class="tag tag-simple">Archivo nuevo</span>
+            <h4>middleware/auth.js</h4>
+            <p>El portero: extrae el token del header, lo verifica con <code>jwt.verify()</code>, busca al usuario en MongoDB, y lo pone en <code>req.usuario</code>.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-simple">Archivo nuevo</span>
+            <h4>routes/privadaRoutes.js</h4>
+            <p>Dos rutas protegidas: <code>/dashboard</code> y <code>/mi-perfil</code>. Ambas pasan por el middleware antes del controlador.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-simple">Archivo nuevo</span>
+            <h4>controllers/privadaController.js</h4>
+            <p>La logica que usa <code>req.usuario</code> para devolver datos personalizados. No sabe nada de tokens.</p>
+        </div>
+        <div class="card">
+            <span class="tag tag-medium">Modificado</span>
+            <h4>server.js</h4>
+            <p>Se agrego <code>app.use('/api/privada', privadaRoutes)</code> para registrar las nuevas rutas.</p>
+        </div>
+    </div>
+
+    <h2>Los 4 escenarios que probaste</h2>
+    <table>
+        <tr><th>Escenario</th><th>Que pasa en el middleware</th><th>Resultado</th></tr>
+        <tr><td>Sin token</td><td>Paso 2: no encontro token</td><td>401 "No hay token"</td></tr>
+        <tr><td>Token falso</td><td>Paso 3: <code>jwt.verify()</code> fallo (firma invalida)</td><td>401 "Token invalido"</td></tr>
+        <tr><td>Token valido</td><td>Todos los pasos OK, llama a <code>next()</code></td><td>200 + datos</td></tr>
+        <tr><td>Token expirado</td><td>Paso 3: <code>jwt.verify()</code> fallo (expirado)</td><td>401 "Token expirado"</td></tr>
+    </table>
+
+    <h2>Conceptos clave que aprendiste</h2>
+    <ul>
+        <li><strong>Middleware:</strong> Una funcion que se ejecuta ENTRE la peticion y el controlador. Puede dejar pasar (<code>next()</code>) o bloquear (responder con error).</li>
+        <li><strong>Bearer Token:</strong> El formato estandar para enviar JWT: <code>Authorization: Bearer &lt;token&gt;</code></li>
+        <li><strong><code>jwt.verify()</code>:</strong> La funcion que valida la firma y la expiracion. Si algo falla, lanza error.</li>
+        <li><strong><code>req.usuario</code>:</strong> La forma de pasar informacion del middleware al controlador. El middleware lo escribe, el controlador lo lee.</li>
+        <li><strong>401 vs 403:</strong> 401 = "no se quien eres" (autenticacion). 403 = "se quien eres pero no puedes" (autorizacion).</li>
+    </ul>
+
+    <h2>Checklist final</h2>
+    <div class="exercise">
+        <span class="exercise-label">Verificacion</span>
+        <h3>Confirma que todo funciona</h3>
+        <ul class="checklist">
+            <li>El servidor arranca sin errores</li>
+            <li>El login devuelve un token</li>
+            <li><code>GET /api/privada/dashboard</code> SIN token devuelve 401</li>
+            <li><code>GET /api/privada/dashboard</code> con token FALSO devuelve 401</li>
+            <li><code>GET /api/privada/dashboard</code> con token REAL devuelve 200 y tu nombre</li>
+            <li><code>GET /api/privada/mi-perfil</code> con token REAL devuelve tu perfil</li>
+            <li>El <code>.env</code> tiene <code>JWT_EXPIRES_IN=1d</code> (restaurado)</li>
+            <li>Los archivos estan en la estructura correcta</li>
+        </ul>
+    </div>
+
+    <h2>Estructura final de tu proyecto</h2>
+    <div class="code-block">
+        <div class="code-header"><span class="code-filename">Tu proyecto ahora</span></div>
+        <pre><code class="language-text">proyecto/
+├── models/
+│   └── User.js
+├── routes/
+│   ├── userRoutes.js
+│   ├── authRoutes.js
+│   └── privadaRoutes.js       ← NUEVO
+├── controllers/
+│   ├── userController.js
+│   ├── authController.js
+│   └── privadaController.js   ← NUEVO
+├── middleware/
+│   └── auth.js                ← NUEVO
+├── config/
+│   └── db.js
+├── server.js                  ← modificado
+├── package.json
+└── .env</code></pre>
+    </div>
+
+    <h2>Proximo paso</h2>
+    <p>Con esto tienes la base completa de autenticacion. Los siguientes pasos naturales son:</p>
+    <ul>
+        <li><strong>Proteger tus rutas CRUD existentes</strong> con el mismo middleware (el reto de la seccion anterior)</li>
+        <li><strong>Agregar autorizacion por roles</strong> (que solo admins puedan borrar)</li>
+        <li><strong>Conectar un frontend</strong> que haga login y envie el token automaticamente</li>
+    </ul>
+
+    <div class="success">
+        <p><strong>Felicitaciones.</strong> Tu API ya tiene puertas con cerradura. Ya no es una casa abierta donde cualquiera entra. Ahora tienes un portero que pide credenciales, verifica la identidad, y solo deja pasar a quien debe pasar. Eso es autenticacion con JWT en accion.</p>
+    </div>
+
+    <div class="section-nav">
+        <button class="nav-btn" onclick="goNext('s14')">&larr; Anterior</button>
+        <button class="nav-btn" disabled>Fin del ejercicio &#10003;</button>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function go(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (el) el.classList.add('active');
+    document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.main').scrollTop = 0;
+}
+
+function goNext(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const items = document.querySelectorAll('.nav-item');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const map = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15'];
+    const idx = map.indexOf(id);
+    if (idx >= 0 && items[idx]) items[idx].classList.add('active');
+    document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cp(btn) {
+    const code = btn.parentElement.nextElementSibling.querySelector('code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        btn.textContent = '✓ Copiado';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+    });
+}
+
+document.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+</script>
+</body>
+</html>
